@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
+import { FaLock, FaUser } from "react-icons/fa";
 
-const loginForm = () => {
+const LoginForm = () => {
   return (
     <div>
       <form action="">
         <h1>Login</h1>
         <div className="input-box">
           <input type="text" placeholder="Username" required />
-          {/*<FaUser className="icon" />*/}
+          <FaUser className="icon" />
         </div>
         <div className="input-box">
           <input type="password" placeholder="Password" required />
-          {/*<FaLock className="icon" />*/}
+          <FaLock className="icon" />
         </div>
         <div className="remember-me-button">
           <label>
@@ -28,4 +29,4 @@ const loginForm = () => {
   );
 };
 
-export default loginForm;
+export default LoginForm;
