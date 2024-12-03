@@ -17,11 +17,18 @@ const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <div>
-          <header>
-            <Link to="/login">Selfie!</Link>
-          </header>
+
+        <div class="banner">
+          <div class="prodotto">
+
+            <Link to="/login">  <button class="palla" style="--url: url(freepik-export-20241130173751DCNm.png)">
+            </button>
+
+            <button class="palla" style="--url: url(1000_F_168326327_hUfexGoYOi9IAB9DFzLY0DvkRHKGBqpi.jpg)">
+            </button></Link>
+          </div>
         </div>
+
         <Routes>
           <Route path="/login" element={<LoginForm />} />
         </Routes>
