@@ -1,4 +1,6 @@
-import { connect } from "mongoose";
+import mongoose from "mongoose";
+
+const { connect } = mongoose;
 import { config } from "dotenv";
 
 config();

@@ -7,15 +7,17 @@ config();
 
 export default defineConfig({
   server: {
+    // Specify a different port for the Vite HMR to avoid conflicts
     hmr: {
-      port: process.env.PORT || 3000,
+      port: process.env.VITE_HMR_PORT || 5532,
     },
+    port: process.env.VITE_PORT || 3532, // Ensure Vite's dev server runs on a separate port
   },
   plugins: [
     react(),
     VitePluginNode({
       adapter: "express",
-      appPath: "./src/server/server.js", // Changed from addPath to appPath
+      appPath: "./src/server/server.js",
       exportName: "ViteNodeApp",
     }),
   ],

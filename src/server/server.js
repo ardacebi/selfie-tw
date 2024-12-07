@@ -2,8 +2,10 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import { connectDB } from "./config/db.js";
 import AccountHandling from "./routes/AccountHandling.route.js";
+import mongoose from "mongoose";
 
-const port = process.env.PORT || 3000;
+const { models } = mongoose;
+const port = process.env.VITE_HMR_PORT || 5532;
 
 export const ViteNodeApp = async () => {
   const app = express();
@@ -13,9 +15,7 @@ export const ViteNodeApp = async () => {
   });
 
   app.use(vite.middlewares);
-
-  app.use(express.json()); //allows to accept JSON data in the body of the request
-
+  app.use(express.json()); // Allows accepting JSON data in the body of the request
   app.use("/api/account", AccountHandling);
 
   app.use("*", async (req, res) => {
@@ -49,10 +49,15 @@ export const ViteNodeApp = async () => {
     }
   });
 
-  app.listen(port, () => {
-    connectDB();
-    console.log(`Server is running at http://localhost:${port}`);
-  });
+  // Remove the app.listen call
+  // app.listen(port, () => {
+  //   connectDB();
+  //   console.log(`Server is running at http://localhost:${port}`);
+  // });
+
+  // Initialize the database connection
+  await connectDB();
+  console.log(`Server is running at http://localhost:${port}`);
 
   return app;
 };
