@@ -1,15 +1,19 @@
 const express = require("express");
-const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+//const cors = require("cors");
+
+const connectDB = require("./db.js");
 const uri =
   "mongodb+srv://aledamb:Jhf7tygg1tYjXKhJ@clustertechwebselfiepro.1x9uk.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTechWebSelfieProject";
 
-const app = express();
-const port = 3000;
 
+const app = express()  
+const port = 3000;
+/*
 app.use(cors());
 app.use(express.json());
+*/
 
+/*
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -18,6 +22,8 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+
 
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
@@ -38,6 +44,9 @@ app.post("/api/login", async (req, res) => {
     await client.close();
   }
 });
+*/
+
+connectDB()
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
