@@ -1,9 +1,11 @@
 {
   "name": "selfie-tw-project",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:server": "nodemon src/server/server.js",
+    "dev:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
@@ -12,17 +14,19 @@
   },
   "type": "module",
   "keywords": [],
-  "author": "Alessandro D'Ambrosio, Arda Çebi, Emanuele Dessi",
+  "author": "Alessandro D'Ambrosio, Arda Çebi",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.1",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "nodemon": "^3.1.9",
     "prettier": "^3.3.3",
     "vite": "^5.1.8"
   },
@@ -36,7 +40,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.3.0",
-    "react-router-dom": "^6.4.1",
-    "vite-plugin-node": "^4.0.0"
+    "react-router-dom": "^6.4.1"
   }
 }

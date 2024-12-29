@@ -1,63 +1,43 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
+//import { createServer as createViteServer } from "vite";
 import { connectDB } from "./config/db.js";
 import AccountHandling from "./routes/AccountHandling.route.js";
-import mongoose from "mongoose";
+import { config } from "dotenv";
 
-const { models } = mongoose;
-const port = process.env.VITE_HMR_PORT || 5532;
+config();
 
-export const ViteNodeApp = async () => {
-  const app = express();
+const port = process.env.NODE_PORT || 5532;
 
-  const vite = await createViteServer({
-    server: { middlewareMode: "ssr" },
-  });
+const app = express();
 
-  app.use(vite.middlewares);
-  app.use(express.json()); // Allows accepting JSON data in the body of the request
-  app.use("/api/account", AccountHandling);
+//I tried to use vite-plugin-node to start the server, but it didn't work
+/*
+const vite = await createViteServer({
+  server: { middlewareMode: "ssr" },
+});
 
-  app.use("*", async (req, res) => {
-    try {
-      const url = req.originalUrl;
+app.use(vite.middlewares);
+*/
+app.use(express.json()); // Allows accepting JSON data in the body of the request
+app.use("/api/account", AccountHandling);
 
-      let template = await vite.transformIndexHtml(
-        url,
-        `
-        <!doctype html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Selfie!</title>
-          </head>
-          <body>
-            <div id="root">not rendered</div>
+app.get("*", async (req, res) => {
+  try {
+    const url = req.originalUrl;
 
-            <script type="module" src="./client/App.jsx"></script>
-          </body>
-        </html>
-      `,
-      );
+    res.status(200).set({ "Content-Type": "text/html" }).end(template);
+  } catch (e) {
+    //I tried to use vite-plugin-node to start the server, but it didn't work
+    //vite.ssrFixStacktrace(e);
+    console.error(e);
+    res.status(500).end(e.message);
+  }
+});
 
-      res.status(200).set({ "Content-Type": "text/html" }).end(template);
-    } catch (e) {
-      vite.ssrFixStacktrace(e);
-      console.error(e);
-      res.status(500).end(e.message);
-    }
-  });
-
-  // Remove the app.listen call
-  // app.listen(port, () => {
-  //   connectDB();
-  //   console.log(`Server is running at http://localhost:${port}`);
-  // });
-
-  // Initialize the database connection
-  await connectDB();
+app.listen(port, () => {
+  connectDB();
   console.log(`Server is running at http://localhost:${port}`);
+});
 
-  return app;
-};
+//I tried to use vite-plugin-node to start the server, but it didn't work
+//export const viteNodeApp = app;

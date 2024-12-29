@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
+import { config } from "dotenv";
 
 const { connect } = mongoose;
-import { config } from "dotenv";
 
 config();
 
