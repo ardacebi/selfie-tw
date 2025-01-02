@@ -1,7 +1,6 @@
-async function fetchLoginData({ queryKey }) {
-  const { username, password } = queryKey[1];
+async function fetchLoginData({ username, password }) {
   const res = await fetch("http://localhost:5000/api/account/login", {
-    method: "GET",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },

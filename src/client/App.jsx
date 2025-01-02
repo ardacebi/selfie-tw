@@ -1,7 +1,7 @@
 import { Link, BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
-import LoginForm from "./pages/LoginForm"; //eslint-disable-line
+import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 
 const queryClient = new QueryClient({

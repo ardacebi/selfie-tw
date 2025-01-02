@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
@@ -9,7 +9,14 @@ const SignUpForm = () => {
     username: "",
     password: "",
   });
-  const results = useQuery(["sign_up", createAccountData], postAccountData);
+  const mutateAccount = useMutation(postAccountData, {
+    onSuccess: (data) => {
+      console.log('Account created successfuly! ', data);
+    },
+    onError: (error) => {
+      console.error('Error creating account: ', error);
+    },
+  });
   return (
     <div>
       <form
@@ -21,7 +28,7 @@ const SignUpForm = () => {
             username: formData.get("username") ?? "",
             password: formData.get("password") ?? "",
           };
-          setCreateAccountData(userDataObj);
+          mutateAccount.mutate(userDataObj);
         }}
       >
         <h1>Sign Up</h1>
@@ -50,7 +57,7 @@ const SignUpForm = () => {
             <FaLock className="icon" />
           </div>
         </label>
-        <button type="submit">Login</button>
+        <button type="submit">Create Account</button>
 
         <Link to="/login">Already have an account?</Link>
       </form>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 
 const LoginForm = () => {
@@ -9,7 +9,14 @@ const LoginForm = () => {
     username: "",
     password: "",
   });
-  const results = useQuery(["login", requestLoginData], fetchLoginData);
+  const mutateAccount = useMutation(fetchLoginData, {
+    onSuccess: (data) => {
+      console.log('Account found! Logged in! ', data);
+    },
+    onError: (error) => {
+      console.error('Error finding account: ', error);
+    },
+  });
   return (
     <div>
       <form
@@ -21,7 +28,7 @@ const LoginForm = () => {
             username: formData.get("username") ?? "",
             password: formData.get("password") ?? "",
           };
-          setRequestLoginData(userDataObj);
+          mutateAccount.mutate(userDataObj);
         }}
       >
         <h1>Login</h1>

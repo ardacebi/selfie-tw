@@ -1,5 +1,4 @@
-async function postAccountData({ queryKey }) {
-    const { username, password } = queryKey[1];
+async function postAccountData({ username, password }) {
     const res = await fetch("http://localhost:5000/api/account/sign_up", {
       method: "POST",
       headers: {
