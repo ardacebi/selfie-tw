@@ -19,11 +19,13 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <div>
           <header>
-            <Link to="/login">Selfie!</Link>
+            <Link to="/">Selfie!</Link>
+            <Link to="/login">Login</Link>
           </header>
         </div>
         <Routes>
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/" />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

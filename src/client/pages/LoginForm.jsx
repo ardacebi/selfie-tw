@@ -25,36 +25,41 @@ const LoginForm = () => {
         }}
       >
         <h1>Login</h1>
-        <div className="input-box">
-          <input
-            name="username"
-            id="username"
-            type="text"
-            placeholder="Username"
-            required
-          />
-          <FaUser className="icon" />
-        </div>
-        <div className="input-box">
-          <input
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <FaLock className="icon" />
-        </div>
+        <label htmlFor="username">
+          <div className="input-box">
+            <input
+              name="username"
+              id="username"
+              type="text"
+              placeholder="Username"
+              required
+            />
+            <FaUser className="icon" />
+          </div>
+        </label>
+
+        <label htmlFor="password">
+          <div className="input-box">
+            <input
+              name="password"
+              id="password"
+              type="password"
+              placeholder="Password"
+              required
+            />
+            <FaLock className="icon" />
+          </div>
+        </label>
         <div className="remember-me-button">
           <label>
             <input type="checkbox" />
             Remember Me
-            <Link to="/register">Don't have an account?</Link>
-            <Link to="/forgot-password">Forgot Password?</Link>
           </label>
         </div>
-
         <button type="submit">Login</button>
+
+        <Link to="/register">Don't have an account?</Link>
+        <Link to="/forgot-password">Forgot Password?</Link>
       </form>
     </div>
   );
