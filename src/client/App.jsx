@@ -2,6 +2,7 @@ import { Link, BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm"; //eslint-disable-line
+import SignUpForm from "./pages/SignUpForm";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,11 +22,13 @@ const App = () => {
           <header>
             <Link to="/">Selfie!</Link>
             <Link to="/login">Login</Link>
+            <Link to="/sign_up">Sign Up</Link>
           </header>
         </div>
         <Routes>
-          <Route path="/login" element={<LoginForm />} />
           <Route path="/" />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/sign_up" element={<SignUpForm />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

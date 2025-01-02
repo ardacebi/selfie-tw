@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
-import fetchLoginData from "../data_fetching/fetchLoginData.js";
+import postAccountData from "../data_creation/postAccountData.js";
 
-const LoginForm = () => {
-  const [requestLoginData, setRequestLoginData] = useState({
+const SignUpForm = () => {
+  const [createAccountData, setCreateAccountData] = useState({
     username: "",
     password: "",
   });
-  const results = useQuery(["login", requestLoginData], fetchLoginData);
+  const results = useQuery(["sign_up", createAccountData], postAccountData);
   return (
     <div>
       <form
@@ -21,10 +21,10 @@ const LoginForm = () => {
             username: formData.get("username") ?? "",
             password: formData.get("password") ?? "",
           };
-          setRequestLoginData(userDataObj);
+          setCreateAccountData(userDataObj);
         }}
       >
-        <h1>Login</h1>
+        <h1>Sign Up</h1>
         <label htmlFor="username">
           <div className="input-box">
             <input
@@ -50,19 +50,12 @@ const LoginForm = () => {
             <FaLock className="icon" />
           </div>
         </label>
-        <div className="remember-me-button">
-          <label>
-            <input type="checkbox" />
-            Remember Me
-          </label>
-        </div>
         <button type="submit">Login</button>
 
-        <Link to="/sign_up">Don't have an account?</Link>
-        <Link to="/forgot-password">Forgot Password?</Link>
+        <Link to="/login">Already have an account?</Link>
       </form>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignUpForm;
