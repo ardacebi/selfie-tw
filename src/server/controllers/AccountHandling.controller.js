@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 const { Types } = mongoose;
-
 import ProfileData from "../models/ProfileData.model.js";
 
 export const accountSignUp = async (req, res) => {

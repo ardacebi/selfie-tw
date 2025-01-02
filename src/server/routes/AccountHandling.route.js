@@ -11,7 +11,7 @@ const router = Router();
 
 router.post("/sign_up", accountSignUp);
 
-router.get("/login", accountLogin);
+router.post("/login", accountLogin);
 
 router.patch("/change_username/:id", changeUsername);
 

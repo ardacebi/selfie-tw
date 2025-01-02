@@ -2,19 +2,19 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
-import fetchLoginData from "../data_fetching/fetchLoginData.js";
+import postAccountData from "../data_creation/postAccountData.js";
 
-const LoginForm = () => {
-  const [requestLoginData, setRequestLoginData] = useState({
+const SignUpForm = () => {
+  const [createAccountData, setCreateAccountData] = useState({
     username: "",
     password: "",
   });
-  const mutateAccount = useMutation(fetchLoginData, {
+  const mutateAccount = useMutation(postAccountData, {
     onSuccess: (data) => {
-      console.log('Account found! Logged in! ', data);
+      console.log('Account created successfuly! ', data);
     },
     onError: (error) => {
-      console.error('Error finding account: ', error);
+      console.error('Error creating account: ', error);
     },
   });
   return (
@@ -31,7 +31,7 @@ const LoginForm = () => {
           mutateAccount.mutate(userDataObj);
         }}
       >
-        <h1>Login</h1>
+        <h1>Sign Up</h1>
         <label htmlFor="username">
           <div className="input-box">
             <input
@@ -57,19 +57,12 @@ const LoginForm = () => {
             <FaLock className="icon" />
           </div>
         </label>
-        <div className="remember-me-button">
-          <label>
-            <input type="checkbox" />
-            Remember Me
-          </label>
-        </div>
-        <button type="submit">Login</button>
+        <button type="submit">Create Account</button>
 
-        <Link to="/sign_up">Don't have an account?</Link>
-        <Link to="/forgot-password">Forgot Password?</Link>
+        <Link to="/login">Already have an account?</Link>
       </form>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignUpForm;
