@@ -2,7 +2,7 @@
 
 ## Questa è la repository del progetto di Tecnologie Web dell'anno 2024/2025 dell'Alma Mater Studiorum, Università di Bologna
 
-### Autori: Alessandro D'Ambrosio, Arda Çebi, Emanuele Dessi
+### Autori: Alessandro D'Ambrosio, Arda Çebi
 
 ## Dependencies:
 
