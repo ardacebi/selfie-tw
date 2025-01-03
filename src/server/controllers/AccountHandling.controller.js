@@ -3,16 +3,33 @@ const { Types } = mongoose;
 import ProfileData from "../models/ProfileData.model.js";
 
 export const accountSignUp = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, username, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !username || !password) {
     return res.status(400).json({
       success: false,
-      message: "Please provide username and password",
+      message: "Please provide email, username and password",
+    });
+  }
+
+  if (!email.includes('@')){
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a valid email",
+    });
+  }
+
+
+  const profileData = await ProfileData.findOne({ email});
+  if (profileData) {
+    return res.status(400).json({
+      success: false,
+      message: "There already exists an account associated with this email",
     });
   }
 
   const newProfileData = new ProfileData({
+    email,
     username,
     password,
   });
@@ -74,10 +91,18 @@ export const changeUsername = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
+  const { email, password } = req.body;
 
   if (!Types.ObjectId.isValid(id)) {
     return res.status(404).json({ success: false, message: "Invalid User ID" });
+  }
+
+  const profileData = await ProfileData.findOne({ email });
+  if (!profileData) {
+    return res.status(404).json({
+      success: false,
+      message: "No account is associated with this email",
+    });
   }
 
   try {
@@ -103,3 +128,25 @@ export const deleteAccount = async (req, res) => {
     res.status(404).json({ success: false, message: "Profile not found" });
   }
 };
+
+export const getProfileIDByEmail = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ success: false, message: 'Invalid email', userID: null});
+  }
+
+  try {
+    const profileData = await ProfileData.findOne({ email });
+    if (!profileData) {
+      // Handle null, don’t return success
+      return res.status(404).json({ success: false, message: 'User not found', userID: null });
+    }
+    return res.status(200).json({ success: true, message:'User found', userID: profileData._id });
+  }
+  catch(error){
+    return res.status(500).json({ success: false, message: error.message, userID: null });
+  }
+  
+  
+}

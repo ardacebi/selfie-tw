@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
+import ForgotPasswordForm from "./pages/ForgotPasswordForm";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +30,8 @@ const App = () => {
           <Route path="/" />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/sign_up" element={<SignUpForm />} />
+          {/*<Route path="/forgot_password" element={<ForgotPasswordForm />} />*/}
+          <Route path="/forgot_password" element={<ForgotPasswordForm />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>
