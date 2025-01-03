@@ -5,6 +5,7 @@ import {
   changePassword,
   changeUsername,
   deleteAccount,
+  getProfileIDByEmail,
 } from "../controllers/AccountHandling.controller.js";
 
 const router = Router();
@@ -18,5 +19,7 @@ router.patch("/change_username/:id", changeUsername);
 router.patch("/change_password/:id", changePassword);
 
 router.delete("/delete_account/:id", deleteAccount);
+
+router.post("/find_user_id_by_email", getProfileIDByEmail);
 
 export default router;

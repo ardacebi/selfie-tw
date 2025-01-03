@@ -1,15 +1,14 @@
-import { Link } from "react-router-dom";
-import { FaLock, FaUser, FaMailBulk } from "react-icons/fa";
+import { FaLock, FaMailBulk } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
-import postAccountData from "../data_creation/postAccountData.js";
+import postNewPassword from "../data_creation/postNewPassword.js";
 
-const SignUpForm = () => {
-  const mutateAccount = useMutation(postAccountData, {
+const ForgotPasswordForm = () => {
+  const mutateAccount = useMutation(postNewPassword, {
     onSuccess: (data) => {
-      console.log('Account created successfuly! ', data);
+      console.log('Account found! Password changed! ', data);
     },
     onError: (error) => {
-      console.error('Error creating account: ', error);
+      console.error('Error changing password: ', error);
     },
   });
   return (
@@ -21,14 +20,12 @@ const SignUpForm = () => {
           const formData = new FormData(e.target);
           const userDataObj = {
             email: formData.get("email") ?? "",
-            username: formData.get("username") ?? "",
             password: formData.get("password") ?? "",
           };
           mutateAccount.mutate(userDataObj);
         }}
       >
-        <h1>Sign Up</h1>
-
+        <h1>Change Password</h1>
         <label htmlFor="email">
           <div className="input-box">
             <input
@@ -42,37 +39,22 @@ const SignUpForm = () => {
           </div>
         </label>
 
-        <label htmlFor="username">
-          <div className="input-box">
-            <input
-              name="username"
-              id="username"
-              type="text"
-              placeholder="Username"
-              required
-            />
-            <FaUser className="icon" />
-          </div>
-        </label>
-
         <label htmlFor="password">
           <div className="input-box">
             <input
               name="password"
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="New Password"
               required
             />
             <FaLock className="icon" />
           </div>
         </label>
-        <button type="submit">Create Account</button>
-
-        <Link to="/login">Already have an account?</Link>
+        <button type="submit">Change Password</button>
       </form>
     </div>
   );
 };
 
-export default SignUpForm;
+export default ForgotPasswordForm;
