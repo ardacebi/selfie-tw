@@ -6,7 +6,7 @@ config();
 
 export default defineConfig({
   server: {
-    port: process.env.VITE_PORT || 3532, // Ensure Vite's dev server runs on a separate port
+    port: process.env.VITE_PORT || 3000,
   },
   plugins: [react()],
   root: "src",

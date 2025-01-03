@@ -8,7 +8,8 @@ async function fetchLoginData({ username, password }) {
   });
 
   if (!res.ok) {
-    throw new Error(`No user found with this username or password`);
+    const {message} = await res.json();
+    throw new Error(`${message}`);
   }
 
   return res.json();
