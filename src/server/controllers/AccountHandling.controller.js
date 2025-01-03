@@ -61,7 +61,7 @@ export const accountLogin = async (req, res) => {
 
   try {
     const profileData = await ProfileData.findOne({ username, password });
-    if(profileData === null)
+    if(!profileData)
       res.status(404).json({ success:false, message: "This user does not exist"});
     res.status(200).json({ success: true, data: profileData });
   } catch (error) {
