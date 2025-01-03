@@ -1,6 +1,6 @@
 async function postNewPassword({ email, password }) {
 
-  const IDres = await fetch("http://localhost:5000/api/account/find_user_id_by_email", {
+  const IDres = await fetch(`http://localhost:5000/api/account/find_user_id_by_email`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,7 +27,8 @@ async function postNewPassword({ email, password }) {
     });
   
     if (!res.ok) {
-      throw new Error(`Can't change password`);
+      const {message} = await res.json();
+      throw new Error(`${message}`);
     }
   
     return res.json();

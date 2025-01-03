@@ -8,7 +8,8 @@ async function postAccountData({ email, username, password }) {
     });
   
     if (!res.ok) {
-      throw new Error(`New User creation error`);
+      const {message} = await res.json();
+      throw new Error(`${message}`);
     }
   
     return res.json();
