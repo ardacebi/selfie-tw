@@ -6,7 +6,7 @@ import { config } from "dotenv";
 
 config();
 
-const port = process.env.NODE_PORT || 5000;
+const port = process.env.NODE_PORT || 5001;
 
 const app = express();
 
