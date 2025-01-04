@@ -52,15 +52,14 @@ const LoginForm = () => {
           </div><br></br>
         </label>
         <div className="remember-me-button">
-          <label style={{ color: 'black' }}>
+          <label style={{ color: '#9A9A9A' }}>
             <input type="checkbox" />
-            Remember Me
+            Remember me
           </label>
         </div><br></br>
-        <button type="submit" style={styles.button}>Login</button><br></br><br></br><br></br>
+        <button type="submit" style={styles.button}>Login</button><br></br><br></br>
 
-        <Link to="/sign_up">Don't have an account?</Link><br></br><br></br>
-        <Link to="/forgot_password">Forgot Password?</Link>
+        <Link style={styles.forgot} to="/forgot_password">Forgot your password?</Link>
       </form>
     </div>
   );
@@ -89,6 +88,11 @@ const styles = {
     fontSize: '16px', 
     color: '#000', 
     transition: 'background-color 0.3s, border-color 0.3s', 
+    textDecoration: 'none',
+  },
+
+  forgot: {
+    color: '#9A9A9A',
     textDecoration: 'none',
   },
 };

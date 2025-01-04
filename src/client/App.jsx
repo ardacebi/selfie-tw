@@ -60,7 +60,7 @@ const styles = {
     padding: '10px',
     display: 'inline-block',
     marginTop: '200px',
-    marginBottom: '50px',
+    marginBottom: '30px',
   },
   mainContent: {
     display: 'flex',
