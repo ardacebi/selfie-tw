@@ -25,36 +25,71 @@ const ForgotPasswordForm = () => {
           mutateAccount.mutate(userDataObj);
         }}
       >
-        <h1>Change Password</h1>
+        <h1 style={styles.title}>Forgot Password</h1>
         <label htmlFor="email">
           <div className="input-box">
-            <input
+            <input style={styles.field}
               name="email"
               id="email"
               type="text"
               placeholder="Email"
               required
             />
-            <FaMailBulk className="icon" />
-          </div>
+          </div><br></br>
         </label>
 
         <label htmlFor="password">
           <div className="input-box">
-            <input
+            <input style={styles.field}
               name="password"
               id="password"
               type="password"
               placeholder="New Password"
               required
             />
-            <FaLock className="icon" />
-          </div>
+          </div><br></br>
         </label>
-        <button type="submit">Change Password</button>
+        <button type="submit" style={styles.button}>Change Password</button>
       </form>
     </div>
   );
+};
+
+const styles = {
+  field: {
+    backgroundColor: '#fff', 
+    border: '2px solid #dcdcdc',
+    borderRadius: '10px',
+    width: '250px',
+    padding: '10px 25px', 
+    fontSize: '16px', 
+    color: '#000', 
+    transition: 'background-color 0.3s, border-color 0.3s', 
+    textDecoration: 'none',
+  },
+
+  button: {
+    backgroundColor: '#fff', 
+    border: '2px solid #dcdcdc',
+    borderRadius: '10px',
+    width: '300px',
+    cursor: 'pointer',
+    padding: '10px 25px', 
+    fontSize: '16px', 
+    color: '#000', 
+    transition: 'background-color 0.3s, border-color 0.3s', 
+    textDecoration: 'none',
+  },
+
+  forgot: {
+    color: '#9A9A9A',
+    textDecoration: 'none',
+  },
+
+  title: {
+    color: 'black',
+    textAlign: 'center',
+  } 
 };
 
 export default ForgotPasswordForm;
