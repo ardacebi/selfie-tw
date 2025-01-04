@@ -27,52 +27,75 @@ const SignUpForm = () => {
           mutateAccount.mutate(userDataObj);
         }}
       >
-        <h1>Sign Up</h1>
 
         <label htmlFor="email">
           <div className="input-box">
-            <input
+            <input style={styles.field}
               name="email"
               id="email"
               type="text"
               placeholder="Email"
               required
             />
-            <FaMailBulk className="icon" />
-          </div>
+          </div><br></br>
         </label>
 
         <label htmlFor="username">
           <div className="input-box">
-            <input
+            <input style={styles.field} 
               name="username"
               id="username"
               type="text"
               placeholder="Username"
               required
             />
-            <FaUser className="icon" />
-          </div>
+          </div><br></br>
         </label>
 
         <label htmlFor="password">
           <div className="input-box">
-            <input
+            <input style={styles.field}
               name="password"
               id="password"
               type="password"
               placeholder="Password"
               required
             />
-            <FaLock className="icon" />
-          </div>
+          </div><br></br>
         </label>
-        <button type="submit">Create Account</button>
+        <button type="submit" style={styles.button}>Create Account</button><br></br><br></br><br></br>
 
         <Link to="/login">Already have an account?</Link>
       </form>
     </div>
   );
+};
+
+const styles = {
+  field: {
+    backgroundColor: '#fff', 
+    border: '2px solid #dcdcdc',
+    borderRadius: '10px',
+    width: '250px',
+    padding: '10px 25px', 
+    fontSize: '16px', 
+    color: '#000', 
+    transition: 'background-color 0.3s, border-color 0.3s', 
+    textDecoration: 'none',
+  },
+
+  button: {
+    backgroundColor: '#fff', 
+    border: '2px solid #dcdcdc',
+    borderRadius: '10px',
+    width: '300px',
+    cursor: 'pointer',
+    padding: '10px 25px', 
+    fontSize: '16px', 
+    color: '#000', 
+    transition: 'background-color 0.3s, border-color 0.3s', 
+    textDecoration: 'none',
+  },
 };
 
 export default SignUpForm;
