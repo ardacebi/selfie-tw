@@ -1,4 +1,4 @@
-import { Link, BrowserRouter, Routes, Route } from "react-router-dom";
+import { Link, NavLink, BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm";
@@ -23,8 +23,8 @@ const App = () => {
             <div style={styles.form}>
               <img style={styles.logo} src="/client/assets/logo.png" alt="Selfie Logo"/><br></br>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Link style={{ ...styles.button, ...styles.button1 }} to="/login">Login</Link>
-                <Link style={styles.button} to="/sign_up">Sign Up</Link>
+                <NavLink style={({ isActive }) => ({ ...styles.button, ...styles.button1, backgroundColor: isActive ? '#e7e7e7' : '#fff', color: '#000' })} to="/login">Login</NavLink>
+                <NavLink style={({ isActive }) => ({ ...styles.button, backgroundColor: isActive ? '#e7e7e7' : '#fff', color: '#000' })} to="/sign_up">Sign Up</NavLink>
               </div>
             </div>
           </header>
