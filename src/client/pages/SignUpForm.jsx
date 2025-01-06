@@ -1,13 +1,23 @@
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
+  const [accountCreationError, setAccountCreationError] = useState("no error");
   const mutateAccount = useMutation(postAccountData, {
+    onMutate: () => {
+      document.querySelector("#error_text").style.visibility = "hidden";
+    },
     onSuccess: (data) => {
       console.log("Account created successfully! ", data);
+      setAccountCreationError("Success! You signed up!");
+      document.querySelector("#error_text").style.color = "green";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
     onError: (error) => {
-      console.error("Error creating account: ", error);
+      setAccountCreationError(error.message);
+      document.querySelector("#error_text").style.color = "red";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
   });
   return (
@@ -70,6 +80,12 @@ const SignUpForm = () => {
           Create Account
         </button>
       </form>
+
+      <div>
+        <p id="error_text" style={styles.error_text}>
+          {accountCreationError}
+        </p>
+      </div>
     </div>
   );
 };
@@ -98,6 +114,11 @@ const styles = {
     color: "#000",
     transition: "background-color 0.3s, border-color 0.3s",
     textDecoration: "none",
+  },
+  error_text: {
+    color: "gray",
+    fontSize: "18px",
+    visibility: "hidden",
   },
 };
 

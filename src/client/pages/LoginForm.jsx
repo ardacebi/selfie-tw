@@ -1,14 +1,26 @@
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 
 const LoginForm = () => {
+  const [accountCreationError, setAccountCreationError] = useState("no error");
+  const [rememberMe, setRememberMe] = useState(false);
+
   const mutateAccount = useMutation(fetchLoginData, {
+    onMutate: () => {
+      document.querySelector("#error_text").style.visibility = "hidden";
+    },
     onSuccess: (data) => {
       console.log("Account found! Logged in! ", data);
+      setAccountCreationError("Success! You logged in!");
+      document.querySelector("#error_text").style.color = "green";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
     onError: (error) => {
-      console.error("Error finding account: ", error);
+      setAccountCreationError(error.message);
+      document.querySelector("#error_text").style.color = "red";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
   });
   return (
@@ -54,7 +66,10 @@ const LoginForm = () => {
         </label>
         <div className="remember-me-button">
           <label style={{ color: "#9A9A9A" }}>
-            <input type="checkbox" />
+            <input
+              type="checkbox"
+              onChange={(event) => setRememberMe(event.target.checked)}
+            />
             Remember me
           </label>
         </div>
@@ -69,6 +84,12 @@ const LoginForm = () => {
           Forgot your password?
         </Link>
       </form>
+
+      <div>
+        <p id="error_text" style={styles.error_text}>
+          {accountCreationError}
+        </p>
+      </div>
     </div>
   );
 };
@@ -102,6 +123,11 @@ const styles = {
   forgot: {
     color: "#9A9A9A",
     textDecoration: "none",
+  },
+  error_text: {
+    color: "gray",
+    fontSize: "18px",
+    visibility: "hidden",
   },
 };
 

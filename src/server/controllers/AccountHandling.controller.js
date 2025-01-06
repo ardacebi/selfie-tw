@@ -67,12 +67,17 @@ export const accountLogin = async (req, res) => {
   }
 
   try {
-    const profileData = await ProfileData.findOne({ username, password });
-    if (profileData === null)
+    const passwordProfileData = await ProfileData.findOne({ password });
+    const usernameProfileData = await ProfileData.findOne({ username });
+    if (!usernameProfileData)
       return res
         .status(404)
         .json({ success: false, message: "This user does not exist" });
-    res.status(200).json({ success: true, data: profileData });
+    else if (!passwordProfileData)
+      return res
+        .status(404)
+        .json({ success: false, message: "The password is incorrect" });
+    res.status(200).json({ success: true, data: passwordProfileData });
   } catch (error) {
     console.log("Error Profile could not be found:", error);
     res.status(500).json({ success: false, message: error.message });
