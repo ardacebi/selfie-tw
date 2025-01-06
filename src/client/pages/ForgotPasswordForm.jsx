@@ -1,13 +1,24 @@
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import postNewPassword from "../data_creation/postNewPassword.js";
 
 const ForgotPasswordForm = () => {
+  const [accountCreationError, setAccountCreationError] = useState("no error");
+
   const mutateAccount = useMutation(postNewPassword, {
+    onMutate: () => {
+      document.querySelector("#error_text").style.visibility = "hidden";
+    },
     onSuccess: (data) => {
       console.log("Account found! Password changed! ", data);
+      setAccountCreationError("Success! The password has been changed!");
+      document.querySelector("#error_text").style.color = "green";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
     onError: (error) => {
-      console.error("Error changing password: ", error);
+      setAccountCreationError(error.message);
+      document.querySelector("#error_text").style.color = "red";
+      document.querySelector("#error_text").style.visibility = "visible";
     },
   });
   return (
@@ -56,6 +67,12 @@ const ForgotPasswordForm = () => {
           Change Password
         </button>
       </form>
+
+      <div>
+        <p id="error_text" style={styles.error_text}>
+          {accountCreationError}
+        </p>
+      </div>
     </div>
   );
 };
@@ -94,6 +111,12 @@ const styles = {
   title: {
     color: "black",
     textAlign: "center",
+  },
+
+  error_text: {
+    color: "gray",
+    fontSize: "18px",
+    visibility: "hidden",
   },
 };
 

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
@@ -68,7 +68,7 @@ const LoginForm = () => {
           <label style={{ color: "#9A9A9A" }}>
             <input
               type="checkbox"
-              onChange={(event) => setRememberMe(event.target.checked)}
+              onChange={(e) => setRememberMe(e.target.checked)}
             />
             Remember me
           </label>
@@ -80,9 +80,9 @@ const LoginForm = () => {
         <br></br>
         <br></br>
 
-        <Link style={styles.forgot} to="/forgot_password">
+        <NavLink style={styles.forgot} to="/forgot_password">
           Forgot your password?
-        </Link>
+        </NavLink>
       </form>
 
       <div>
@@ -124,6 +124,7 @@ const styles = {
     color: "#9A9A9A",
     textDecoration: "none",
   },
+
   error_text: {
     color: "gray",
     fontSize: "18px",

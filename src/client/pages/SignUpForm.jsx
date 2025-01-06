@@ -4,6 +4,7 @@ import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
   const [accountCreationError, setAccountCreationError] = useState("no error");
+
   const mutateAccount = useMutation(postAccountData, {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
@@ -115,6 +116,7 @@ const styles = {
     transition: "background-color 0.3s, border-color 0.3s",
     textDecoration: "none",
   },
+
   error_text: {
     color: "gray",
     fontSize: "18px",
