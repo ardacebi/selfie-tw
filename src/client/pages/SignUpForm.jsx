@@ -4,7 +4,7 @@ import postAccountData from "../data_creation/postAccountData.js";
 const SignUpForm = () => {
   const mutateAccount = useMutation(postAccountData, {
     onSuccess: (data) => {
-      console.log("Account created successfuly! ", data);
+      console.log("Account created successfully! ", data);
     },
     onError: (error) => {
       console.error("Error creating account: ", error);
