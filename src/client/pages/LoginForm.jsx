@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
-import { FaLock, FaUser } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 
 const LoginForm = () => {
   const mutateAccount = useMutation(fetchLoginData, {
     onSuccess: (data) => {
-      console.log('Account found! Logged in! ', data);
+      console.log("Account found! Logged in! ", data);
     },
     onError: (error) => {
-      console.error('Error finding account: ', error);
+      console.error("Error finding account: ", error);
     },
   });
   return (
@@ -26,45 +25,84 @@ const LoginForm = () => {
           mutateAccount.mutate(userDataObj);
         }}
       >
-        <h1>Login</h1>
         <label htmlFor="username">
           <div className="input-box">
             <input
+              style={styles.field}
               name="username"
               id="username"
               type="text"
               placeholder="Username"
               required
             />
-            <FaUser className="icon" />
           </div>
+          <br></br>
         </label>
 
         <label htmlFor="password">
           <div className="input-box">
             <input
+              style={styles.field}
               name="password"
               id="password"
               type="password"
               placeholder="Password"
               required
             />
-            <FaLock className="icon" />
           </div>
+          <br></br>
         </label>
         <div className="remember-me-button">
-          <label>
+          <label style={{ color: "#9A9A9A" }}>
             <input type="checkbox" />
-            Remember Me
+            Remember me
           </label>
         </div>
-        <button type="submit">Login</button>
+        <br></br>
+        <button type="submit" style={styles.button}>
+          Login
+        </button>
+        <br></br>
+        <br></br>
 
-        <Link to="/sign_up">Don't have an account?</Link>
-        <Link to="/forgot_password">Forgot Password?</Link>
+        <Link style={styles.forgot} to="/forgot_password">
+          Forgot your password?
+        </Link>
       </form>
     </div>
   );
+};
+
+const styles = {
+  field: {
+    backgroundColor: "#fff",
+    border: "2px solid #dcdcdc",
+    borderRadius: "10px",
+    width: "250px",
+    padding: "10px 25px",
+    fontSize: "16px",
+    color: "#000",
+    transition: "background-color 0.3s, border-color 0.3s",
+    textDecoration: "none",
+  },
+
+  button: {
+    backgroundColor: "#fff",
+    border: "2px solid #dcdcdc",
+    borderRadius: "10px",
+    width: "300px",
+    cursor: "pointer",
+    padding: "10px 25px",
+    fontSize: "16px",
+    color: "#000",
+    transition: "background-color 0.3s, border-color 0.3s",
+    textDecoration: "none",
+  },
+
+  forgot: {
+    color: "#9A9A9A",
+    textDecoration: "none",
+  },
 };
 
 export default LoginForm;
