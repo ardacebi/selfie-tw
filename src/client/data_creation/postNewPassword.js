@@ -11,7 +11,7 @@ async function postNewPassword({ email, password }) {
   );
 
   if (!IDres.ok) {
-    throw new Error("Error finding user ID");
+    throw new Error("Email not found");
   }
 
   const { userID } = await IDres.json();

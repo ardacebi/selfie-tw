@@ -185,7 +185,6 @@ export const getProfileIDByEmail = async (req, res) => {
   try {
     const profileData = await ProfileData.findOne({ email });
     if (!profileData) {
-      // Handle null, don’t return success
       return res
         .status(404)
         .json({ success: false, message: "User not found", userID: null });
