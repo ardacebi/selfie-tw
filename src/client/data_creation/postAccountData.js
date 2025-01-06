@@ -1,19 +1,18 @@
 async function postAccountData({ email, username, password }) {
-    const res = await fetch("http://localhost:5000/api/account/sign_up", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, username, password }),
-    });
-  
-    if (!res.ok) {
-      const {message} = await res.json();
-      throw new Error(`${message}`);
-    }
-  
-    return res.json();
+  const res = await fetch("http://localhost:5001/api/account/sign_up", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, username, password }),
+  });
+
+  if (!res.ok) {
+    const { message } = await res.json();
+    throw new Error(`${message}`);
   }
-  
-  export default postAccountData;
-  
+
+  return res.json();
+}
+
+export default postAccountData;

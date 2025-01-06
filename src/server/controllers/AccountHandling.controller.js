@@ -12,15 +12,14 @@ export const accountSignUp = async (req, res) => {
     });
   }
 
-  if (!email.includes('@')){
+  if (!email.includes("@")) {
     return res.status(400).json({
       success: false,
       message: "Please provide a valid email",
     });
   }
 
-
-  const profileData = await ProfileData.findOne({ email});
+  const profileData = await ProfileData.findOne({ email });
   if (profileData) {
     return res.status(400).json({
       success: false,
@@ -61,8 +60,10 @@ export const accountLogin = async (req, res) => {
 
   try {
     const profileData = await ProfileData.findOne({ username, password });
-    if(profileData === null)
-      res.status(404).json({ success:false, message: "This user does not exist"});
+    if (profileData === null)
+      return res
+        .status(404)
+        .json({ success: false, message: "This user does not exist" });
     res.status(200).json({ success: true, data: profileData });
   } catch (error) {
     console.log("Error Profile could not be found:", error);
@@ -134,21 +135,26 @@ export const deleteAccount = async (req, res) => {
 export const getProfileIDByEmail = async (req, res) => {
   const { email } = req.body;
 
-  if (!email || !email.includes('@')) {
-    return res.status(400).json({ success: false, message: 'Invalid email', userID: null});
+  if (!email || !email.includes("@")) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid email", userID: null });
   }
 
   try {
     const profileData = await ProfileData.findOne({ email });
     if (!profileData) {
       // Handle null, don’t return success
-      return res.status(404).json({ success: false, message: 'User not found', userID: null });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found", userID: null });
     }
-    return res.status(200).json({ success: true, message:'User found', userID: profileData._id });
+    return res
+      .status(200)
+      .json({ success: true, message: "User found", userID: profileData._id });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: error.message, userID: null });
   }
-  catch(error){
-    return res.status(500).json({ success: false, message: error.message, userID: null });
-  }
-  
-  
-}
+};

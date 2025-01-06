@@ -1,5 +1,5 @@
 async function fetchLoginData({ username, password }) {
-  const res = await fetch("http://localhost:5000/api/account/login", {
+  const res = await fetch("http://localhost:5001/api/account/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -8,7 +8,7 @@ async function fetchLoginData({ username, password }) {
   });
 
   if (!res.ok) {
-    const {message} = await res.json();
+    const { message } = await res.json();
     throw new Error(`${message}`);
   }
 

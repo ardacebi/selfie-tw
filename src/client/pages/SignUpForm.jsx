@@ -1,15 +1,13 @@
-import { Link } from "react-router-dom";
-import { FaLock, FaUser, FaMailBulk } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
 import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
   const mutateAccount = useMutation(postAccountData, {
     onSuccess: (data) => {
-      console.log('Account created successfuly! ', data);
+      console.log("Account created successfuly! ", data);
     },
     onError: (error) => {
-      console.error('Error creating account: ', error);
+      console.error("Error creating account: ", error);
     },
   });
   return (
@@ -27,44 +25,50 @@ const SignUpForm = () => {
           mutateAccount.mutate(userDataObj);
         }}
       >
-
         <label htmlFor="email">
           <div className="input-box">
-            <input style={styles.field}
+            <input
+              style={styles.field}
               name="email"
               id="email"
               type="text"
               placeholder="Email"
               required
             />
-          </div><br></br>
+          </div>
+          <br></br>
         </label>
 
         <label htmlFor="username">
           <div className="input-box">
-            <input style={styles.field} 
+            <input
+              style={styles.field}
               name="username"
               id="username"
               type="text"
               placeholder="Username"
               required
             />
-          </div><br></br>
+          </div>
+          <br></br>
         </label>
 
         <label htmlFor="password">
           <div className="input-box">
-            <input style={styles.field}
+            <input
+              style={styles.field}
               name="password"
               id="password"
               type="password"
               placeholder="Password"
               required
             />
-          </div><br></br>
+          </div>
+          <br></br>
         </label>
-        <button type="submit" style={styles.button}>Create Account</button>
-
+        <button type="submit" style={styles.button}>
+          Create Account
+        </button>
       </form>
     </div>
   );
@@ -72,28 +76,28 @@ const SignUpForm = () => {
 
 const styles = {
   field: {
-    backgroundColor: '#fff', 
-    border: '2px solid #dcdcdc',
-    borderRadius: '10px',
-    width: '250px',
-    padding: '10px 25px', 
-    fontSize: '16px', 
-    color: '#000', 
-    transition: 'background-color 0.3s, border-color 0.3s', 
-    textDecoration: 'none',
+    backgroundColor: "#fff",
+    border: "2px solid #dcdcdc",
+    borderRadius: "10px",
+    width: "250px",
+    padding: "10px 25px",
+    fontSize: "16px",
+    color: "#000",
+    transition: "background-color 0.3s, border-color 0.3s",
+    textDecoration: "none",
   },
 
   button: {
-    backgroundColor: '#fff', 
-    border: '2px solid #dcdcdc',
-    borderRadius: '10px',
-    width: '300px',
-    cursor: 'pointer',
-    padding: '10px 25px', 
-    fontSize: '16px', 
-    color: '#000', 
-    transition: 'background-color 0.3s, border-color 0.3s', 
-    textDecoration: 'none',
+    backgroundColor: "#fff",
+    border: "2px solid #dcdcdc",
+    borderRadius: "10px",
+    width: "300px",
+    cursor: "pointer",
+    padding: "10px 25px",
+    fontSize: "16px",
+    color: "#000",
+    transition: "background-color 0.3s, border-color 0.3s",
+    textDecoration: "none",
   },
 };
 
