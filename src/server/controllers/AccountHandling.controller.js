@@ -19,6 +19,34 @@ export const accountSignUp = async (req, res) => {
     });
   }
 
+  if (username.includes(" ")) {
+    return res.status(400).json({
+      success: false,
+      message: "Username cannot contain spaces",
+    });
+  }
+
+  if (username.includes("@")) {
+    return res.status(400).json({
+      success: false,
+      message: "Username cannot contain @",
+    });
+  }
+
+  if (password.includes(" ")) {
+    return res.status(400).json({
+      success: false,
+      message: "Password cannot contain spaces",
+    });
+  }
+
+  if (password.length < 5) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 5 characters long",
+    });
+  }
+
   const profileData = await ProfileData.findOne({ email });
   if (profileData) {
     return res.status(400).json({
