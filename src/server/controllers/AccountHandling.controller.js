@@ -19,6 +19,34 @@ export const accountSignUp = async (req, res) => {
     });
   }
 
+  if (username.includes(" ")) {
+    return res.status(400).json({
+      success: false,
+      message: "Username cannot contain spaces",
+    });
+  }
+
+  if (username.includes("@")) {
+    return res.status(400).json({
+      success: false,
+      message: "Username cannot contain @",
+    });
+  }
+
+  if (password.includes(" ")) {
+    return res.status(400).json({
+      success: false,
+      message: "Password cannot contain spaces",
+    });
+  }
+
+  if (password.length < 5) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 5 characters long",
+    });
+  }
+
   const profileData = await ProfileData.findOne({ email });
   if (profileData) {
     return res.status(400).json({
@@ -67,12 +95,17 @@ export const accountLogin = async (req, res) => {
   }
 
   try {
-    const profileData = await ProfileData.findOne({ username, password });
-    if (profileData === null)
+    const passwordProfileData = await ProfileData.findOne({ password });
+    const usernameProfileData = await ProfileData.findOne({ username });
+    if (!usernameProfileData)
       return res
         .status(404)
         .json({ success: false, message: "This user does not exist" });
-    res.status(200).json({ success: true, data: profileData });
+    else if (!passwordProfileData)
+      return res
+        .status(404)
+        .json({ success: false, message: "The password is incorrect" });
+    res.status(200).json({ success: true, data: passwordProfileData });
   } catch (error) {
     console.log("Error Profile could not be found:", error);
     res.status(500).json({ success: false, message: error.message });
