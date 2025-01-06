@@ -27,6 +27,14 @@ export const accountSignUp = async (req, res) => {
     });
   }
 
+  const profileDataUsername = await ProfileData.findOne({ username });
+  if (profileDataUsername) {
+    return res.status(400).json({
+      success: false,
+      message: "This username is already taken",
+    });
+  }
+
   const newProfileData = new ProfileData({
     email,
     username,
