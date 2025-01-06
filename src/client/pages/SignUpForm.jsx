@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
@@ -80,6 +81,10 @@ const SignUpForm = () => {
         <button type="submit" style={styles.button}>
           Create Account
         </button>
+
+        <NavLink style={styles.a_account} to="/login">
+          Already have an account?
+        </NavLink>
       </form>
 
       <div>
@@ -121,6 +126,14 @@ const styles = {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
+    textAlign: "center",
+  },
+
+  a_account: {
+    color: "#9A9A9A",
+    textDecoration: "none",
+    display: "block",
+    padding: "15px 0px",
   },
 };
 

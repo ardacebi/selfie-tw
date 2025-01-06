@@ -117,6 +117,7 @@ const styles = {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
+    textAlign: "center",
   },
 };
 

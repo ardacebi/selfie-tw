@@ -83,6 +83,10 @@ const LoginForm = () => {
         <NavLink style={styles.forgot} to="/forgot_password">
           Forgot your password?
         </NavLink>
+
+        <NavLink style={styles.a_account} to="/sign_up">
+          You do not have an account? Sign up here!
+        </NavLink>
       </form>
 
       <div>
@@ -125,10 +129,18 @@ const styles = {
     textDecoration: "none",
   },
 
+  a_account: {
+    color: "#9A9A9A",
+    textDecoration: "none",
+    display: "block",
+    padding: "15px 0px",
+  },
+
   error_text: {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
+    textAlign: "center",
   },
 };
 

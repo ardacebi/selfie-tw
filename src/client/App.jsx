@@ -1,9 +1,10 @@
-import { NavLink, BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 import ForgotPasswordForm from "./pages/ForgotPasswordForm";
+import BaseHomePage from "./pages/BaseHomePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,40 +22,19 @@ const App = () => {
         <div style={styles.page}>
           <header style={styles.header}>
             <div style={styles.form}>
-              <img
-                style={styles.logo}
-                src="/client/assets/logo.png"
-                alt="Selfie Logo"
-              />
+              <NavLink to="/">
+                <img
+                  style={styles.logo}
+                  src="/client/assets/logo.png"
+                  alt="Selfie Logo"
+                />
+              </NavLink>
               <br></br>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <NavLink
-                  style={({ isActive }) => ({
-                    ...styles.button,
-                    ...styles.button1,
-                    backgroundColor: isActive ? "#e7e7e7" : "#fff",
-                    color: "#000",
-                  })}
-                  to="/login"
-                >
-                  Login
-                </NavLink>
-                <NavLink
-                  style={({ isActive }) => ({
-                    ...styles.button,
-                    backgroundColor: isActive ? "#e7e7e7" : "#fff",
-                    color: "#000",
-                  })}
-                  to="/sign_up"
-                >
-                  Sign Up
-                </NavLink>
-              </div>
             </div>
           </header>
           <main style={styles.mainContent}>
             <Routes>
-              <Route path="/" />
+              <Route path="/" element={<BaseHomePage />} />
               <Route
                 path="/login"
                 element={<LoginForm style={styles.card} />}
