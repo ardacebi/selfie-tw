@@ -10,7 +10,7 @@ const LoginForm = () => {
   let navigate = useNavigate();
   const [accountCreationError, setAccountCreationError] = useState("no error");
   const [rememberMe, setRememberMe] = useState(false);
-  const { setCurrentUser, currentUser } = useContext(CurrentUserContext);
+  const { setCurrentUser } = useContext(CurrentUserContext);
 
   const mutateAccount = useMutation(fetchLoginData, {
     onMutate: () => {
