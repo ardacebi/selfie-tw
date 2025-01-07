@@ -1,9 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
+  let navigate = useNavigate();
   const [accountCreationError, setAccountCreationError] = useState("no error");
 
   const mutateAccount = useMutation(postAccountData, {
