@@ -1,35 +1,60 @@
 import { NavLink } from "react-router-dom";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { useContext } from "react";
 
 const BaseHomePage = () => {
-  return (
-    <header style={styles.header}>
-      <div style={styles.form}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <NavLink
-            style={({ isActive }) => ({
-              ...styles.button,
-              ...styles.button1,
-              backgroundColor: isActive ? "#e7e7e7" : "#fff",
-              color: "#000",
-            })}
-            to="/login"
-          >
-            Login
-          </NavLink>
-          <NavLink
-            style={({ isActive }) => ({
-              ...styles.button,
-              backgroundColor: isActive ? "#e7e7e7" : "#fff",
-              color: "#000",
-            })}
-            to="/sign_up"
-          >
-            Sign Up
-          </NavLink>
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+  if (!currentUser){
+    return (
+      <header style={styles.header}>
+        <div style={styles.form}>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <NavLink
+              style={({ isActive }) => ({
+                ...styles.button,
+                ...styles.button1,
+                backgroundColor: isActive ? "#e7e7e7" : "#fff",
+                color: "#000",
+              })}
+              to="/login"
+            >
+              Login
+            </NavLink>
+            <NavLink
+              style={({ isActive }) => ({
+                ...styles.button,
+                backgroundColor: isActive ? "#e7e7e7" : "#fff",
+                color: "#000",
+              })}
+              to="/sign_up"
+            >
+              Sign Up
+            </NavLink>
+          </div>
         </div>
-      </div>
-    </header>
-  );
+      </header>
+    );
+  }
+  else {
+    return(
+      <header style={styles.header}>
+        <div style={styles.form}>
+          <p>YOU ARE CONNECTED TO YOUR ACCOUNT! ID: {currentUser}</p>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+        <button styles={styles.button}
+        onClick={() => {
+          setCurrentUser(null);
+          localStorage.removeItem("savedUser");
+        }}>
+          Exit Account
+        </button>
+        </div>
+      </header>
+    )
+    
+  }
+  
 };
 
 const styles = {

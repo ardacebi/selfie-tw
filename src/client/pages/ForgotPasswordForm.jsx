@@ -9,8 +9,8 @@ const ForgotPasswordForm = () => {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
     },
-    onSuccess: (data) => {
-      console.log("Account found! Password changed! ", data);
+    onSuccess: (res) => {
+      console.log("Account found! Password changed! ", res);
       setAccountCreationError("Success! The password has been changed!");
       document.querySelector("#error_text").style.color = "green";
       document.querySelector("#error_text").style.visibility = "visible";

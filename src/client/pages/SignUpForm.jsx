@@ -10,11 +10,12 @@ const SignUpForm = () => {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
     },
-    onSuccess: (data) => {
-      console.log("Account created successfully! ", data);
+    onSuccess: (res) => {
+      console.log("Account created successfully! ", res);
       setAccountCreationError("Success! You signed up!");
       document.querySelector("#error_text").style.color = "green";
       document.querySelector("#error_text").style.visibility = "visible";
+      navigate("/login", { replace: true });
     },
     onError: (error) => {
       setAccountCreationError(error.message);
