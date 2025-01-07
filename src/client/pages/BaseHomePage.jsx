@@ -4,7 +4,7 @@ import { useContext } from "react";
 
 const BaseHomePage = () => {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-  if (!currentUser){
+  if (!currentUser) {
     return (
       <header style={styles.header}>
         <div style={styles.form}>
@@ -34,27 +34,26 @@ const BaseHomePage = () => {
         </div>
       </header>
     );
-  }
-  else {
-    return(
+  } else {
+    return (
       <header style={styles.header}>
         <div style={styles.form}>
           <p>YOU ARE CONNECTED TO YOUR ACCOUNT! ID: {currentUser}</p>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
-        <button styles={styles.button}
-        onClick={() => {
-          setCurrentUser(null);
-          localStorage.removeItem("savedUser");
-        }}>
-          Exit Account
-        </button>
+          <button
+            styles={styles.button}
+            onClick={() => {
+              setCurrentUser(null);
+              localStorage.removeItem("savedUser");
+            }}
+          >
+            Exit Account
+          </button>
         </div>
       </header>
-    )
-    
+    );
   }
-  
 };
 
 const styles = {

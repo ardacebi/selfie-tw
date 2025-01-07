@@ -6,7 +6,10 @@ import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 import ForgotPasswordForm from "./pages/ForgotPasswordForm";
 import BaseHomePage from "./pages/BaseHomePage";
-import { CurrentUserProvider, CurrentUserContext } from "./contexts/CurrentUserContext";
+import {
+  CurrentUserProvider,
+  CurrentUserContext,
+} from "./contexts/CurrentUserContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,21 +43,15 @@ const App = () => {
       </header>
       <main style={styles.mainContent}>
         <Routes>
-          <Route path="/" element={<BaseHomePage/>} />
-          <Route
-            path="/login"
-            element={<LoginForm style={styles.card} />}
-          />
-          <Route
-            path="/sign_up"
-            element={<SignUpForm style={styles.card} />}
-          />
+          <Route path="/" element={<BaseHomePage />} />
+          <Route path="/login" element={<LoginForm style={styles.card} />} />
+          <Route path="/sign_up" element={<SignUpForm style={styles.card} />} />
           <Route
             path="/forgot_password"
             element={<ForgotPasswordForm style={styles.card} />}
           />
-       </Routes>
-     </main>
+        </Routes>
+      </main>
     </div>
   );
 };
@@ -121,7 +118,7 @@ root.render(
         <App />
       </CurrentUserProvider>
     </QueryClientProvider>
-  </BrowserRouter>
+  </BrowserRouter>,
 );
 
 const style = document.createElement("style");

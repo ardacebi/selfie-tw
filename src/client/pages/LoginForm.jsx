@@ -4,8 +4,6 @@ import { useState, useContext } from "react";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 
-
-
 const LoginForm = () => {
   let navigate = useNavigate();
   const [accountCreationError, setAccountCreationError] = useState("no error");

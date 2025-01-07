@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema, model, models } = mongoose;
 
-const EventDataSchema = new Schema (
+const EventDataSchema = new Schema(
   {
     title: { type: String, required: true },
     description: String,
@@ -11,7 +11,7 @@ const EventDataSchema = new Schema (
 
     // Types can be: basic, basic-recurring, study-session, exam, project, activity
     type: { type: String, required: true, default: "basic" },
-    
+
     /* These properties are for "project" or "study-session" event types. 
     They track if the project or study session has different phases, their number and other phases */
     hasPhases: Boolean,
@@ -28,7 +28,7 @@ const EventDataSchema = new Schema (
     activityDueDate: { type: Date, required: true },
 
     // Used to keep track of the users that are invited to the event
-    invited_users: [{ _id: Number }]
+    invited_users: [{ _id: Number }],
   },
   {
     timestamps: true, // createdAt and updatedAt
@@ -40,4 +40,4 @@ const EventData =
   models.EventData ||
   model("EventData", EventDataSchema);
 
-  export default EventData;
+export default EventData;
