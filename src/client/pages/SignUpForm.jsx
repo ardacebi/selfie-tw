@@ -1,19 +1,22 @@
+import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
 
 const SignUpForm = () => {
+  let navigate = useNavigate();
   const [accountCreationError, setAccountCreationError] = useState("no error");
 
   const mutateAccount = useMutation(postAccountData, {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
     },
-    onSuccess: (data) => {
-      console.log("Account created successfully! ", data);
+    onSuccess: (res) => {
+      console.log("Account created successfully! ", res);
       setAccountCreationError("Success! You signed up!");
       document.querySelector("#error_text").style.color = "green";
       document.querySelector("#error_text").style.visibility = "visible";
+      navigate("/login", { replace: true });
     },
     onError: (error) => {
       setAccountCreationError(error.message);
@@ -80,6 +83,10 @@ const SignUpForm = () => {
         <button type="submit" style={styles.button}>
           Create Account
         </button>
+
+        <NavLink style={styles.a_account} to="/login">
+          Already have an account?
+        </NavLink>
       </form>
 
       <div>
@@ -121,6 +128,14 @@ const styles = {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
+    textAlign: "center",
+  },
+
+  a_account: {
+    color: "#9A9A9A",
+    textDecoration: "none",
+    display: "block",
+    padding: "15px 0px",
   },
 };
 

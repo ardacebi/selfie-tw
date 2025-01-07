@@ -105,7 +105,7 @@ export const accountLogin = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "The password is incorrect" });
-    res.status(200).json({ success: true, data: passwordProfileData });
+    res.status(200).json({ success: true, data: usernameProfileData });
   } catch (error) {
     console.log("Error Profile could not be found:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -185,7 +185,6 @@ export const getProfileIDByEmail = async (req, res) => {
   try {
     const profileData = await ProfileData.findOne({ email });
     if (!profileData) {
-      // Handle null, don’t return success
       return res
         .status(404)
         .json({ success: false, message: "User not found", userID: null });

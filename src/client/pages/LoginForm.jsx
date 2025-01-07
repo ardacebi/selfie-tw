@@ -1,21 +1,31 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
+
+
 
 const LoginForm = () => {
+  let navigate = useNavigate();
   const [accountCreationError, setAccountCreationError] = useState("no error");
   const [rememberMe, setRememberMe] = useState(false);
+  const { setCurrentUser } = useContext(CurrentUserContext);
 
   const mutateAccount = useMutation(fetchLoginData, {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
     },
-    onSuccess: (data) => {
-      console.log("Account found! Logged in! ", data);
+    onSuccess: (res) => {
+      console.log("Account found! Logged in! ", res);
       setAccountCreationError("Success! You logged in!");
       document.querySelector("#error_text").style.color = "green";
       document.querySelector("#error_text").style.visibility = "visible";
+      setCurrentUser(res.data._id);
+      if (rememberMe) {
+        localStorage.setItem("savedUser", res.data._id);
+      }
+      navigate("/", { replace: true });
     },
     onError: (error) => {
       setAccountCreationError(error.message);
@@ -83,6 +93,10 @@ const LoginForm = () => {
         <NavLink style={styles.forgot} to="/forgot_password">
           Forgot your password?
         </NavLink>
+
+        <NavLink style={styles.a_account} to="/sign_up">
+          You do not have an account? Sign up here!
+        </NavLink>
       </form>
 
       <div>
@@ -125,10 +139,18 @@ const styles = {
     textDecoration: "none",
   },
 
+  a_account: {
+    color: "#9A9A9A",
+    textDecoration: "none",
+    display: "block",
+    padding: "15px 0px",
+  },
+
   error_text: {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
+    textAlign: "center",
   },
 };
 

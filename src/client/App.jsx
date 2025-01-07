@@ -1,9 +1,12 @@
-import { NavLink, BrowserRouter, Routes, Route } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 import ForgotPasswordForm from "./pages/ForgotPasswordForm";
+import BaseHomePage from "./pages/BaseHomePage";
+import { CurrentUserProvider, CurrentUserContext } from "./contexts/CurrentUserContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,64 +17,45 @@ const queryClient = new QueryClient({
   },
 });
 
+const savedUser = () => localStorage.getItem("savedUser") || null;
+
 const App = () => {
+  const { setCurrentUser } = useContext(CurrentUserContext);
+  useEffect(() => {
+    setCurrentUser(savedUser());
+  }, [setCurrentUser]);
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <div style={styles.page}>
-          <header style={styles.header}>
-            <div style={styles.form}>
-              <img
-                style={styles.logo}
-                src="/client/assets/logo.png"
-                alt="Selfie Logo"
-              />
-              <br></br>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <NavLink
-                  style={({ isActive }) => ({
-                    ...styles.button,
-                    ...styles.button1,
-                    backgroundColor: isActive ? "#e7e7e7" : "#fff",
-                    color: "#000",
-                  })}
-                  to="/login"
-                >
-                  Login
-                </NavLink>
-                <NavLink
-                  style={({ isActive }) => ({
-                    ...styles.button,
-                    backgroundColor: isActive ? "#e7e7e7" : "#fff",
-                    color: "#000",
-                  })}
-                  to="/sign_up"
-                >
-                  Sign Up
-                </NavLink>
-              </div>
-            </div>
-          </header>
-          <main style={styles.mainContent}>
-            <Routes>
-              <Route path="/" />
-              <Route
-                path="/login"
-                element={<LoginForm style={styles.card} />}
-              />
-              <Route
-                path="/sign_up"
-                element={<SignUpForm style={styles.card} />}
-              />
-              <Route
-                path="/forgot_password"
-                element={<ForgotPasswordForm style={styles.card} />}
-              />
-            </Routes>
-          </main>
+    <div style={styles.page}>
+      <header style={styles.header}>
+        <div style={styles.form}>
+          <NavLink to="/">
+            <img
+              style={styles.logo}
+              src="/client/assets/logo.png"
+              alt="Selfie Logo"
+            />
+          </NavLink>
+          <br></br>
         </div>
-      </QueryClientProvider>
-    </BrowserRouter>
+      </header>
+      <main style={styles.mainContent}>
+        <Routes>
+          <Route path="/" element={<BaseHomePage/>} />
+          <Route
+            path="/login"
+            element={<LoginForm style={styles.card} />}
+          />
+          <Route
+            path="/sign_up"
+            element={<SignUpForm style={styles.card} />}
+          />
+          <Route
+            path="/forgot_password"
+            element={<ForgotPasswordForm style={styles.card} />}
+          />
+       </Routes>
+     </main>
+    </div>
   );
 };
 
@@ -130,7 +114,15 @@ const styles = {
 
 const container = document.getElementById("root");
 const root = createRoot(container);
-root.render(<App />);
+root.render(
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <CurrentUserProvider>
+        <App />
+      </CurrentUserProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
+);
 
 const style = document.createElement("style");
 style.innerHTML = `
