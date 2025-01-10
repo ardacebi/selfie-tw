@@ -1,8 +1,9 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { useContext } from "react";
 
 const BaseHomePage = () => {
+  let navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
   if (!currentUser) {
     return (
@@ -49,6 +50,14 @@ const BaseHomePage = () => {
             }}
           >
             Exit Account
+          </button>
+          <button
+            styles={styles.button}
+            onClick={() => {
+              navigate("/calendar", { replace: true });
+            }}
+          >
+            Calendar
           </button>
         </div>
       </header>

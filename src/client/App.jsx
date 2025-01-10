@@ -6,10 +6,15 @@ import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 import ForgotPasswordForm from "./pages/ForgotPasswordForm";
 import BaseHomePage from "./pages/BaseHomePage";
+import CalendarPage from "./pages/CalendarPage";
 import {
   CurrentUserProvider,
   CurrentUserContext,
 } from "./contexts/CurrentUserContext";
+import {
+  CurrentDateContext,
+  CurrentDateProvider,
+} from "./contexts/CurrentDateContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +55,7 @@ const App = () => {
             path="/forgot_password"
             element={<ForgotPasswordForm style={styles.card} />}
           />
+          <Route path="/calendar" element={<CalendarPage />} />
         </Routes>
       </main>
     </div>
@@ -115,7 +121,9 @@ root.render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <CurrentUserProvider>
-        <App />
+        <CurrentDateProvider>
+          <App />
+        </CurrentDateProvider>
       </CurrentUserProvider>
     </QueryClientProvider>
   </BrowserRouter>,
