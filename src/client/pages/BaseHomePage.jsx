@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { useContext } from "react";
 
 const BaseHomePage = () => {
+  let navigate = useNavigate();
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-  if (!currentUser){
+  if (!currentUser) {
     return (
       <header style={styles.header}>
         <div style={styles.form}>
@@ -34,27 +35,34 @@ const BaseHomePage = () => {
         </div>
       </header>
     );
-  }
-  else {
-    return(
+  } else {
+    return (
       <header style={styles.header}>
         <div style={styles.form}>
           <p>YOU ARE CONNECTED TO YOUR ACCOUNT! ID: {currentUser}</p>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
-        <button styles={styles.button}
-        onClick={() => {
-          setCurrentUser(null);
-          localStorage.removeItem("savedUser");
-        }}>
-          Exit Account
-        </button>
+          <button
+            styles={styles.button}
+            onClick={() => {
+              setCurrentUser(null);
+              localStorage.removeItem("savedUser");
+            }}
+          >
+            Exit Account
+          </button>
+          <button
+            styles={styles.button}
+            onClick={() => {
+              navigate("/calendar", { replace: true });
+            }}
+          >
+            Calendar
+          </button>
         </div>
       </header>
-    )
-    
+    );
   }
-  
 };
 
 const styles = {
