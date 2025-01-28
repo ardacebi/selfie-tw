@@ -66,7 +66,7 @@ const styles = {
   page: {
     backgroundColor: "#f8f7f5",
     minHeight: "100vh",
-    color: "#fff",
+    color: "black",
     display: "flex",
     flexDirection: "column",
     fontFamily: "sans-serif",
