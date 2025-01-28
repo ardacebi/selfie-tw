@@ -1,6 +1,6 @@
 async function postNewPassword({ email, password }) {
   const IDres = await fetch(
-    `http://localhost:5001/api/account/find_user_id_by_email`,
+    `http://localhost:8000/api/account/find_user_id_by_email`,
     {
       method: "POST",
       headers: {
@@ -21,7 +21,7 @@ async function postNewPassword({ email, password }) {
     throw new Error("User not found");
   } else {
     const res = await fetch(
-      `http://localhost:5001/api/account/change_password/${userID}`,
+      `http://localhost:8000/api/account/change_password/${userID}`,
       {
         method: "PATCH",
         headers: {

@@ -43,7 +43,7 @@ const BaseHomePage = () => {
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <button
-            styles={styles.button}
+            style={styles.button}
             onClick={() => {
               setCurrentUser(null);
               localStorage.removeItem("savedUser");
@@ -52,7 +52,7 @@ const BaseHomePage = () => {
             Exit Account
           </button>
           <button
-            styles={styles.button}
+            style={styles.button}
             onClick={() => {
               navigate("/calendar", { replace: true });
             }}
