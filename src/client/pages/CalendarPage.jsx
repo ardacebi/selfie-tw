@@ -5,13 +5,14 @@ import { CurrentDateContext } from "../contexts/CurrentDateContext";
 const CalendarPage = () => {
   const { currentDate } = useContext(CurrentDateContext);
   const [calendarDate, setCalendarDate] = useState(currentDate);
+  const [selectZoomLevel, setSelectZoomLevel] = useState(1);
 
   const findMonthsDays = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
   const findFirstDay = (year, month) => {
-    return new Date(year, month, 1).getDay();
+    return new Date(year, month, 0).getDay();
   };
 
   const handleDateClick = (year, month, day) => {
@@ -61,7 +62,55 @@ const CalendarPage = () => {
     }
   };
 
-  const renderCalendar = () => {
+  const changeToPrevYear = () => {
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear() - 1,
+        calendarDate.getMonth(),
+        calendarDate.getDate(),
+      ),
+    );
+  };
+
+  const changeToNextYear = () => {
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear() + 1,
+        calendarDate.getMonth(),
+        calendarDate.getDate(),
+      ),
+    );
+  };
+
+  const decreaseZoomLevel = () => {
+    if (selectZoomLevel > 0) setSelectZoomLevel(selectZoomLevel - 1);
+  };
+
+  const increaseZoomLevel = () => {
+    if (selectZoomLevel < 2) setSelectZoomLevel(selectZoomLevel + 1);
+  };
+
+  const renderMonth = () => {
+    const currentYear = calendarDate.getFullYear();
+    const currentMonth = calendarDate.getMonth();
+    const months = [
+      "Gennaio",
+      "Febbraio",
+      "Marzo",
+      "Aprile",
+      "Maggio",
+      "Giugno",
+      "Luglio",
+      "Agosto",
+      "Settembre",
+      "Ottobre",
+      "Novembre",
+      "Dicembre",
+    ];
+    return `${months[currentMonth]} ${currentYear}`;
+  };
+
+  const renderMonthCalendar = () => {
     const currentYear = calendarDate.getFullYear();
     const currentMonth = calendarDate.getMonth();
     const monthsTotalDays = findMonthsDays(currentYear, currentMonth);
@@ -69,9 +118,17 @@ const CalendarPage = () => {
 
     let allDays = [];
 
+    allDays.push(<div style={styles.week_day}>Lunedi</div>);
+    allDays.push(<div style={styles.week_day}>Martedi</div>);
+    allDays.push(<div style={styles.week_day}>Mercoledi</div>);
+    allDays.push(<div style={styles.week_day}>Giovedi</div>);
+    allDays.push(<div style={styles.week_day}>Venerdi</div>);
+    allDays.push(<div style={styles.week_day}>Sabato</div>);
+    allDays.push(<div style={styles.week_day}>Domenica</div>);
+
     for (let i = 0; i < firstDay; i++) {
       allDays.push(
-        <div key={`empty-${i}`} className="empty_calendar_box"></div>,
+        <div key={`empty-${i}`} style={styles.empty_calendar_box}></div>,
       );
     }
 
@@ -80,10 +137,18 @@ const CalendarPage = () => {
       const isSelected =
         calendarDate && calendarDate.toDateString() === date.toDateString();
 
+      const isToday = currentDate.toDateString() === date.toDateString();
+
       allDays.push(
         <div
           key={`day-${i}`}
-          className={`calendar_box_${isSelected ? "selected" : ""}`}
+          style={
+            isSelected
+              ? styles.calendar_box_selected
+              : isToday
+                ? styles.calendar_box_today
+                : styles.calendar_box
+          }
           onClick={() => handleDateClick(currentYear, currentMonth, i)}
         >
           {i}
@@ -94,17 +159,132 @@ const CalendarPage = () => {
     return allDays;
   };
 
+  const monthName = (month) => {
+    const months = [
+      "Gennaio",
+      "Febbraio",
+      "Marzo",
+      "Aprile",
+      "Maggio",
+      "Giugno",
+      "Luglio",
+      "Agosto",
+      "Settembre",
+      "Ottobre",
+      "Novembre",
+      "Dicembre",
+    ];
+    return months[month];
+  };
+
+  const renderYearCalendar = () => {
+    const currentYear = calendarDate.getFullYear();
+    const allMonths = [];
+    for (let i = 0; i < 12; i++) {
+      const dateSelected = new Date(currentYear, i, calendarDate.getDate());
+      const isSelected =
+        calendarDate &&
+        calendarDate.toDateString() === dateSelected.toDateString();
+
+      const dateToday = new Date(currentYear, i, currentDate.getDate());
+      const isToday = currentDate.toDateString() === dateToday.toDateString();
+
+      allMonths.push(
+        <div>
+          <div
+            style={
+              isSelected
+                ? styles.calendar_box_selected
+                : isToday
+                  ? styles.calendar_box_today
+                  : styles.calendar_box
+            }
+            onClick={() => handleDateClick(currentYear, i, 1)}
+          >
+            {monthName(i)}
+          </div>
+        </div>,
+      );
+    }
+
+    return allMonths;
+  };
+
   return (
     <div>
       <h1>Calendar Page</h1>
       <div>
-        <button onClick={changeToPrevMonth}>Previous Month</button>
-        <button onClick={changeToNextMonth}>Next Month</button>
+        <button onClick={increaseZoomLevel}>Increase Zoom</button>
+        <button onClick={decreaseZoomLevel}>Decrease Zoom</button>
       </div>
-      <div className="calendar">{renderCalendar()}</div>
-      {calendarDate && <div>Selected date: {calendarDate.toDateString()}</div>}
+      {selectZoomLevel === 0 && (
+        <>
+          <div style={styles.month_name}>{calendarDate.getFullYear()}</div>
+          <button onClick={changeToPrevYear}>Previous Year</button>
+          <button onClick={changeToNextYear}>Next Year</button>
+          <div style={styles.year_calendar}>{renderYearCalendar()}</div>
+        </>
+      )}
+
+      {selectZoomLevel === 1 && (
+        <>
+          <button onClick={changeToPrevMonth}>Previous Month</button>
+          <button onClick={changeToNextMonth}>Next Month</button>
+          <div style={styles.month_name}>{renderMonth()}</div>
+          <div style={styles.month_calendar}>{renderMonthCalendar()}</div>
+          <div>{currentDate.getMonth}</div>
+        </>
+      )}
     </div>
   );
 };
 
 export default CalendarPage;
+
+const styles = {
+  month_calendar: {
+    display: "grid",
+    gridTemplateColumns: "repeat(7, 1fr)",
+    gridTemplateRows: "repeat(7, auto)",
+  },
+  empty_calendar_box: {
+    backgroundColor: "#f8f7f5",
+    height: "100px",
+    width: "100px",
+  },
+  calendar_box: {
+    backgroundColor: "#f8f7f5",
+    border: "2px solid rgb(40, 40, 40)",
+    height: "100px",
+    width: "100px",
+  },
+  calendar_box_selected: {
+    border: "2px solid rgba(0, 47, 80, 0.77)",
+    height: "100px",
+    width: "100px",
+    backgroundColor: "lightblue",
+  },
+  calendar_box_today: {
+    border: "2px solid rgb(9, 152, 255)",
+    height: "100px",
+    width: "100px",
+    backgroundColor: "rgb(212, 232, 248)",
+  },
+  week_day: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: "30px",
+    width: "100px",
+    textAlign: "center",
+  },
+  month_name: {
+    textAlign: "center",
+    fontSize: "24px",
+    marginBottom: "20px",
+  },
+  year_calendar: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gridTemplateRows: "repeat(3, 1fr)",
+  },
+};
