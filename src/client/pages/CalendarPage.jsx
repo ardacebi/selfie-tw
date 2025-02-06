@@ -82,6 +82,26 @@ const CalendarPage = () => {
     );
   };
 
+  const changeToPrevWeek = () => {
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth(),
+        calendarDate.getDate() - 7,
+      ),
+    );
+  };
+
+  const changeToNextWeek = () => {
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth(),
+        calendarDate.getDate() + 7,
+      ),
+    );
+  };
+
   const decreaseZoomLevel = () => {
     if (selectZoomLevel > 0) setSelectZoomLevel(selectZoomLevel - 1);
   };
@@ -149,7 +169,9 @@ const CalendarPage = () => {
                 ? styles.calendar_box_today
                 : styles.calendar_box
           }
-          onClick={() => handleDateClick(currentYear, currentMonth, i)}
+          onClick={() => {
+            handleDateClick(currentYear, currentMonth, i);
+          }}
         >
           {i}
         </div>,
@@ -199,7 +221,9 @@ const CalendarPage = () => {
                   ? styles.calendar_box_today
                   : styles.calendar_box
             }
-            onClick={() => handleDateClick(currentYear, i, 1)}
+            onClick={() => {
+              handleDateClick(currentYear, i, 1);
+            }}
           >
             {monthName(i)}
           </div>
@@ -208,6 +232,158 @@ const CalendarPage = () => {
     }
 
     return allMonths;
+  };
+
+  const remapGetDay = (day) => {
+    if (day === 0) return 6;
+    return day - 1;
+  };
+
+  const renderWeekCalendar = () => {
+    const currentYear = calendarDate.getFullYear();
+    const currentMonth = calendarDate.getMonth();
+    let weekTotalDays = 7;
+    const monthsTotalDays = findMonthsDays(currentYear, currentMonth);
+    const firstDay = findFirstDay(currentYear, currentMonth);
+
+    let allDays = [];
+
+    allDays.push(<div style={styles.week_day}>Lunedi</div>);
+    allDays.push(<div style={styles.week_day}>Martedi</div>);
+    allDays.push(<div style={styles.week_day}>Mercoledi</div>);
+    allDays.push(<div style={styles.week_day}>Giovedi</div>);
+    allDays.push(<div style={styles.week_day}>Venerdi</div>);
+    allDays.push(<div style={styles.week_day}>Sabato</div>);
+    allDays.push(<div style={styles.week_day}>Domenica</div>);
+
+    let firstWeekDay =
+      calendarDate.getDate() - remapGetDay(calendarDate.getDay());
+
+    if (firstWeekDay < 1) {
+      let prevMonthThisWeekDays = 0;
+      while (prevMonthThisWeekDays < firstDay) prevMonthThisWeekDays++;
+      const prevMonthTotalDays = findMonthsDays(currentYear, currentMonth - 1);
+
+      for (
+        let i = prevMonthTotalDays - prevMonthThisWeekDays + 1;
+        i <= prevMonthTotalDays;
+        i++
+      ) {
+        const date = new Date(currentYear, currentMonth - 1, i);
+        const isSelected =
+          calendarDate && calendarDate.toDateString() === date.toDateString();
+
+        const isToday = currentDate.toDateString() === date.toDateString();
+
+        allDays.push(
+          <div
+            key={`day-${i}`}
+            style={
+              isSelected
+                ? styles.calendar_day_week_box_selected
+                : isToday
+                  ? styles.calendar_day_week_box_today
+                  : styles.calendar_day_week_box_other_month
+            }
+            onClick={() => {
+              handleDateClick(currentYear, currentMonth - 1, i);
+            }}
+          >
+            {i}
+          </div>,
+        );
+        weekTotalDays--;
+      }
+
+      for (let i = 1; i <= weekTotalDays; i++) {
+        const date = new Date(currentYear, currentMonth, i);
+        const isSelected =
+          calendarDate && calendarDate.toDateString() === date.toDateString();
+
+        const isToday = currentDate.toDateString() === date.toDateString();
+
+        allDays.push(
+          <div
+            key={`day-${i}`}
+            style={
+              isSelected
+                ? styles.calendar_day_week_box_selected
+                : isToday
+                  ? styles.calendar_day_week_box_today
+                  : styles.calendar_day_week_box
+            }
+            onClick={() => {
+              handleDateClick(currentYear, currentMonth, i);
+            }}
+          >
+            {i}
+          </div>,
+        );
+      }
+    } else {
+      let j = 1;
+
+      for (
+        let i = firstWeekDay;
+        j <= weekTotalDays && i <= monthsTotalDays;
+        i++
+      ) {
+        const date = new Date(currentYear, currentMonth, i);
+        const isSelected =
+          calendarDate && calendarDate.toDateString() === date.toDateString();
+
+        const isToday = currentDate.toDateString() === date.toDateString();
+
+        allDays.push(
+          <div
+            key={`day-${i}`}
+            style={
+              isSelected
+                ? styles.calendar_day_week_box_selected
+                : isToday
+                  ? styles.calendar_day_week_box_today
+                  : styles.calendar_day_week_box
+            }
+            onClick={() => {
+              handleDateClick(currentYear, currentMonth, i);
+            }}
+          >
+            {i}
+          </div>,
+        );
+        j++;
+      }
+
+      if (j <= weekTotalDays) {
+        for (let i = 1; j <= weekTotalDays; i++, j++) {
+          const date = new Date(currentYear, currentMonth + 1, i);
+          const isSelected =
+            calendarDate && calendarDate.toDateString() === date.toDateString();
+
+          const isToday = currentDate.toDateString() === date.toDateString();
+
+          allDays.push(
+            <div
+              key={`day-${i}`}
+              style={
+                isSelected
+                  ? styles.calendar_day_week_box_selected
+                  : isToday
+                    ? styles.calendar_day_week_box_today
+                    : styles.calendar_day_week_box_other_month
+              }
+              onClick={() => {
+                handleDateClick(currentYear, currentMonth + 1, i);
+              }}
+            >
+              {i}
+            </div>,
+          );
+        }
+      }
+    }
+
+    return allDays;
   };
 
   return (
@@ -232,7 +408,15 @@ const CalendarPage = () => {
           <button onClick={changeToNextMonth}>Next Month</button>
           <div style={styles.month_name}>{renderMonth()}</div>
           <div style={styles.month_calendar}>{renderMonthCalendar()}</div>
-          <div>{currentDate.getMonth}</div>
+        </>
+      )}
+
+      {selectZoomLevel === 2 && (
+        <>
+          <button onClick={changeToPrevWeek}>Previous Week</button>
+          <button onClick={changeToNextWeek}>Next Week</button>
+          <div style={styles.month_name}>{renderMonth()}</div>
+          <div style={styles.week_calendar}>{renderWeekCalendar()}</div>
         </>
       )}
     </div>
@@ -286,5 +470,34 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gridTemplateRows: "repeat(3, 1fr)",
+  },
+  week_calendar: {
+    display: "grid",
+    gridTemplateColumns: "repeat(7, 1fr)",
+    gridTemplateRows: "repeat(2, auto)",
+  },
+  calendar_day_week_box: {
+    backgroundColor: "#f8f7f5",
+    border: "2px solid rgb(40, 40, 40)",
+    height: "350px",
+    width: "100px",
+  },
+  calendar_day_week_box_other_month: {
+    backgroundColor: "#f8f7f5",
+    border: "2px solid rgb(167, 167, 167)",
+    height: "350px",
+    width: "100px",
+  },
+  calendar_day_week_box_selected: {
+    border: "2px solid rgba(0, 47, 80, 0.77)",
+    height: "350px",
+    width: "100px",
+    backgroundColor: "lightblue",
+  },
+  calendar_day_week_box_today: {
+    border: "2px solid rgb(9, 152, 255)",
+    height: "350px",
+    width: "100px",
+    backgroundColor: "rgb(212, 232, 248)",
   },
 };
