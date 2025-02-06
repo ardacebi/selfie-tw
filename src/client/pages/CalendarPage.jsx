@@ -260,18 +260,20 @@ const CalendarPage = () => {
       calendarDate.getDate() - remapGetDay(calendarDate.getDay());
 
     if (firstWeekDay < 1) {
-      const prevMonthDate = new Date(currentYear, currentMonth, i);
-      const prevMonthFirstWeekDay =
-        prevMonthDate.getDate() - remapGetDay(prevMonthDate.getDay());
+      let prevMonthThisWeekDays = 0;
+      while (prevMonthThisWeekDays < firstDay) prevMonthThisWeekDays++;
       const prevMonthTotalDays = findMonthsDays(currentYear, currentMonth - 1);
 
-      for (let i = prevMonthFirstWeekDay; i <= prevMonthTotalDays; i++) {
+      for (
+        let i = prevMonthTotalDays - prevMonthThisWeekDays + 1;
+        i <= prevMonthTotalDays;
+        i++
+      ) {
+        const date = new Date(currentYear, currentMonth - 1, i);
         const isSelected =
-          calendarDate &&
-          calendarDate.toDateString() === prevMonthDate.toDateString();
+          calendarDate && calendarDate.toDateString() === date.toDateString();
 
-        const isToday =
-          currentDate.toDateString() === prevMonthDate.toDateString();
+        const isToday = currentDate.toDateString() === date.toDateString();
 
         allDays.push(
           <div
