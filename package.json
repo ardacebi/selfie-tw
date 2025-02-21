@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev": "node src/server/server.js",
     "dev:server": "nodemon src/server/server.js",
     "dev:client": "vite",
-    "build": "vite build",
+    "build": "concurrently \"npm run build:client\" \"npm run build:server\"",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --ssr src/app-entry-server.jsx --outDir dist/server",
+    "build:ssr": "vite build --ssr",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet",
@@ -32,6 +35,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^4.10.1",
+    "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -40,6 +44,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.3.0",
-    "react-router-dom": "^6.4.1"
+    "react-router-dom": "^6.4.1",
+    "sirv": "^3.0.1"
   }
 }

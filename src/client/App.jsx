@@ -1,29 +1,14 @@
 import { useContext, useEffect } from "react";
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createRoot } from "react-dom/client";
+//import { createRoot } from "react-dom/client";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 import ForgotPasswordForm from "./pages/ForgotPasswordForm";
 import BaseHomePage from "./pages/BaseHomePage";
 import CalendarPage from "./pages/CalendarPage";
-import {
-  CurrentUserProvider,
-  CurrentUserContext,
-} from "./contexts/CurrentUserContext";
-import {
-  CurrentDateContext,
-  CurrentDateProvider,
-} from "./contexts/CurrentDateContext";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    },
-  },
-});
+import { CurrentUserContext } from "./contexts/CurrentUserContext";
+import { CurrentDateContext } from "./contexts/CurrentDateContext";
 
 const savedUser = () => localStorage.getItem("savedUser") || null;
 
@@ -115,6 +100,7 @@ const styles = {
   },
 };
 
+/*
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
@@ -128,6 +114,7 @@ root.render(
     </QueryClientProvider>
   </BrowserRouter>,
 );
+*/
 
 const style = document.createElement("style");
 style.innerHTML = `
@@ -139,3 +126,5 @@ style.innerHTML = `
   }
 `;
 document.head.appendChild(style);
+
+export default App;

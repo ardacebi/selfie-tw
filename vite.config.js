@@ -1,13 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { config } from "dotenv";
+//import { config } from "dotenv";
 
-config();
+//config();
 
 export default defineConfig({
-  server: {
-    port: process.env.VITE_PORT || 3001,
-  },
+  /*
+    build: {
+      outDir: "dist/build",
+      rollupOptions: {
+        output: {
+          format: "esm",
+        },
+      },
+    },
+    */
   plugins: [react()],
-  root: "src",
 });
