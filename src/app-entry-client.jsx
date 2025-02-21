@@ -17,15 +17,13 @@ const queryClient = new QueryClient({
 
 hydrateRoot(
   document.getElementById("root"),
-  <StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <CurrentUserProvider>
-          <CurrentDateProvider>
-            <App />
-          </CurrentDateProvider>
-        </CurrentUserProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
-  </StrictMode>,
+  <CurrentUserProvider>
+    <CurrentDateProvider>
+      <StrictMode>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </StrictMode>
+    </CurrentDateProvider>
+  </CurrentUserProvider>,
 );

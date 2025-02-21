@@ -10,13 +10,33 @@ import CalendarPage from "./pages/CalendarPage";
 import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { CurrentDateContext } from "./contexts/CurrentDateContext";
 
-const savedUser = () => localStorage.getItem("savedUser") || null;
+const savedUser = () =>
+  typeof window !== "undefined" && window.localStorage
+    ? window.localStorage.getItem("savedUser")
+    : null;
 
 const App = () => {
   const { setCurrentUser } = useContext(CurrentUserContext);
   useEffect(() => {
     setCurrentUser(savedUser());
   }, [setCurrentUser]);
+  useEffect(() => {
+    // Only run on the client
+    const style = document.createElement("style");
+    style.innerHTML = `
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: #f8f7f5;
+      }
+    `;
+    document.head.appendChild(style);
+    // Cleanup if needed:
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
   return (
     <div style={styles.page}>
       <header style={styles.header}>
@@ -114,7 +134,7 @@ root.render(
     </QueryClientProvider>
   </BrowserRouter>,
 );
-*/
+
 
 const style = document.createElement("style");
 style.innerHTML = `
@@ -126,5 +146,6 @@ style.innerHTML = `
   }
 `;
 document.head.appendChild(style);
+*/
 
 export default App;

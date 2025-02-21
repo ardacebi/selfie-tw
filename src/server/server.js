@@ -25,10 +25,10 @@ const templateHtml = isProduction
 
 let vite;
 if (!isProduction) {
-  const { createServer } = await import("vite");
   vite = await createViteServer({
     server: { middlewareMode: true },
     appType: "custom",
+    base,
   });
   app.use(vite.middlewares);
 } else {
@@ -54,7 +54,7 @@ app.use("/api/account", AccountHandling);
   */
 
 // Serve HTML
-app.use("*all", async (req, res) => {
+app.get("*", async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, "");
 
@@ -64,10 +64,14 @@ app.use("*all", async (req, res) => {
       // Always read fresh template in development
       template = await fs.readFile("./index.html", "utf-8");
       template = await vite.transformIndexHtml(url, template);
-      render = (await vite.ssrLoadModule("/src/app-entry-server.jsx")).render;
+      render = (await vite.ssrLoadModule("/src/app-entry-server.jsx")).render(
+        url,
+      );
     } else {
       template = templateHtml;
-      render = (await import("./dist/server/app-entry-server.js")).render;
+      render = (await import("../../dist/server/app-entry-server.js")).render(
+        url,
+      );
     }
 
     const rendered = await render(url);
