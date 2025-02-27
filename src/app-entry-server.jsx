@@ -18,7 +18,7 @@ export function render(url) {
   return renderToString(
     <CurrentUserProvider>
       <CurrentDateProvider>
-        <StaticRouter location={"/"}>
+        <StaticRouter location={url}>
           <QueryClientProvider client={queryClient}>
             <App />
           </QueryClientProvider>
