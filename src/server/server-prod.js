@@ -10,6 +10,10 @@ import { config } from "dotenv";
 
 config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "../..");
+
 const port = process.env.NODE_PORT || 8000;
 
 const app = express();
@@ -18,17 +22,17 @@ app.use(cors());
 app.use(express.json()); // Allows accepting JSON data in the body of the request
 app.use("/api/account", AccountHandling);
 app.use(
-  express.static(path.resolve(process.cwd(), "dist/client"), { index: false }),
+  express.static(path.join(projectRoot, "dist/client"), { index: false }),
 );
 
 app.use("*", async (req, res) => {
   try {
     const url = req.originalUrl;
-    const template = fs.readFileSync(
-      path.resolve(process.cwd(), "dist/client/index.html"),
-      "utf-8",
+    const templatePath = path.join(projectRoot, "dist/client/index.html");
+    const template = fs.readFileSync(templatePath, "utf-8");
+    const { render } = await import(
+      path.join(projectRoot, "dist/server/app-entry-server.js")
     );
-    const { render } = await import("../../dist/server/app-entry-server.js");
     const html = template.replace(`not rendered body`, render(url));
 
     res.status(200).set({ "Content-Type": "text/html" }).end(html);
