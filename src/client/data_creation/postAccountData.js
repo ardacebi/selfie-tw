@@ -1,5 +1,5 @@
 async function postAccountData({ email, username, password }) {
-  const res = await fetch("http://localhost:8000/api/account/sign_up", {
+  const res = await fetch(`/api/account/sign_up`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
