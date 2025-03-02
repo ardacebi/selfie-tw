@@ -34,7 +34,6 @@ const LoginForm = () => {
   return (
     <div>
       <form
-        action=""
         onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.target);

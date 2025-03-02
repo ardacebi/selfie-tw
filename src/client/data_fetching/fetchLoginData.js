@@ -1,5 +1,5 @@
 async function fetchLoginData({ username, password }) {
-  const res = await fetch("/api/account/login", {
+  const res = await fetch(`/api/account/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

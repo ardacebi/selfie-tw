@@ -18,16 +18,16 @@ app.use(cors());
 app.use(express.json()); // Allows accepting JSON data in the body of the request
 app.use("/api/account", AccountHandling);
 app.use(
-  express.static(
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dist/client"),
-    { index: false },
-  ),
+  express.static(path.resolve(process.cwd(), "dist/client"), { index: false }),
 );
 
 app.use("*", async (req, res) => {
   try {
     const url = req.originalUrl;
-    const template = fs.readFileSync("./dist/client/index.html", "utf-8");
+    const template = fs.readFileSync(
+      path.resolve(process.cwd(), "dist/client/index.html"),
+      "utf-8",
+    );
     const { render } = await import("../../dist/server/app-entry-server.js");
     const html = template.replace(`not rendered body`, render(url));
 

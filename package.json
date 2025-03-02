@@ -10,7 +10,7 @@
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/app-entry-server.jsx --outDir dist/server",
     "build:ssr": "vite build --ssr",
-    "serve": "node src/server/server-prod.js",
+    "serve": "node src/server/server-prod.js --no-hmr",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
