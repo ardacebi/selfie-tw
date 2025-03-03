@@ -3,23 +3,28 @@ import { useContext, useState } from "react";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 
 const CalendarPage = () => {
+  //These are setup variables for the calendar used through the entire page
   const { currentDate } = useContext(CurrentDateContext);
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [selectZoomLevel, setSelectZoomLevel] = useState(1);
 
+  //Takes the year and the month and returns the amount of days of that month in that year
   const findMonthsDays = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
+  //Takes the year and the moth and returns the day of the week of the first day of the month
   const findFirstDay = (year, month) => {
     return new Date(year, month, 0).getDay();
   };
 
+  //This function is called when a day is clicked and it sets the calendarDate to the date of the day clicked
   const handleDateClick = (year, month, day) => {
     setCalendarDate(new Date(year, month, day));
-    console.log("You clicked on day: ", day);
   };
 
+  //This function is used to change the calendarDate to the previous month. If it is possible it keeps the same day, if it
+  //is not possible it sets the day to the last day of the month
   const changeToPrevMonth = () => {
     const prevMonthDate = new Date(
       calendarDate.getFullYear(),
@@ -41,6 +46,8 @@ const CalendarPage = () => {
     }
   };
 
+  //This function is used to change the calendarDate to the next month. If it is possible it keeps the same day, if it
+  //is not possible it sets the day to the last day of the month
   const changeToNextMonth = () => {
     const nextMonthDate = new Date(
       calendarDate.getFullYear(),
@@ -62,6 +69,7 @@ const CalendarPage = () => {
     }
   };
 
+  //This function is used to change the calendarDate to the previous year, the day and the month are kept the same
   const changeToPrevYear = () => {
     setCalendarDate(
       new Date(
@@ -72,6 +80,7 @@ const CalendarPage = () => {
     );
   };
 
+  //This function is used to change the calendarDate to the next year, the day and the month are kept the same
   const changeToNextYear = () => {
     setCalendarDate(
       new Date(
@@ -82,6 +91,7 @@ const CalendarPage = () => {
     );
   };
 
+  //This function is used to change the calendarDate to the previous week
   const changeToPrevWeek = () => {
     setCalendarDate(
       new Date(
@@ -92,6 +102,7 @@ const CalendarPage = () => {
     );
   };
 
+  //This function is used to change the calendarDate to the next week
   const changeToNextWeek = () => {
     setCalendarDate(
       new Date(
@@ -102,14 +113,17 @@ const CalendarPage = () => {
     );
   };
 
+  //Decreases the value of the variable selectZoomLevel by 1, if the value is already 0 it does nothing
   const decreaseZoomLevel = () => {
     if (selectZoomLevel > 0) setSelectZoomLevel(selectZoomLevel - 1);
   };
 
+  //Increases the value of the variable selectZoomLevel by 1, if the value is already 2 it does nothing
   const increaseZoomLevel = () => {
     if (selectZoomLevel < 2) setSelectZoomLevel(selectZoomLevel + 1);
   };
 
+  //This function is used to return the month and the year of the calendarDate in italian
   const renderMonth = () => {
     const currentYear = calendarDate.getFullYear();
     const currentMonth = calendarDate.getMonth();
@@ -130,12 +144,14 @@ const CalendarPage = () => {
     return `${months[currentMonth]} ${currentYear}`;
   };
 
+  //This function renders the calendar when selectZoomLevel is 1. This level shows an entire month of the year in a grid.
   const renderMonthCalendar = () => {
     const currentYear = calendarDate.getFullYear();
     const currentMonth = calendarDate.getMonth();
     const monthsTotalDays = findMonthsDays(currentYear, currentMonth);
     const firstDay = findFirstDay(currentYear, currentMonth);
 
+    //This array will contain all the divs that will be rendered in the calendar
     let allDays = [];
 
     allDays.push(<div style={styles.week_day}>Lunedi</div>);
@@ -181,6 +197,7 @@ const CalendarPage = () => {
     return allDays;
   };
 
+  //Similar to renderMonth, but it does not return the year, only the month
   const monthName = (month) => {
     const months = [
       "Gennaio",
@@ -199,8 +216,11 @@ const CalendarPage = () => {
     return months[month];
   };
 
+  //This function renders the calendar when selectZoomLevel is 0. This level shows an entire year ina grid.
   const renderYearCalendar = () => {
     const currentYear = calendarDate.getFullYear();
+
+    //This array will contain all the divs that will be rendered in the calendar
     const allMonths = [];
     for (let i = 0; i < 12; i++) {
       const dateSelected = new Date(currentYear, i, calendarDate.getDate());
@@ -234,11 +254,13 @@ const CalendarPage = () => {
     return allMonths;
   };
 
+  //The getDay() function of the Date class sets Sunday as 0, this function remaps it to 6 and Monday to 0
   const remapGetDay = (day) => {
     if (day === 0) return 6;
     return day - 1;
   };
 
+  //This function renders the calendar when selectZoomLevel is 2. This level shows a week of the month in a grid.
   const renderWeekCalendar = () => {
     const currentYear = calendarDate.getFullYear();
     const currentMonth = calendarDate.getMonth();
@@ -246,6 +268,7 @@ const CalendarPage = () => {
     const monthsTotalDays = findMonthsDays(currentYear, currentMonth);
     const firstDay = findFirstDay(currentYear, currentMonth);
 
+    //This array will contain all the divs that will be rendered in the calendar
     let allDays = [];
 
     allDays.push(<div style={styles.week_day}>Lunedi</div>);
@@ -259,6 +282,8 @@ const CalendarPage = () => {
     let firstWeekDay =
       calendarDate.getDate() - remapGetDay(calendarDate.getDay());
 
+    //If the first day of the week is in the previous month, you should render the last days of the previous month. When selecting
+    //a day in the previous month, the calendarDate should be set to the day of the month selected
     if (firstWeekDay < 1) {
       let prevMonthThisWeekDays = 0;
       while (prevMonthThisWeekDays < firstDay) prevMonthThisWeekDays++;
@@ -354,6 +379,8 @@ const CalendarPage = () => {
         j++;
       }
 
+      //If the last day of the week is in the next month, you should render the first days of the next month. When selecting
+      //a day in the next month, the calendarDate should be set to the day of the month selected
       if (j <= weekTotalDays) {
         for (let i = 1; j <= weekTotalDays; i++, j++) {
           const date = new Date(currentYear, currentMonth + 1, i);
