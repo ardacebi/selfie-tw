@@ -74,7 +74,7 @@ export const accountSignUp = async (req, res) => {
     res.status(201).json({
       success: true,
       data: newProfileData,
-    }); //201: Created
+    });
   } catch (error) {
     console.log("Error Profile could not be created:", error);
     res.status(500).json({

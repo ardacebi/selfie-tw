@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
+import selfieImg from '../assets/selfie.png';
 
 const SignUpForm = () => {
   const { theme } = useContext(ThemeContext);
@@ -15,14 +16,21 @@ const SignUpForm = () => {
       button:hover, a:hover {
         background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
       }
+      
+      input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
+        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
 
   const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#f8f7f5' : '#000';
+  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
   const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
+  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
 
   const signup = useMutation(postAccountData, {
     onMutate: () => {
@@ -43,6 +51,9 @@ const SignUpForm = () => {
 
   return (
     <div>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <img src={selfieImg} alt="Selfie" style={styles.logo} />
+      </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -56,7 +67,7 @@ const SignUpForm = () => {
       >
         <label htmlFor="email">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
             name="email"
             id="email"
             type="text"
@@ -68,7 +79,7 @@ const SignUpForm = () => {
 
         <label htmlFor="username">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
             name="username"
             id="username"
             type="text"
@@ -80,7 +91,7 @@ const SignUpForm = () => {
 
         <label htmlFor="password">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
             name="password"
             id="password"
             type="password"
@@ -92,7 +103,7 @@ const SignUpForm = () => {
 
         <button 
           type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor}}
+          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
         >
           Create Account
         </button>
@@ -117,7 +128,7 @@ const styles = {
     width: "250px",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   button: {
     border: "2px solid #dcdcdc",
@@ -126,7 +137,7 @@ const styles = {
     cursor: "pointer",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   a_account: {
     textDecoration: "none",
@@ -138,6 +149,12 @@ const styles = {
     fontSize: "18px",
     visibility: "hidden",
     textAlign: "center",
+  },
+  logo: {
+    maxWidth: "150px",
+    height: "auto",
+    marginBottom: "20px",
+    borderRadius: "10px",
   },
 };
 

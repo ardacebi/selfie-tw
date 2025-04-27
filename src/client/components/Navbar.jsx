@@ -1,16 +1,19 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import { FaSun, FaMoon, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaSun, FaMoon, FaCog, FaSignOutAlt, FaInfo } from "react-icons/fa";
 import logo from "../assets/logo.png";
 import logo_dark from "../assets/logo_dark.png";
 
 const Navbar = () => {
   const { theme, toggleTheme, isSystemTheme, resetToSystemTheme } = useContext(ThemeContext);
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [isTooltipHovered, setIsTooltipHovered] = useState(false);
+  const [showInfoTooltip, setShowInfoTooltip] = useState(false);
   const [showLogoutTooltip, setShowLogoutTooltip] = useState(false);
+  const buttonLeaveTimeoutRef = useRef(null);
   const navigate = useNavigate();
   
   const isDark = theme === 'dark';
@@ -18,14 +21,15 @@ const Navbar = () => {
     moon: "#FFD700",
     sun: "#DAA520",
     bg: isDark ? '#1e1e1e' : '#ffffff',
-    border: isDark ? '#333' : '#dcdcdc',
+    border: isDark ? '#444' : '#dcdcdc',
     btnBg: isDark ? '#333' : '#fff',
-    btnColor: isDark ? '#fff' : '#000',
+    btnColor: isDark ? '#e0e0e0' : '#000',
     tooltipBg: isDark ? '#333' : '#fff',
-    tooltipColor: isDark ? '#fff' : '#000',
+    tooltipColor: isDark ? '#e0e0e0' : '#000',
     tooltipBorder: isDark ? '#444' : '#ddd',
     resetBtnBg: isDark ? '#222' : '#f0f0f0',
     resetBtnBorder: isDark ? '#555' : '#ccc',
+    iconColor: isDark ? '#e0e0e0' : '#555555',
   };
   
   const getThemeIcon = () => {
@@ -67,6 +71,8 @@ const Navbar = () => {
         zIndex: 1000,
         boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
       }}
+      onMouseEnter={() => setIsTooltipHovered(true)}
+      onMouseLeave={() => setIsTooltipHovered(false)}
     >
       {content}
     </div>
@@ -75,8 +81,17 @@ const Navbar = () => {
   const renderThemeButton = () => (
     <div
       style={{ position: 'relative', display: 'inline-block', marginRight: currentUser ? '10px' : '0' }}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      onMouseEnter={() => {
+        clearTimeout(buttonLeaveTimeoutRef.current);
+        setIsButtonHovered(true);
+      }}
+      onMouseLeave={() => {
+        buttonLeaveTimeoutRef.current = setTimeout(() => {
+          if (!isTooltipHovered) {
+            setIsButtonHovered(false);
+          }
+        }, 100);
+      }}
     >
       <button
         onClick={toggleTheme}
@@ -89,15 +104,41 @@ const Navbar = () => {
       >
         {getThemeIcon()}
       </button>
-      {showTooltip && renderTooltip(
-        <>
+      {(isButtonHovered || isTooltipHovered) && (
+        <div
+          style={{
+            position: 'absolute',
+            right: '0',
+            top: '45px',
+            backgroundColor: colors.tooltipBg,
+            color: colors.tooltipColor,
+            border: `1px solid ${colors.tooltipBorder}`,
+            padding: '8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            whiteSpace: 'nowrap',
+            zIndex: 1000,
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+          }}
+          onMouseEnter={() => {
+            clearTimeout(buttonLeaveTimeoutRef.current);
+            setIsTooltipHovered(true);
+          }}
+          onMouseLeave={() => {
+            setIsTooltipHovered(false);
+            if (!isButtonHovered) {
+              setIsButtonHovered(false);
+            }
+          }}
+        >
           {isSystemTheme ? 'Using system theme' : 'Using your saved preference'}
           {!isSystemTheme && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 resetToSystemTheme();
-                setShowTooltip(false);
+                setIsButtonHovered(false);
+                setIsTooltipHovered(false);
               }}
               style={{
                 display: 'block',
@@ -114,7 +155,29 @@ const Navbar = () => {
               Reset to system theme
             </button>
           )}
-        </>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderInfoButton = () => (
+    <div
+      style={{ position: 'relative', display: 'inline-block', marginRight: '10px' }}
+      onMouseEnter={() => setShowInfoTooltip(true)}
+      onMouseLeave={() => setShowInfoTooltip(false)}
+    >
+      <button
+        style={{
+          ...styles.themeButton,
+          backgroundColor: colors.btnBg,
+          color: colors.btnColor,
+          border: `2px solid ${colors.border}`
+        }}
+      >
+        <FaInfo color={colors.iconColor} />
+      </button>
+      {showInfoTooltip && renderTooltip(
+        "Progetto di corso Tecnologie Web fatta da Alessandro D'Ambrosio e Arda Çebi."
       )}
     </div>
   );
@@ -132,6 +195,7 @@ const Navbar = () => {
           </NavLink>
         </div>
         <div style={styles.controlsContainer}>
+          {renderInfoButton()}
           {renderThemeButton()}
           {currentUser && (
             <div
@@ -148,7 +212,7 @@ const Navbar = () => {
                   border: `2px solid ${colors.border}`
                 }}
               >
-                <FaSignOutAlt />
+                <FaSignOutAlt color={colors.iconColor} />
               </button>
               {showLogoutTooltip && renderTooltip('Log out')}
             </div>

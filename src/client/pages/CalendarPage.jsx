@@ -9,7 +9,8 @@ const CalendarPage = () => {
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [zoomLevel, setZoomLevel] = useState(1); // 0: year, 1: month, 2: week
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 992);
+  const [hoveredDay, setHoveredDay] = useState(null);
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -30,6 +31,8 @@ const CalendarPage = () => {
     };
   }, []);
 
+  const isMobile = windowWidth < 576;
+  
   // Helper functions
   const findMonthsDays = (year, month) => new Date(year, month + 1, 0).getDate();
   const findFirstDay = (year, month) => new Date(year, month, 0).getDay();
@@ -69,9 +72,19 @@ const CalendarPage = () => {
   // Format helpers
   const months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", 
                   "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-                  
-  const renderMonth = () => `${months[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-  const monthName = month => months[month];
+  
+  // Get abbreviated month names for mobile view
+  const getMonthName = (month) => {
+    if (isMobile) {
+      // Return abbreviated month names for mobile
+      const abbr = months[month].substring(0, 3);
+      return abbr;
+    }
+    return months[month];
+  };
+                
+  const renderMonth = () => `${getMonthName(calendarDate.getMonth())} ${calendarDate.getFullYear()}`;
+  const monthName = month => getMonthName(month);
 
   // Theme colors
   const darkBoxBg = '#2e2e2e'; 
@@ -84,27 +97,47 @@ const CalendarPage = () => {
   const lightOtherMonthBg = '#f9f9f9';
   const darkEmptyBg = '#2c2c2c'; 
   const lightEmptyBg = '#e0f0f0';
+  const darkBorderColor = '#444444';
+  const lightBorderColor = '#cccccc';
+  const darkTextColor = '#e0e0e0';
   
   const getResponsiveStyles = () => {
     // Mobile styles
     if (windowWidth < 576) {
       return {
         calendarBox: {
-          minHeight: "40px",
-          fontSize: "13px",
+          minHeight: "35px",
+          fontSize: "12px",
           padding: "2px"
         },
         weekDay: {
-          fontSize: "10px",
+          fontSize: "9px",
           padding: "2px"
         },
         button: {
-          padding: "5px 8px",
-          fontSize: "12px"
+          padding: "4px 6px",
+          fontSize: "11px",
+          marginBottom: "5px"
         },
         calendarContainer: {
-          gap: "2px", 
-          padding: "5px"
+          gap: "1px", 
+          padding: "4px"
+        },
+        yearCalendar: {
+          gridTemplateColumns: "repeat(3, 1fr)",
+          fontSize: "12px"
+        },
+        monthName: {
+          fontSize: "14px",
+          marginBottom: "10px"
+        },
+        headerButton: {
+          fontSize: "11px",
+          padding: "4px 8px",
+          width: "100%",
+          maxWidth: "120px",
+          margin: "5px auto",
+          display: "block"
         }
       };
     }
@@ -112,18 +145,26 @@ const CalendarPage = () => {
     else if (windowWidth < 768) {
       return {
         calendarBox: {
-          minHeight: "50px",
-          fontSize: "14px"
+          minHeight: "40px",
+          fontSize: "13px",
+          padding: "3px"
         },
         weekDay: {
-          fontSize: "11px"
+          fontSize: "10px",
+          padding: "3px"
         },
         button: {
-          padding: "6px 10px",
-          fontSize: "13px"
+          padding: "5px 8px",
+          fontSize: "12px"
         },
         calendarContainer: {
-          gap: "3px"
+          gap: "2px"
+        },
+        yearCalendar: {
+          gridTemplateColumns: "repeat(4, 1fr)"
+        },
+        monthName: {
+          fontSize: "16px"
         }
       };
     }
@@ -149,12 +190,24 @@ const CalendarPage = () => {
         : isOtherMonth
           ? theme === 'dark' ? darkOtherMonthBg : lightOtherMonthBg
           : theme === 'dark' ? darkBoxBg : lightBoxBg;
+      
+    const borderColor = theme === 'dark' ? darkBorderColor : lightBorderColor;
+    
+    // Check if this day is currently being hovered
+    const isHovered = hoveredDay && date && date.toDateString() === hoveredDay.toDateString();
+    const hoverStyles = isHovered ? {
+      backgroundColor: theme === 'dark' ? '#3a3a3a' : '#f0f0f0',
+      transform: 'scale(1.05)',
+      boxShadow: theme === 'dark' ? '0 0 5px rgba(255,255,255,0.1)' : '0 0 5px rgba(0,0,0,0.1)',
+    } : {};
     
     return {
       ...baseStyle,
       backgroundColor: bgColor,
-      color: theme === 'dark' ? (isOtherMonth ? '#a0a0a0' : '#f8f7f5') : 'inherit',
-      ...(responsiveStyles.calendarBox || {})
+      borderColor: borderColor,
+      color: theme === 'dark' ? (isOtherMonth ? '#a0a0a0' : darkTextColor) : 'inherit',
+      ...(responsiveStyles.calendarBox || {}),
+      ...hoverStyles
     };
   };
   
@@ -173,6 +226,8 @@ const CalendarPage = () => {
           <div
             style={getBoxStyle(dateSelected, isToday, isSelected)}
             onClick={() => handleDateClick(year, i, 1)}
+            onMouseEnter={() => setHoveredDay(new Date(year, i, 1))}
+            onMouseLeave={() => setHoveredDay(null)}
           >
             {monthName(i)}
           </div>
@@ -220,6 +275,8 @@ const CalendarPage = () => {
           key={`day-${i}`}
           style={getBoxStyle(date, isToday, isSelected)}
           onClick={() => handleDateClick(year, month, i)}
+          onMouseEnter={() => setHoveredDay(date)}
+          onMouseLeave={() => setHoveredDay(null)}
         >
           {i}
         </div>
@@ -268,6 +325,8 @@ const CalendarPage = () => {
             key={`prev-${i}`}
             style={getBoxStyle(date, isToday, isSelected, true)}
             onClick={() => handleDateClick(prevYear, prevMonth, i)}
+            onMouseEnter={() => setHoveredDay(date)}
+            onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
           </div>
@@ -286,6 +345,8 @@ const CalendarPage = () => {
             key={`day-${i}`}
             style={getBoxStyle(date, isToday, isSelected)}
             onClick={() => handleDateClick(year, month, i)}
+            onMouseEnter={() => setHoveredDay(date)}
+            onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
           </div>
@@ -306,6 +367,8 @@ const CalendarPage = () => {
             key={`day-${i}`}
             style={getBoxStyle(date, isToday, isSelected)}
             onClick={() => handleDateClick(year, month, i)}
+            onMouseEnter={() => setHoveredDay(date)}
+            onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
           </div>
@@ -328,6 +391,8 @@ const CalendarPage = () => {
               key={`next-${i}`}
               style={getBoxStyle(date, isToday, isSelected, true)}
               onClick={() => handleDateClick(nextYear, nextMonth, i)}
+              onMouseEnter={() => setHoveredDay(date)}
+              onMouseLeave={() => setHoveredDay(null)}
             >
               {i}
             </div>
@@ -343,8 +408,15 @@ const CalendarPage = () => {
   const btnStyle = {
     ...styles.button,
     backgroundColor: theme === 'dark' ? '#333' : '#fff',
-    color: theme === 'dark' ? '#f8f7f5' : '#000',
+    color: theme === 'dark' ? darkTextColor : '#000',
+    borderColor: theme === 'dark' ? darkBorderColor : lightBorderColor,
     ...(responsiveStyles.button || {})
+  };
+  
+  // Back home button style
+  const backHomeBtnStyle = {
+    ...btnStyle,
+    ...(responsiveStyles.headerButton || {})
   };
   
   // Disabled button style
@@ -356,9 +428,14 @@ const CalendarPage = () => {
   };
   
   // Calendar container style
+  const yearCalendarStyle = {
+    ...styles.year_calendar,
+    ...(responsiveStyles.yearCalendar || {})
+  };
+  
   const calendarContainerStyle = {
     ...(zoomLevel === 0 
-      ? styles.year_calendar 
+      ? yearCalendarStyle 
       : (zoomLevel === 1 ? styles.month_calendar : styles.week_calendar)),
     backgroundColor: theme === 'dark' ? '#1a1a1a' : '#f0f0f0',
     ...(responsiveStyles.calendarContainer || {})
@@ -373,15 +450,25 @@ const CalendarPage = () => {
   const weekDayStyle = {
     ...styles.week_day,
     ...(responsiveStyles.weekDay || {}),
-    color: theme === 'dark' ? '#f8f7f5' : '#333333'
+    color: theme === 'dark' ? darkTextColor : '#333333'
+  };
+  
+  // Month name style with responsive adjustment
+  const monthNameStyle = {
+    ...styles.month_name,
+    ...(responsiveStyles.monthName || {}),
+    color: theme === 'dark' ? darkTextColor : 'inherit'
   };
   
   return (
     <div>
-      <div style={styles.headerContainer}>
+      <div style={{
+        ...styles.headerContainer,
+        flexDirection: isMobile ? 'column' : 'row',
+      }}>
         <button
           style={{
-            ...btnStyle,
+            ...backHomeBtnStyle,
             ...(isButtonHovered ? styles.buttonHover : {})
           }}
           onMouseEnter={() => setIsButtonHovered(true)}
@@ -393,37 +480,43 @@ const CalendarPage = () => {
       </div>
       
       <div style={styles.titleContainer}>
-        <h1 style={{ color: theme === 'dark' ? '#f8f7f5' : 'inherit' }}>Calendar</h1>
+        <h1 style={{ 
+          color: theme === 'dark' ? darkTextColor : 'inherit',
+          fontSize: isMobile ? '20px' : '24px'
+        }}>Calendar</h1>
       </div>
       
-      <div style={styles.month_name}>
+      <div style={monthNameStyle}>
         {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
       </div>
       
       <ButtonContainer>
         {zoomLevel === 0 && (
           <>
-            <button style={btnStyle} onClick={changeToPrevYear}><FaArrowLeft /> Previous Year</button>
-            <button style={btnStyle} onClick={changeToNextYear}>Next Year <FaArrowRight /></button>
+            <button style={btnStyle} onClick={changeToPrevYear}><FaArrowLeft /> {isMobile ? 'Prev Year' : 'Previous Year'}</button>
+            <button style={btnStyle} onClick={changeToNextYear}>{isMobile ? 'Next Year' : 'Next Year'} <FaArrowRight /></button>
           </>
         )}
         
         {zoomLevel === 1 && (
           <>
-            <button style={btnStyle} onClick={changeToPrevMonth}><FaArrowLeft /> Previous Month</button>
-            <button style={btnStyle} onClick={changeToNextMonth}>Next Month <FaArrowRight /></button>
+            <button style={btnStyle} onClick={changeToPrevMonth}><FaArrowLeft /> {isMobile ? 'Prev Month' : 'Previous Month'}</button>
+            <button style={btnStyle} onClick={changeToNextMonth}>{isMobile ? 'Next Month' : 'Next Month'} <FaArrowRight /></button>
           </>
         )}
         
         {zoomLevel === 2 && (
           <>
-            <button style={btnStyle} onClick={changeToPrevWeek}><FaArrowLeft /> Previous Week</button>
-            <button style={btnStyle} onClick={changeToNextWeek}>Next Week <FaArrowRight /></button>
+            <button style={btnStyle} onClick={changeToPrevWeek}><FaArrowLeft /> {isMobile ? 'Prev Week' : 'Previous Week'}</button>
+            <button style={btnStyle} onClick={changeToNextWeek}>{isMobile ? 'Next Week' : 'Next Week'} <FaArrowRight /></button>
           </>
         )}
       </ButtonContainer>
       
-      <div style={styles.calendarOuterContainer}>
+      <div style={{
+        ...styles.calendarOuterContainer,
+        padding: isMobile ? '5px' : '10px',
+      }}>
         <div style={calendarContainerStyle}>
           {zoomLevel === 0 && renderYearCalendar()}
           {zoomLevel === 1 && renderMonthCalendar()}
@@ -437,14 +530,14 @@ const CalendarPage = () => {
           onClick={decreaseZoomLevel} 
           disabled={zoomLevel === 0}
         >
-          <FaSearchMinus /> Decrease Zoom
+          <FaSearchMinus /> {isMobile ? 'Decrease' : 'Decrease Zoom'}
         </button>
         <button 
           style={zoomLevel === 2 ? disabledBtnStyle : btnStyle} 
           onClick={increaseZoomLevel} 
           disabled={zoomLevel === 2}
         >
-          <FaSearchPlus /> Increase Zoom
+          <FaSearchPlus /> {isMobile ? 'Increase' : 'Increase Zoom'}
         </button>
       </ButtonContainer>
     </div>
@@ -475,7 +568,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.2s",
+    transition: "background-color 0.3s, transform 0.2s, border-color 0.3s",
   },
   calendar_box_selected: {
     border: "2px solid #003366",
@@ -514,7 +607,7 @@ const styles = {
   },
   year_calendar: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
     gap: "10px",
     padding: "10px",
     borderRadius: "10px",
@@ -541,7 +634,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.2s",
+    transition: "background-color 0.3s, transform 0.2s, border-color 0.3s",
   },
   calendar_day_week_box_other_month: {
     border: "1px solid #dddddd",
@@ -579,7 +672,7 @@ const styles = {
     fontSize: "14px",
     cursor: "pointer",
     margin: "5px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   buttonHover: {
     backgroundColor: "#f0f0f0",
@@ -600,6 +693,8 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "10px",
+    width: "100%",
+    marginTop: "10px"
   },
   calendarOuterContainer: {
     display: "flex",
@@ -611,11 +706,7 @@ const styles = {
   titleContainer: {
     textAlign: "center",
     width: "100%",
-    marginBottom: "20px",
-  },
-  // Responsive styles object for media queries
-  responsive: {
-    // Will apply these styles conditionally in the component
+    marginBottom: "10px",
   }
 };
 

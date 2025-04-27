@@ -27,7 +27,7 @@ const App = () => {
         padding: 0;
         height: 100%;
         background-color: ${theme === 'dark' ? '#121212' : '#f8f7f5'};
-        color: ${theme === 'dark' ? '#f8f7f5' : 'black'};
+        color: ${theme === 'dark' ? '#e0e0e0' : 'black'};
         transition: background-color 0.3s, color 0.3s;
       }
     `;
@@ -39,7 +39,7 @@ const App = () => {
   const colors = {
     bg: isDark ? '#121212' : '#f8f7f5',
     cardBg: isDark ? '#1e1e1e' : '#fff',
-    text: isDark ? '#f8f7f5' : 'black'
+    text: isDark ? '#e0e0e0' : 'black'
   };
   
   return (

@@ -4,6 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
+import selfieImg from '../assets/selfie.png';
 
 const LoginForm = () => {
   const { theme } = useContext(ThemeContext);
@@ -18,14 +19,21 @@ const LoginForm = () => {
       button:hover, a:hover {
         background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
       }
+      
+      input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
+        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
 
   const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#c0c0c0' : '#000';
+  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
   const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
+  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
   
   const login = useMutation(fetchLoginData, {
     onMutate: () => {
@@ -48,6 +56,9 @@ const LoginForm = () => {
   
   return (
     <div>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <img src={selfieImg} alt="Selfie" style={styles.logo} />
+      </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -60,7 +71,7 @@ const LoginForm = () => {
       >
         <label htmlFor="username">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
             name="username"
             id="username"
             type="text"
@@ -72,7 +83,7 @@ const LoginForm = () => {
 
         <label htmlFor="password">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
             name="password"
             id="password"
             type="password"
@@ -95,7 +106,7 @@ const LoginForm = () => {
         
         <button 
           type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor}}
+          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
         >
           Login
         </button>
@@ -122,7 +133,7 @@ const styles = {
     width: "250px",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   button: {
     border: "2px solid #dcdcdc",
@@ -131,7 +142,7 @@ const styles = {
     cursor: "pointer",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   forgot: { textDecoration: "none" },
   a_account: {
@@ -144,6 +155,12 @@ const styles = {
     fontSize: "18px",
     visibility: "hidden",
     textAlign: "center",
+  },
+  logo: {
+    maxWidth: "150px",
+    height: "auto",
+    marginBottom: "20px",
+    borderRadius: "10px",
   },
 };
 

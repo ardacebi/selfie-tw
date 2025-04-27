@@ -3,6 +3,7 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { useContext, useEffect } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
+import selfieImg from '../assets/selfie.png';
 
 const BaseHomePage = () => {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -21,13 +22,15 @@ const BaseHomePage = () => {
   }, [theme]);
 
   const btnBg = theme === 'dark' ? "#333" : "#fff";
-  const btnColor = theme === 'dark' ? "#c0c0c0" : "#000";
-  const txtColor = theme === 'dark' ? '#c0c0c0' : '#000';
+  const btnColor = theme === 'dark' ? "#e0e0e0" : "#000";
+  const txtColor = theme === 'dark' ? '#e0e0e0' : '#000';
+  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
   
   if (!currentUser) {
     return (
       <div style={styles.container}>
         <div style={{...styles.form, backgroundColor: 'transparent'}}>
+          <img src={selfieImg} alt="Selfie" style={styles.logo} />
           <div style={{ display: "flex", justifyContent: "center" }}>
             <NavLink
               style={({ isActive }) => ({
@@ -35,6 +38,7 @@ const BaseHomePage = () => {
                 ...styles.button1,
                 backgroundColor: theme === 'dark' ? (isActive ? "#444" : "#333") : (isActive ? "#e7e7e7" : "#fff"),
                 color: btnColor,
+                borderColor: borderColor,
               })}
               to="/login"
             >
@@ -45,6 +49,7 @@ const BaseHomePage = () => {
                 ...styles.button,
                 backgroundColor: theme === 'dark' ? (isActive ? "#444" : "#333") : (isActive ? "#e7e7e7" : "#fff"),
                 color: btnColor,
+                borderColor: borderColor,
               })}
               to="/sign_up"
             >
@@ -59,10 +64,11 @@ const BaseHomePage = () => {
   return (
     <div style={styles.container}>
       <div style={{...styles.form, backgroundColor: 'transparent'}}>
+        <img src={selfieImg} alt="Selfie" style={styles.logo} />
         <p style={{ color: txtColor }}>Welcome to Selfie. You are now logged in.</p>
         <div style={{
           display: 'inline-block',
-          border: '2px solid #dcdcdc',
+          border: `2px solid ${borderColor}`,
           borderRadius: '10px',
           padding: '5px 10px',
           marginTop: '10px',
@@ -73,7 +79,7 @@ const BaseHomePage = () => {
             fontFamily: 'monospace',
             fontSize: '18px',
             margin: '0'
-          }}>ID: {currentUser}</p>
+          }}>User ID: {currentUser}</p>
         </div>
       </div>
       <div style={styles.buttonContainer}>
@@ -82,6 +88,7 @@ const BaseHomePage = () => {
             ...styles.button,
             backgroundColor: btnBg,
             color: btnColor,
+            borderColor: borderColor,
             display: "flex",
             flexDirection: "column",
             alignItems: "center"
@@ -128,6 +135,12 @@ const styles = {
   },
   button1: {
     marginRight: "5px",
+  },
+  logo: {
+    maxWidth: "150px",
+    height: "auto",
+    marginBottom: "20px",
+    borderRadius: "10px",
   },
 };
 

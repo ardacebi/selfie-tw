@@ -23,7 +23,7 @@ const vite = await createViteServer({
 
 app.use(vite.middlewares);
 app.use(cors());
-app.use(express.json()); // Allows accepting JSON data in the body of the request
+app.use(express.json());
 app.use("/api/account", AccountHandling);
 
 app.use("*", async (req, res) => {

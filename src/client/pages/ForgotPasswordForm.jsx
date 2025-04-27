@@ -13,14 +13,21 @@ const ForgotPasswordForm = () => {
       button:hover, a:hover {
         background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
       }
+      
+      input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
+        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
 
   const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#c0c0c0' : '#000';
-  const titleColor = theme === 'dark' ? '#c0c0c0' : 'black';
+  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
+  const titleColor = theme === 'dark' ? '#e0e0e0' : 'black';
+  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
 
   const resetPassword = useMutation(postNewPassword, {
     onMutate: () => {
@@ -53,7 +60,7 @@ const ForgotPasswordForm = () => {
         <h1 style={{...styles.title, color: titleColor}}>Forgot Password</h1>
         <label htmlFor="email">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
             name="email"
             id="email"
             type="text"
@@ -65,7 +72,7 @@ const ForgotPasswordForm = () => {
 
         <label htmlFor="password">
           <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor}}
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
             name="password"
             id="password"
             type="password"
@@ -77,7 +84,7 @@ const ForgotPasswordForm = () => {
         
         <button 
           type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor}}
+          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
         >
           Change Password
         </button>
@@ -95,7 +102,7 @@ const styles = {
     width: "250px",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   button: {
     border: "2px solid #dcdcdc",
@@ -104,7 +111,7 @@ const styles = {
     cursor: "pointer",
     padding: "10px 25px",
     fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
   title: {
     textAlign: "center",

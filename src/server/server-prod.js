@@ -19,7 +19,7 @@ const port = process.env.NODE_PORT || 8000;
 const app = express();
 
 app.use(cors());
-app.use(express.json()); // Allows accepting JSON data in the body of the request
+app.use(express.json());
 app.use("/api/account", AccountHandling);
 app.use(
   express.static(path.join(projectRoot, "dist/client"), { index: false }),
