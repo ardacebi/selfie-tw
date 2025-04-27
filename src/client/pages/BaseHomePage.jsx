@@ -43,7 +43,7 @@ const BaseHomePage = () => {
               })}
               to="/login"
             >
-              Login
+              Log In
             </NavLink>
             <NavLink
               style={({ isActive }) => ({

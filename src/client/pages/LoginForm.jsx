@@ -108,7 +108,7 @@ const LoginForm = () => {
           type="submit" 
           style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
         >
-          Login
+          Log In
         </button>
         <br /><br />
 
@@ -117,7 +117,7 @@ const LoginForm = () => {
         </NavLink>
 
         <NavLink style={{...styles.a_account, color: linkColor}} to="/sign_up">
-          You do not have an account? Sign up here!
+          Don't have an account? Sign up.
         </NavLink>
       </form>
 

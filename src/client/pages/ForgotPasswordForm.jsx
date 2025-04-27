@@ -70,6 +70,8 @@ const ForgotPasswordForm = () => {
           <br />
         </label>
 
+        <div style={{marginBottom: '20px'}}></div>
+
         <label htmlFor="password">
           <input
             style={{...styles.field, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
@@ -82,6 +84,8 @@ const ForgotPasswordForm = () => {
           <br />
         </label>
         
+        <div style={{marginBottom: '20px'}}></div>
+        
         <button 
           type="submit" 
           style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
@@ -89,6 +93,42 @@ const ForgotPasswordForm = () => {
           Change Password
         </button>
       </form>
+
+      <div style={{
+        marginTop: '20px',
+        padding: '12px',
+        backgroundColor: theme === 'dark' ? '#444' : '#f8f8f8',
+        border: `1px solid ${theme === 'dark' ? '#555' : '#ddd'}`,
+        borderRadius: '6px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        maxWidth: '300px',
+      }}>
+        <div style={{ 
+          marginRight: '10px',
+          backgroundColor: theme === 'dark' ? '#666' : '#e0e0e0',
+          borderRadius: '50%',
+          width: '24px',
+          height: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          color: theme === 'dark' ? '#fff' : '#444',
+          flexShrink: 0,
+        }}>
+          i
+        </div>
+        <p style={{
+          margin: 0,
+          fontSize: '12px',
+          color: theme === 'dark' ? '#ccc' : '#666',
+          lineHeight: '1.4'
+        }}>
+          In production environments, password changes require email verification for security. This is not the case in this educational project. Without this verification, any user could change another user's password, which is not expected practice.
+        </p>
+      </div>
 
       <p id="error_text" style={styles.error_text}>{error}</p>
     </div>
