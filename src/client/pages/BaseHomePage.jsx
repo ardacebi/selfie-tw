@@ -31,6 +31,7 @@ const BaseHomePage = () => {
       <div style={styles.container}>
         <div style={{...styles.form, backgroundColor: 'transparent'}}>
           <img src={selfieImg} alt="Selfie" style={styles.logo} />
+          <p style={{ color: txtColor }}>Welcome to Selfie.</p><br></br>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <NavLink
               style={({ isActive }) => ({
