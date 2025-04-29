@@ -24,25 +24,22 @@ const SignUpForm = () => {
   }, [theme]);
 
   const signup = useMutation(postAccountData, {
-    onMutate: () => {
-      setShowErrorBanner(false);
-    },
-    onSuccess: () => {
-      navigate("/login", { 
-        replace: true,
-        state: { fromSignup: true }
-      });
-    },
-    onError: (error) => {
-      setError(error.message);
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => navigate("/login", { replace: true, state: { fromSignup: true } }),
+    onError: (err) => {
+      setError(err.message);
       setShowErrorBanner(true);
     },
   });
-
-  // Error banner
-  const errorBannerStyle = {
-    ...commonStyles.baseBannerStyle,
-    ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    signup.mutate({
+      email: formData.get("email") ?? "",
+      username: formData.get("username") ?? "",
+      password: formData.get("password") ?? "",
+    });
   };
 
   return (
@@ -64,41 +61,17 @@ const SignUpForm = () => {
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          signup.mutate({
-            email: formData.get("email") ?? "",
-            username: formData.get("username") ?? "",
-            password: formData.get("password") ?? "",
-          });
-        }}
-      >
+      
+      <form onSubmit={handleSubmit}>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={commonStyles.gradientTitle(theme)} key={theme}>
             Sign Up
           </div>
         </div>
         
-        <FormInput 
-          name="email"
-          placeholder="Email"
-          required={true}
-        />
-
-        <FormInput 
-          name="username"
-          placeholder="Username"
-          required={true}
-        />
-
-        <FormInput 
-          name="password"
-          type="password"
-          placeholder="Password"
-          required={true}
-        />
+        <FormInput name="email" placeholder="Email" required={true} />
+        <FormInput name="username" placeholder="Username" required={true} />
+        <FormInput name="password" type="password" placeholder="Password" required={true} />
 
         <FormButton>Create Account</FormButton>
 
@@ -109,7 +82,10 @@ const SignUpForm = () => {
           Already have an account?
         </NavLink>
 
-        <div style={errorBannerStyle}>
+        <div style={{
+          ...commonStyles.baseBannerStyle,
+          ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+        }}>
           <FaExclamationCircle style={commonStyles.bannerIconStyle} />
           <span>{error}</span>
         </div>

@@ -14,6 +14,7 @@ const ForgotPasswordForm = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const themeStyles = commonStyles.getThemeStyles(theme);
+  const isDark = theme === 'dark';
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -24,18 +25,23 @@ const ForgotPasswordForm = () => {
 
   const resetPassword = useMutation(postNewPassword, {
     onMutate: () => { document.querySelector("#error_text").style.visibility = "hidden"; },
-    onSuccess: () => {
-      navigate("/login", { 
-        replace: true,
-        state: { fromPasswordReset: true }
-      });
-    },
-    onError: (error) => {
-      setError(error.message);
-      document.querySelector("#error_text").style.color = "red";
-      document.querySelector("#error_text").style.visibility = "visible";
+    onSuccess: () => navigate("/login", { replace: true, state: { fromPasswordReset: true } }),
+    onError: (err) => {
+      setError(err.message);
+      const errorText = document.querySelector("#error_text");
+      errorText.style.color = "red";
+      errorText.style.visibility = "visible";
     },
   });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    resetPassword.mutate({
+      email: formData.get("email") ?? "",
+      password: formData.get("password") ?? "",
+    });
+  };
 
   return (
     <div>
@@ -57,43 +63,21 @@ const ForgotPasswordForm = () => {
         <img src={selfieImg} alt="Selfie" style={{...commonStyles.logo, marginBottom: "5px"}} />
       </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          resetPassword.mutate({
-            email: formData.get("email") ?? "",
-            password: formData.get("password") ?? "",
-          });
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={commonStyles.gradientTitle(theme)} key={theme}>
-            Forgot Password
-          </div>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>Forgot Password</div>
         </div>
         
-        <FormInput
-          name="email"
-          placeholder="Email"
-          required={true}
-        />
-
-        <FormInput
-          name="password"
-          type="password"
-          placeholder="New Password"
-          required={true}
-        />
-        
+        <FormInput name="email" placeholder="Email" required={true} />
+        <FormInput name="password" type="password" placeholder="New Password" required={true} />
         <FormButton>Change Password</FormButton>
       </form>
 
       <div style={{
         marginTop: '20px',
         padding: '12px',
-        backgroundColor: theme === 'dark' ? '#444' : '#f8f8f8',
-        border: `1px solid ${theme === 'dark' ? '#555' : '#ddd'}`,
+        backgroundColor: isDark ? '#444' : '#f8f8f8',
+        border: `1px solid ${isDark ? '#555' : '#ddd'}`,
         borderRadius: '6px',
         display: 'flex',
         alignItems: 'flex-start',
@@ -101,7 +85,7 @@ const ForgotPasswordForm = () => {
       }}>
         <div style={{ 
           marginRight: '10px',
-          backgroundColor: theme === 'dark' ? '#666' : '#e0e0e0',
+          backgroundColor: isDark ? '#666' : '#e0e0e0',
           borderRadius: '50%',
           width: '24px',
           height: '24px',
@@ -110,16 +94,14 @@ const ForgotPasswordForm = () => {
           justifyContent: 'center',
           fontWeight: 'bold',
           fontSize: '14px',
-          color: theme === 'dark' ? '#fff' : '#444',
+          color: isDark ? '#fff' : '#444',
           minWidth: '24px',
           flexShrink: 0,
-        }}>
-          i
-        </div>
+        }}>i</div>
         <p style={{
           margin: 0,
           fontSize: '12px',
-          color: theme === 'dark' ? '#ccc' : '#666',
+          color: isDark ? '#ccc' : '#666',
         }}>
           In production environments, password changes require email verification for security. This is not the case in this educational project. Without this verification, any user could change another user's password, which is not expected practice.
         </p>

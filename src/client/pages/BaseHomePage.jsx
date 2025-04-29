@@ -53,11 +53,11 @@ const BaseHomePage = () => {
         </div>
         
         <div style={{...styles.userIdBox, backgroundColor: themeStyles.inputBg, borderColor: themeStyles.borderColor, marginBottom: '20px'}}>
-          <p style={{...styles.userId, color: themeStyles.inputColor}}>User ID: {currentUser}</p>
+          <p style={{...styles.userId, color: themeStyles.inputColor}}>            User ID: {currentUser}          </p>
         </div>
         
         <button
-          style={{...styles.button, ...styles.calendarButton, backgroundColor: themeStyles.inputBg, color: themeStyles.inputColor, borderColor: themeStyles.borderColor}}
+          style={{            ...styles.button, ...styles.calendarButton,             backgroundColor: themeStyles.inputBg,             color: themeStyles.inputColor,             borderColor: themeStyles.borderColor          }}
           onClick={() => navigate("/calendar", { replace: true })}
         >
           <FaCalendarAlt style={styles.calendarIcon} />

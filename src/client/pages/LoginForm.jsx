@@ -30,58 +30,45 @@ const LoginForm = () => {
   }, [theme]);
   
   useEffect(() => {
-    if (location.state?.fromSignup) {
-      setShowSignupSuccess(true);
-      
-      const timerId = setTimeout(() => {
-        window.history.replaceState({}, document.title);
-      }, 10000);
-      
-      return () => clearTimeout(timerId);
-    }
+    const { state } = location;
+    if (!state) return;
     
-    if (location.state?.fromPasswordReset) {
-      setShowPasswordResetSuccess(true);
-      
-      const timerId = setTimeout(() => {
-        window.history.replaceState({}, document.title);
-      }, 10000);
-      
+    const showSuccess = (flag, timeout = 10000) => {
+      flag(true);
+      const timerId = setTimeout(() => window.history.replaceState({}, document.title), timeout);
       return () => clearTimeout(timerId);
-    }
+    };
+    
+    if (state.fromSignup) return showSuccess(setShowSignupSuccess);
+    if (state.fromPasswordReset) return showSuccess(setShowPasswordResetSuccess);
   }, [location]);
   
   const login = useMutation(fetchLoginData, {
-    onMutate: () => {
-      setShowErrorBanner(false);
-    },
+    onMutate: () => setShowErrorBanner(false),
     onSuccess: (res) => {
       setCurrentUser(res.data._id);
       if (rememberMe) localStorage.setItem("savedUser", res.data._id);
       navigate("/", { replace: true });
     },
-    onError: (error) => {
-      setError(error.message);
+    onError: (err) => {
+      setError(err.message);
       setShowErrorBanner(true);
     },
   });
 
-  // Success banner
-  const successBannerStyle = {
+  // Banner styles
+  const getBannerStyle = (type, visible) => ({
     ...commonStyles.baseBannerStyle,
-    ...commonStyles.successBannerStyle(theme, showSignupSuccess ? "flex" : "none"),
-  };
-  
-  // Password reset success banner
-  const passwordResetBannerStyle = {
-    ...commonStyles.baseBannerStyle,
-    ...commonStyles.successBannerStyle(theme, showPasswordResetSuccess ? "flex" : "none"),
-  };
+    ...commonStyles[type](theme, visible ? "flex" : "none")
+  });
 
-  // Error banner
-  const errorBannerStyle = {
-    ...commonStyles.baseBannerStyle,
-    ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    login.mutate({
+      username: formData.get("username") ?? "",
+      password: formData.get("password") ?? "",
+    });
   };
   
   return (
@@ -104,41 +91,19 @@ const LoginForm = () => {
         <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
       </div>
       
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          login.mutate({
-            username: formData.get("username") ?? "",
-            password: formData.get("password") ?? "",
-          });
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={commonStyles.gradientTitle(theme)} key={theme}>
             Log In
           </div>
         </div>
         
-        <FormInput 
-          name="username"
-          placeholder="Username"
-          required={true}
-        />
-
-        <FormInput 
-          name="password"
-          type="password"
-          placeholder="Password"
-          required={true}
-        />
+        <FormInput name="username" placeholder="Username" required={true} />
+        <FormInput name="password" type="password" placeholder="Password" required={true} />
         
         <div className="remember-me-button">
           <label style={{ color: themeStyles.linkColor }}>
-            <input
-              type="checkbox"
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
+            <input type="checkbox" onChange={(e) => setRememberMe(e.target.checked)} />
             Remember me
           </label>
         </div>
@@ -155,17 +120,17 @@ const LoginForm = () => {
           Don't have an account? Sign up.
         </NavLink>
 
-        <div style={errorBannerStyle}>
+        <div style={getBannerStyle("errorBannerStyle", showErrorBanner)}>
           <FaExclamationCircle style={commonStyles.bannerIconStyle} />
           <span>{error}</span>
         </div>
         
-        <div style={successBannerStyle}>
+        <div style={getBannerStyle("successBannerStyle", showSignupSuccess)}>
           <FaCheckCircle style={commonStyles.bannerIconStyle} />
           <span>Account created successfully! You can now log in with your credentials.</span>
         </div>
         
-        <div style={passwordResetBannerStyle}>
+        <div style={getBannerStyle("successBannerStyle", showPasswordResetSuccess)}>
           <FaCheckCircle style={commonStyles.bannerIconStyle} />
           <span>Success! The password has been changed! You can now log in with your new password.</span>
         </div>
