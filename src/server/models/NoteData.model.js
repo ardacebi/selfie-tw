@@ -9,7 +9,7 @@ const NoteDataSchema = new Schema(
     category: { type: String, required: true },
   },
   {
-    timestamps: true, // createdAt and updatedAt
+    timestamps: true,
   },
 );
 

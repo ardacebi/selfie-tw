@@ -1,141 +1,160 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import postAccountData from "../data_creation/postAccountData.js";
+import { ThemeContext } from "../contexts/ThemeContext.jsx";
+import selfieImg from '../assets/selfie.png';
 
 const SignUpForm = () => {
-  let navigate = useNavigate();
-  const [accountCreationError, setAccountCreationError] = useState("no error");
+  const { theme } = useContext(ThemeContext);
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
-  const mutateAccount = useMutation(postAccountData, {
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+      button:hover, a:hover {
+        background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
+      }
+      
+      input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
+        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, [theme]);
+
+  const inputBg = theme === 'dark' ? '#333' : '#fff';
+  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
+  const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
+  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
+
+  const signup = useMutation(postAccountData, {
     onMutate: () => {
       document.querySelector("#error_text").style.visibility = "hidden";
     },
-    onSuccess: (res) => {
-      console.log("Account created successfully! ", res);
-      setAccountCreationError("Success! You signed up!");
+    onSuccess: () => {
+      setError("Success! You signed up!");
       document.querySelector("#error_text").style.color = "green";
       document.querySelector("#error_text").style.visibility = "visible";
       navigate("/login", { replace: true });
     },
     onError: (error) => {
-      setAccountCreationError(error.message);
+      setError(error.message);
       document.querySelector("#error_text").style.color = "red";
       document.querySelector("#error_text").style.visibility = "visible";
     },
   });
+
   return (
     <div>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <img src={selfieImg} alt="Selfie" style={styles.logo} />
+      </div>
       <form
-        action=""
         onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.target);
-          const userDataObj = {
+          signup.mutate({
             email: formData.get("email") ?? "",
             username: formData.get("username") ?? "",
             password: formData.get("password") ?? "",
-          };
-          mutateAccount.mutate(userDataObj);
+          });
         }}
       >
         <label htmlFor="email">
-          <div className="input-box">
-            <input
-              style={styles.field}
-              name="email"
-              id="email"
-              type="text"
-              placeholder="Email"
-              required
-            />
-          </div>
-          <br></br>
+          <input
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
+            name="email"
+            id="email"
+            type="text"
+            placeholder="Email"
+            required
+          />
+          <br />
         </label>
 
         <label htmlFor="username">
-          <div className="input-box">
-            <input
-              style={styles.field}
-              name="username"
-              id="username"
-              type="text"
-              placeholder="Username"
-              required
-            />
-          </div>
-          <br></br>
+          <input
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
+            name="username"
+            id="username"
+            type="text"
+            placeholder="Username"
+            required
+          />
+          <br />
         </label>
 
         <label htmlFor="password">
-          <div className="input-box">
-            <input
-              style={styles.field}
-              name="password"
-              id="password"
-              type="password"
-              placeholder="Password"
-              required
-            />
-          </div>
-          <br></br>
+          <input
+            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
+            name="password"
+            id="password"
+            type="password"
+            placeholder="Password"
+            required
+          />
+          <br />
         </label>
-        <button type="submit" style={styles.button}>
+
+        <button 
+          type="submit" 
+          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
+        >
           Create Account
         </button>
 
-        <NavLink style={styles.a_account} to="/login">
+        <NavLink 
+          style={{...styles.a_account, color: linkColor}} 
+          to="/login"
+        >
           Already have an account?
         </NavLink>
       </form>
 
-      <div>
-        <p id="error_text" style={styles.error_text}>
-          {accountCreationError}
-        </p>
-      </div>
+      <p id="error_text" style={styles.error_text}>{error}</p>
     </div>
   );
 };
 
 const styles = {
   field: {
-    backgroundColor: "#fff",
     border: "2px solid #dcdcdc",
     borderRadius: "10px",
     width: "250px",
     padding: "10px 25px",
     fontSize: "16px",
-    color: "#000",
-    transition: "background-color 0.3s, border-color 0.3s",
-    textDecoration: "none",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
-
   button: {
-    backgroundColor: "#fff",
     border: "2px solid #dcdcdc",
     borderRadius: "10px",
     width: "300px",
     cursor: "pointer",
     padding: "10px 25px",
     fontSize: "16px",
-    color: "#000",
-    transition: "background-color 0.3s, border-color 0.3s",
-    textDecoration: "none",
+    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
   },
-
+  a_account: {
+    textDecoration: "none",
+    display: "block",
+    padding: "15px 0px",
+  },
   error_text: {
     color: "gray",
     fontSize: "18px",
     visibility: "hidden",
     textAlign: "center",
   },
-
-  a_account: {
-    color: "#9A9A9A",
-    textDecoration: "none",
-    display: "block",
-    padding: "15px 0px",
+  logo: {
+    maxWidth: "150px",
+    height: "auto",
+    marginBottom: "20px",
+    borderRadius: "10px",
   },
 };
 
