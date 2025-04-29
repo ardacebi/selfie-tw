@@ -95,16 +95,19 @@ export const accountLogin = async (req, res) => {
   }
 
   try {
-    const passwordProfileData = await ProfileData.findOne({ password });
     const usernameProfileData = await ProfileData.findOne({ username });
-    if (!usernameProfileData)
+    if (!usernameProfileData) {
       return res
         .status(404)
         .json({ success: false, message: "This user does not exist." });
-    else if (!passwordProfileData)
+    }
+    
+    if (usernameProfileData.password !== password) {
       return res
         .status(404)
         .json({ success: false, message: "The password is incorrect." });
+    }
+    
     res.status(200).json({ success: true, data: usernameProfileData });
   } catch (error) {
     console.log("Error profile could not be found:", error);
