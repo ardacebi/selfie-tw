@@ -48,9 +48,9 @@ const App = () => {
       <main style={{...styles.mainContent, paddingTop: '80px'}}>
         <Routes>
           <Route path="/" element={<BaseHomePage />} />
-          <Route path="/login" element={<LoginForm style={{...styles.card, backgroundColor: colors.cardBg}} />} />
-          <Route path="/sign_up" element={<SignUpForm style={{...styles.card, backgroundColor: colors.cardBg}} />} />
-          <Route path="/forgot_password" element={<ForgotPasswordForm style={{...styles.card, backgroundColor: colors.cardBg}} />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/sign_up" element={<SignUpForm />} />
+          <Route path="/forgot_password" element={<ForgotPasswordForm />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="*" element={<div>404 - Page Not Found</div>} />
         </Routes>
@@ -71,14 +71,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     flexGrow: 1,
-  },
-  card: {
-    padding: "20px",
-    width: "50%",
-    textAlign: "center",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-    transition: "background-color 0.3s",
-  },
+  }
 };
 
 export default App;

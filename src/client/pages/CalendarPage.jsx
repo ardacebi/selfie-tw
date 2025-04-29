@@ -12,6 +12,7 @@ const CalendarPage = () => {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 992);
   const [hoveredDay, setHoveredDay] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -21,7 +22,6 @@ const CalendarPage = () => {
   }, [theme]);
 
   useEffect(() => {
-    // Add window resize listener for responsive layout
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -46,7 +46,15 @@ const CalendarPage = () => {
   
   // Date navigation functions
   //This function is called when a day is clicked and it sets the calendarDate to the date of the day clicked
-  const handleDateClick = (year, month, day) => setCalendarDate(new Date(year, month, day));
+  const handleDateClick = (year, month, day) => {
+    const newDate = new Date(year, month, day);
+    setCalendarDate(newDate);
+    if (selectedDate && selectedDate.toDateString() === newDate.toDateString()) {
+      setSelectedDate(null);
+    } else {
+      setSelectedDate(newDate);
+    }
+  };
   
   //This function is used to change the calendarDate to the previous month. If it is possible it keeps the same day, if it
   //is not possible it sets the day to the last day of the month
@@ -196,6 +204,8 @@ const CalendarPage = () => {
   const responsiveStyles = getResponsiveStyles();
   
   const getBoxStyle = (date, isToday, isSelected, isOtherMonth = false) => {
+    isSelected = selectedDate && date && date.toDateString() === selectedDate.toDateString();
+    
     const baseStyle = isSelected 
       ? (zoomLevel === 2 ? styles.calendar_day_week_box_selected : styles.calendar_box_selected)
       : isToday
@@ -212,7 +222,11 @@ const CalendarPage = () => {
           ? theme === 'dark' ? darkOtherMonthBg : lightOtherMonthBg
           : theme === 'dark' ? darkBoxBg : lightBoxBg;
       
-    const borderColor = theme === 'dark' ? darkBorderColor : lightBorderColor;
+    const borderColor = isSelected
+      ? theme === 'dark' ? '#ffffff' : '#003366' // Make selected border more visible
+      : isToday
+        ? theme === 'dark' ? '#0066cc' : '#0066cc' // Consistent today border color
+        : theme === 'dark' ? darkBorderColor : lightBorderColor;
     
     // Check if this day is currently being hovered
     const isHovered = hoveredDay && date && date.toDateString() === hoveredDay.toDateString();
@@ -237,11 +251,14 @@ const CalendarPage = () => {
   const renderYearCalendar = () => {
     const year = calendarDate.getFullYear();
     return months.map((month, i) => {
-      const dateSelected = new Date(year, i, calendarDate.getDate());
-      const isSelected = calendarDate && calendarDate.toDateString() === dateSelected.toDateString();
+      const dateSelected = new Date(year, i, 1);
       
-      // Fixed: Use proper date comparison to check if this month contains today's date
-      const isToday = currentDate.getMonth() === i && currentDate.getFullYear() === year;
+      const isSelected = selectedDate && 
+        selectedDate.getFullYear() === year && 
+        selectedDate.getMonth() === i;
+      
+      const isToday = currentDate.getMonth() === i && 
+                      currentDate.getFullYear() === year;
       
       return (
         <div key={`month-${i}`}>
@@ -290,13 +307,16 @@ const CalendarPage = () => {
     // Add days of month
     for (let i = 1; i <= totalDays; i++) {
       const date = new Date(year, month, i);
-      const isSelected = calendarDate && calendarDate.toDateString() === date.toDateString();
-      const isToday = currentDate.toDateString() === date.toDateString();
+      
+      const isToday = 
+          currentDate.getDate() === i && 
+          currentDate.getMonth() === month && 
+          currentDate.getFullYear() === year;
       
       allDays.push(
         <div
           key={`day-${i}`}
-          style={getBoxStyle(date, isToday, isSelected)}
+          style={getBoxStyle(date, isToday, false)}
           onClick={() => handleDateClick(year, month, i)}
           onMouseEnter={() => setHoveredDay(date)}
           onMouseLeave={() => setHoveredDay(null)}
@@ -343,13 +363,16 @@ const CalendarPage = () => {
       // Add days from previous month
       for (let i = prevMonthDays + firstWeekDay; i <= prevMonthDays; i++) {
         const date = new Date(prevYear, prevMonth, i);
-        const isSelected = calendarDate && calendarDate.toDateString() === date.toDateString();
-        const isToday = currentDate.toDateString() === date.toDateString();
+        
+        const isToday = 
+            currentDate.getDate() === i && 
+            currentDate.getMonth() === prevMonth && 
+            currentDate.getFullYear() === prevYear;
         
         allDays.push(
           <div
             key={`prev-${i}`}
-            style={getBoxStyle(date, isToday, isSelected, true)}
+            style={getBoxStyle(date, isToday, false, true)}
             onClick={() => handleDateClick(prevYear, prevMonth, i)}
             onMouseEnter={() => setHoveredDay(date)}
             onMouseLeave={() => setHoveredDay(null)}
@@ -363,13 +386,16 @@ const CalendarPage = () => {
       // Add beginning days of current month
       for (let i = 1; i <= daysLeft; i++) {
         const date = new Date(year, month, i);
-        const isSelected = calendarDate && calendarDate.toDateString() === date.toDateString();
-        const isToday = currentDate.toDateString() === date.toDateString();
+        
+        const isToday = 
+            currentDate.getDate() === i && 
+            currentDate.getMonth() === month && 
+            currentDate.getFullYear() === year;
         
         allDays.push(
           <div
             key={`day-${i}`}
-            style={getBoxStyle(date, isToday, isSelected)}
+            style={getBoxStyle(date, isToday, false)}
             onClick={() => handleDateClick(year, month, i)}
             onMouseEnter={() => setHoveredDay(date)}
             onMouseLeave={() => setHoveredDay(null)}
@@ -385,13 +411,17 @@ const CalendarPage = () => {
       // Add days from current month
       for (let i = firstWeekDay; dayCount <= 7 && i <= totalDays; i++) {
         const date = new Date(year, month, i);
-        const isSelected = calendarDate && calendarDate.toDateString() === date.toDateString();
-        const isToday = currentDate.toDateString() === date.toDateString();
+        
+
+        const isToday = 
+            currentDate.getDate() === i && 
+            currentDate.getMonth() === month && 
+            currentDate.getFullYear() === year;
         
         allDays.push(
           <div
             key={`day-${i}`}
-            style={getBoxStyle(date, isToday, isSelected)}
+            style={getBoxStyle(date, isToday, false)}
             onClick={() => handleDateClick(year, month, i)}
             onMouseEnter={() => setHoveredDay(date)}
             onMouseLeave={() => setHoveredDay(null)}
@@ -410,13 +440,17 @@ const CalendarPage = () => {
         
         for (let i = 1; dayCount <= 7; i++, dayCount++) {
           const date = new Date(nextYear, nextMonth, i);
-          const isSelected = calendarDate && calendarDate.toDateString() === date.toDateString();
-          const isToday = currentDate.toDateString() === date.toDateString();
+          
+
+          const isToday = 
+              currentDate.getDate() === i && 
+              currentDate.getMonth() === nextMonth && 
+              currentDate.getFullYear() === nextYear;
           
           allDays.push(
             <div
               key={`next-${i}`}
-              style={getBoxStyle(date, isToday, isSelected, true)}
+              style={getBoxStyle(date, isToday, false, true)}
               onClick={() => handleDateClick(nextYear, nextMonth, i)}
               onMouseEnter={() => setHoveredDay(date)}
               onMouseLeave={() => setHoveredDay(null)}

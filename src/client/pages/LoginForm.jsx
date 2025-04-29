@@ -1,10 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
-import selfieImg from '../assets/selfie.png';
+import FormInput from "../components/FormInput.jsx";
+import FormButton from "../components/FormButton.jsx";
+import commonStyles from "../styles/commonStyles.js";
+import selfieImg from '../assets/selfie_locked.png';
 
 const LoginForm = () => {
   const { theme } = useContext(ThemeContext);
@@ -12,28 +16,14 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const { setCurrentUser } = useContext(CurrentUserContext);
+  const themeStyles = commonStyles.getThemeStyles(theme);
   
   useEffect(() => {
     const style = document.createElement("style");
-    style.innerHTML = `
-      button:hover, a:hover {
-        background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
-      }
-      
-      input:focus {
-        outline: none !important;
-        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
-        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
-      }
-    `;
+    style.innerHTML = commonStyles.getDynamicCSS(theme);
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
-
-  const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
-  const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
-  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
   
   const login = useMutation(fetchLoginData, {
     onMutate: () => {
@@ -56,8 +46,22 @@ const LoginForm = () => {
   
   return (
     <div>
+      <div style={{...commonStyles.headerContainer, marginBottom: "20px"}}>
+        <NavLink
+          style={{
+            ...commonStyles.backButton,
+            backgroundColor: themeStyles.inputBg,
+            color: themeStyles.inputColor,
+            borderColor: themeStyles.borderColor,
+          }}
+          to="/"
+        >
+          <FaArrowLeft style={{ marginRight: '8px' }} /> Go back
+        </NavLink>
+      </div>
+      
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <img src={selfieImg} alt="Selfie" style={styles.logo} />
+        <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
       </div>
       <form
         onSubmit={(e) => {
@@ -69,32 +73,23 @@ const LoginForm = () => {
           });
         }}
       >
-        <label htmlFor="username">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="username"
-            id="username"
-            type="text"
-            placeholder="Username"
-            required
-          />
-          <br />
-        </label>
+        <h1 style={{...commonStyles.pageTitle, color: themeStyles.titleColor, marginBottom: "20px"}}>Log In</h1>
+        
+        <FormInput 
+          name="username"
+          placeholder="Username"
+          required={true}
+        />
 
-        <label htmlFor="password">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <br />
-        </label>
+        <FormInput 
+          name="password"
+          type="password"
+          placeholder="Password"
+          required={true}
+        />
         
         <div className="remember-me-button">
-          <label style={{ color: linkColor }}>
+          <label style={{ color: themeStyles.linkColor }}>
             <input
               type="checkbox"
               onChange={(e) => setRememberMe(e.target.checked)}
@@ -104,64 +99,21 @@ const LoginForm = () => {
         </div>
         <br />
         
-        <button 
-          type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
-        >
-          Log In
-        </button>
+        <FormButton>Log In</FormButton>
         <br /><br />
 
-        <NavLink style={{...styles.forgot, color: linkColor}} to="/forgot_password">
+        <NavLink style={{...commonStyles.link, color: themeStyles.linkColor}} to="/forgot_password">
           Forgot your password?
         </NavLink>
 
-        <NavLink style={{...styles.a_account, color: linkColor}} to="/sign_up">
+        <NavLink style={{...commonStyles.accountLink, color: themeStyles.linkColor}} to="/sign_up">
           Don't have an account? Sign up.
         </NavLink>
       </form>
 
-      <p id="error_text" style={styles.error_text}>{error}</p>
+      <p id="error_text" style={commonStyles.errorText}>{error}</p>
     </div>
   );
-};
-
-const styles = {
-  field: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "250px",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  button: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "300px",
-    cursor: "pointer",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  forgot: { textDecoration: "none" },
-  a_account: {
-    textDecoration: "none",
-    display: "block",
-    padding: "15px 0px",
-  },
-  error_text: {
-    color: "gray",
-    fontSize: "18px",
-    visibility: "hidden",
-    textAlign: "center",
-  },
-  logo: {
-    maxWidth: "150px",
-    height: "auto",
-    marginBottom: "20px",
-    borderRadius: "10px",
-  },
 };
 
 export default LoginForm;

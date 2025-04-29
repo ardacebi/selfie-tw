@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { FaSun, FaMoon, FaCog, FaSignOutAlt, FaInfo } from "react-icons/fa";
+import commonStyles from "../styles/commonStyles";
 import logo from "../assets/logo.png";
 import logo_dark from "../assets/logo_dark.png";
 
@@ -17,15 +18,14 @@ const Navbar = () => {
   const navigate = useNavigate();
   
   const isDark = theme === 'dark';
+  const themeStyles = commonStyles.getThemeStyles(theme);
+  
   const colors = {
     moon: "#FFD700",
     sun: "#DAA520",
     bg: isDark ? '#1e1e1e' : '#ffffff',
     border: isDark ? '#444' : '#dcdcdc',
-    btnBg: isDark ? '#333' : '#fff',
-    btnColor: isDark ? '#e0e0e0' : '#000',
     tooltipBg: isDark ? '#333' : '#fff',
-    tooltipColor: isDark ? '#e0e0e0' : '#000',
     tooltipBorder: isDark ? '#444' : '#ddd',
     resetBtnBg: isDark ? '#222' : '#f0f0f0',
     resetBtnBorder: isDark ? '#555' : '#ccc',
@@ -62,7 +62,7 @@ const Navbar = () => {
         right: '0',
         top: '45px',
         backgroundColor: colors.tooltipBg,
-        color: colors.tooltipColor,
+        color: themeStyles.inputColor,
         border: `1px solid ${colors.tooltipBorder}`,
         padding: '8px',
         borderRadius: '4px',
@@ -97,8 +97,8 @@ const Navbar = () => {
         onClick={toggleTheme}
         style={{
           ...styles.themeButton,
-          backgroundColor: colors.btnBg,
-          color: colors.btnColor,
+          backgroundColor: themeStyles.inputBg,
+          color: themeStyles.inputColor,
           border: `2px solid ${colors.border}`
         }}
       >
@@ -111,7 +111,7 @@ const Navbar = () => {
             right: '0',
             top: '45px',
             backgroundColor: colors.tooltipBg,
-            color: colors.tooltipColor,
+            color: themeStyles.inputColor,
             border: `1px solid ${colors.tooltipBorder}`,
             padding: '8px',
             borderRadius: '4px',
@@ -149,7 +149,7 @@ const Navbar = () => {
                 border: `1px solid ${colors.resetBtnBorder}`,
                 borderRadius: '3px',
                 cursor: 'pointer',
-                color: colors.tooltipColor,
+                color: themeStyles.inputColor,
               }}
             >
               Reset to system theme
@@ -169,8 +169,8 @@ const Navbar = () => {
       <button
         style={{
           ...styles.themeButton,
-          backgroundColor: colors.btnBg,
-          color: colors.btnColor,
+          backgroundColor: themeStyles.inputBg,
+          color: themeStyles.inputColor,
           border: `2px solid ${colors.border}`
         }}
       >
@@ -207,8 +207,8 @@ const Navbar = () => {
                 onClick={handleLogout}
                 style={{
                   ...styles.themeButton,
-                  backgroundColor: colors.btnBg,
-                  color: colors.btnColor,
+                  backgroundColor: themeStyles.inputBg,
+                  color: themeStyles.inputColor,
                   border: `2px solid ${colors.border}`
                 }}
               >
