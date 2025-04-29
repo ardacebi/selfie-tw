@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { FaArrowLeft, FaArrowRight, FaHome, FaSearch, FaSearchMinus, FaSearchPlus } from "react-icons/fa";
+import commonStyles from "../styles/commonStyles";
 
 const CalendarPage = () => {
   //These are setup variables for the calendar used through the entire page
@@ -536,15 +537,12 @@ const CalendarPage = () => {
           onMouseLeave={() => setIsButtonHovered(false)}
           onClick={() => window.location.href = "/"}
         >
-          <FaArrowLeft /> Back to Home
+          <FaArrowLeft /> Go back
         </button>
       </div>
       
       <div style={styles.titleContainer}>
-        <h1 style={{ 
-          color: theme === 'dark' ? darkTextColor : 'inherit',
-          fontSize: isMobile ? '20px' : '24px'
-        }}>Calendar</h1>
+        <h1 style={commonStyles.welcomeGradient(theme)} key={theme}>Calendar</h1>
       </div>
       
       <div style={monthNameStyle}>

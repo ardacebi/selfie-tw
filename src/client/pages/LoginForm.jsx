@@ -1,7 +1,7 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
@@ -13,8 +13,12 @@ import selfieImg from '../assets/selfie_locked.png';
 const LoginForm = () => {
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showSignupSuccess, setShowSignupSuccess] = useState(false);
+  const [showPasswordResetSuccess, setShowPasswordResetSuccess] = useState(false);
   const { setCurrentUser } = useContext(CurrentUserContext);
   const themeStyles = commonStyles.getThemeStyles(theme);
   
@@ -25,24 +29,60 @@ const LoginForm = () => {
     return () => document.head.removeChild(style);
   }, [theme]);
   
+  useEffect(() => {
+    if (location.state?.fromSignup) {
+      setShowSignupSuccess(true);
+      
+      const timerId = setTimeout(() => {
+        window.history.replaceState({}, document.title);
+      }, 10000);
+      
+      return () => clearTimeout(timerId);
+    }
+    
+    if (location.state?.fromPasswordReset) {
+      setShowPasswordResetSuccess(true);
+      
+      const timerId = setTimeout(() => {
+        window.history.replaceState({}, document.title);
+      }, 10000);
+      
+      return () => clearTimeout(timerId);
+    }
+  }, [location]);
+  
   const login = useMutation(fetchLoginData, {
     onMutate: () => {
-      document.querySelector("#error_text").style.visibility = "hidden";
+      setShowErrorBanner(false);
     },
     onSuccess: (res) => {
-      setError("Success! You logged in!");
-      document.querySelector("#error_text").style.color = "green";
-      document.querySelector("#error_text").style.visibility = "visible";
       setCurrentUser(res.data._id);
       if (rememberMe) localStorage.setItem("savedUser", res.data._id);
       navigate("/", { replace: true });
     },
     onError: (error) => {
       setError(error.message);
-      document.querySelector("#error_text").style.color = "red";
-      document.querySelector("#error_text").style.visibility = "visible";
+      setShowErrorBanner(true);
     },
   });
+
+  // Success banner
+  const successBannerStyle = {
+    ...commonStyles.baseBannerStyle,
+    ...commonStyles.successBannerStyle(theme, showSignupSuccess ? "flex" : "none"),
+  };
+  
+  // Password reset success banner
+  const passwordResetBannerStyle = {
+    ...commonStyles.baseBannerStyle,
+    ...commonStyles.successBannerStyle(theme, showPasswordResetSuccess ? "flex" : "none"),
+  };
+
+  // Error banner
+  const errorBannerStyle = {
+    ...commonStyles.baseBannerStyle,
+    ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+  };
   
   return (
     <div>
@@ -63,6 +103,7 @@ const LoginForm = () => {
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
       </div>
+      
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -73,7 +114,11 @@ const LoginForm = () => {
           });
         }}
       >
-        <h1 style={{...commonStyles.pageTitle, color: themeStyles.titleColor, marginBottom: "20px"}}>Log In</h1>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>
+            Log In
+          </div>
+        </div>
         
         <FormInput 
           name="username"
@@ -109,9 +154,22 @@ const LoginForm = () => {
         <NavLink style={{...commonStyles.accountLink, color: themeStyles.linkColor}} to="/sign_up">
           Don't have an account? Sign up.
         </NavLink>
-      </form>
 
-      <p id="error_text" style={commonStyles.errorText}>{error}</p>
+        <div style={errorBannerStyle}>
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+        
+        <div style={successBannerStyle}>
+          <FaCheckCircle style={commonStyles.bannerIconStyle} />
+          <span>Account created successfully! You can now log in with your credentials.</span>
+        </div>
+        
+        <div style={passwordResetBannerStyle}>
+          <FaCheckCircle style={commonStyles.bannerIconStyle} />
+          <span>Success! The password has been changed! You can now log in with your new password.</span>
+        </div>
+      </form>
     </div>
   );
 };

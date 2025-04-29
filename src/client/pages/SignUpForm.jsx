@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaExclamationCircle } from "react-icons/fa";
 import postAccountData from "../data_creation/postAccountData.js";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
 import FormInput from "../components/FormInput.jsx";
@@ -13,6 +13,7 @@ const SignUpForm = () => {
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
   const themeStyles = commonStyles.getThemeStyles(theme);
 
   useEffect(() => {
@@ -24,20 +25,25 @@ const SignUpForm = () => {
 
   const signup = useMutation(postAccountData, {
     onMutate: () => {
-      document.querySelector("#error_text").style.visibility = "hidden";
+      setShowErrorBanner(false);
     },
     onSuccess: () => {
-      setError("Success! You signed up!");
-      document.querySelector("#error_text").style.color = "green";
-      document.querySelector("#error_text").style.visibility = "visible";
-      navigate("/login", { replace: true });
+      navigate("/login", { 
+        replace: true,
+        state: { fromSignup: true }
+      });
     },
     onError: (error) => {
       setError(error.message);
-      document.querySelector("#error_text").style.color = "red";
-      document.querySelector("#error_text").style.visibility = "visible";
+      setShowErrorBanner(true);
     },
   });
+
+  // Error banner
+  const errorBannerStyle = {
+    ...commonStyles.baseBannerStyle,
+    ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+  };
 
   return (
     <div>
@@ -69,7 +75,11 @@ const SignUpForm = () => {
           });
         }}
       >
-        <h1 style={{...commonStyles.pageTitle, color: themeStyles.titleColor, marginBottom: "20px"}}>Sign Up</h1>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>
+            Sign Up
+          </div>
+        </div>
         
         <FormInput 
           name="email"
@@ -98,9 +108,12 @@ const SignUpForm = () => {
         >
           Already have an account?
         </NavLink>
-      </form>
 
-      <p id="error_text" style={commonStyles.errorText}>{error}</p>
+        <div style={errorBannerStyle}>
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+      </form>
     </div>
   );
 };

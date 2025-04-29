@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import postNewPassword from "../data_creation/postNewPassword.js";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
@@ -11,6 +11,7 @@ import selfieImg from '../assets/selfie_forgot.png';
 
 const ForgotPasswordForm = () => {
   const { theme } = useContext(ThemeContext);
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const themeStyles = commonStyles.getThemeStyles(theme);
   
@@ -24,9 +25,10 @@ const ForgotPasswordForm = () => {
   const resetPassword = useMutation(postNewPassword, {
     onMutate: () => { document.querySelector("#error_text").style.visibility = "hidden"; },
     onSuccess: () => {
-      setError("Success! The password has been changed!");
-      document.querySelector("#error_text").style.color = "green";
-      document.querySelector("#error_text").style.visibility = "visible";
+      navigate("/login", { 
+        replace: true,
+        state: { fromPasswordReset: true }
+      });
     },
     onError: (error) => {
       setError(error.message);
@@ -65,7 +67,11 @@ const ForgotPasswordForm = () => {
           });
         }}
       >
-        <h1 style={{...commonStyles.pageTitle, color: themeStyles.titleColor}}>Forgot Password</h1>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>
+            Forgot Password
+          </div>
+        </div>
         
         <FormInput
           name="email"
@@ -119,7 +125,7 @@ const ForgotPasswordForm = () => {
         </p>
       </div>
 
-      <p id="error_text" style={commonStyles.errorText}>{error}</p>
+      <p id="error_text" style={{...commonStyles.errorText, fontFamily: "sans-serif"}}>{error}</p>
     </div>
   );
 };

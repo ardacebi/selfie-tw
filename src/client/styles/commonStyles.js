@@ -81,6 +81,81 @@ const commonStyles = {
     marginBottom: "20px"
   },
   
+  // Gradient title style
+  gradientTitle: (theme) => ({
+    fontSize: '28px',
+    fontWeight: 'bold',
+    padding: '10px',
+    marginBottom: '15px',
+    background: theme === 'dark' 
+      ? 'linear-gradient(to bottom, #ffffff, #dddddd, #aaaaaa, #888888)'
+      : 'linear-gradient(to bottom, #000000, #222222, #555555, #777777)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    textFillColor: 'transparent',
+    display: 'inline-block',
+    color: theme === 'dark' ? '#ffffff' : '#000000',
+    textAlign: 'center',
+  }),
+  
+  // Welcome gradient style for larger titles
+  welcomeGradient: (theme) => ({
+    fontSize: '34px',
+    fontWeight: 'bold',
+    padding: '10px',
+    marginBottom: '10px',
+    background: theme === 'dark' 
+      ? 'linear-gradient(to bottom, #ffffff, #dddddd, #aaaaaa, #888888)'
+      : 'linear-gradient(to bottom, #000000, #222222, #555555, #777777)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    textFillColor: 'transparent',
+    display: 'inline-block',
+    color: theme === 'dark' ? '#ffffff' : '#000000',
+  }),
+  
+  // Base banner style
+  baseBannerStyle: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    padding: "12px 20px",
+    borderRadius: "10px",
+    marginTop: "15px",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    transition: "all 0.3s ease",
+    fontSize: "16px",
+    fontFamily: "sans-serif",
+    width: "250px",
+    maxWidth: "250px",
+    margin: "15px auto 8px auto",
+  },
+  
+  // Success banner style
+  successBannerStyle: (theme, display = "none") => ({
+    display,
+    backgroundColor: "#4CAF50",
+    color: "white",
+    border: `2px solid ${theme === 'dark' ? '#388E3C' : '#2E7D32'}`,
+  }),
+  
+  // Error banner style
+  errorBannerStyle: (theme, display = "none") => ({
+    display,
+    backgroundColor: "#F44336",
+    color: "white",
+    border: `2px solid ${theme === 'dark' ? '#D32F2F' : '#C62828'}`,
+  }),
+  
+  // Icon style for banners
+  bannerIconStyle: {
+    fontSize: '20px',
+    marginRight: '12px',
+    flexShrink: 0,
+  },
+  
   getThemeStyles: (theme) => {
     const isDark = theme === 'dark';
     return {
