@@ -1,167 +1,142 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
+import { FaArrowLeft, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
-import selfieImg from '../assets/selfie.png';
+import FormInput from "../components/FormInput.jsx";
+import FormButton from "../components/FormButton.jsx";
+import commonStyles from "../styles/commonStyles.js";
+import selfieImg from '../assets/selfie_locked.png';
 
 const LoginForm = () => {
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showSignupSuccess, setShowSignupSuccess] = useState(false);
+  const [showPasswordResetSuccess, setShowPasswordResetSuccess] = useState(false);
   const { setCurrentUser } = useContext(CurrentUserContext);
+  const themeStyles = commonStyles.getThemeStyles(theme);
   
   useEffect(() => {
     const style = document.createElement("style");
-    style.innerHTML = `
-      button:hover, a:hover {
-        background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
-      }
-      
-      input:focus {
-        outline: none !important;
-        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
-        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
-      }
-    `;
+    style.innerHTML = commonStyles.getDynamicCSS(theme);
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
-
-  const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
-  const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
-  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
+  
+  useEffect(() => {
+    const { state } = location;
+    if (!state) return;
+    
+    const showSuccess = (flag, timeout = 10000) => {
+      flag(true);
+      const timerId = setTimeout(() => window.history.replaceState({}, document.title), timeout);
+      return () => clearTimeout(timerId);
+    };
+    
+    if (state.fromSignup) return showSuccess(setShowSignupSuccess);
+    if (state.fromPasswordReset) return showSuccess(setShowPasswordResetSuccess);
+  }, [location]);
   
   const login = useMutation(fetchLoginData, {
-    onMutate: () => {
-      document.querySelector("#error_text").style.visibility = "hidden";
-    },
+    onMutate: () => setShowErrorBanner(false),
     onSuccess: (res) => {
-      setError("Success! You logged in!");
-      document.querySelector("#error_text").style.color = "green";
-      document.querySelector("#error_text").style.visibility = "visible";
       setCurrentUser(res.data._id);
       if (rememberMe) localStorage.setItem("savedUser", res.data._id);
       navigate("/", { replace: true });
     },
-    onError: (error) => {
-      setError(error.message);
-      document.querySelector("#error_text").style.color = "red";
-      document.querySelector("#error_text").style.visibility = "visible";
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
     },
   });
+
+  // Banner styles
+  const getBannerStyle = (type, visible) => ({
+    ...commonStyles.baseBannerStyle,
+    ...commonStyles[type](theme, visible ? "flex" : "none")
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    login.mutate({
+      username: formData.get("username") ?? "",
+      password: formData.get("password") ?? "",
+    });
+  };
   
   return (
     <div>
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <img src={selfieImg} alt="Selfie" style={styles.logo} />
+      <div style={{...commonStyles.headerContainer, marginBottom: "20px"}}>
+        <NavLink
+          style={{
+            ...commonStyles.backButton,
+            backgroundColor: themeStyles.inputBg,
+            color: themeStyles.inputColor,
+            borderColor: themeStyles.borderColor,
+          }}
+          to="/"
+        >
+          <FaArrowLeft style={{ marginRight: '8px' }} /> Go back
+        </NavLink>
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          login.mutate({
-            username: formData.get("username") ?? "",
-            password: formData.get("password") ?? "",
-          });
-        }}
-      >
-        <label htmlFor="username">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="username"
-            id="username"
-            type="text"
-            placeholder="Username"
-            required
-          />
-          <br />
-        </label>
-
-        <label htmlFor="password">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <br />
-        </label>
+      
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
+      </div>
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>
+            Log In
+          </div>
+        </div>
+        
+        <FormInput name="username" placeholder="Username" required={true} />
+        <FormInput name="password" type="password" placeholder="Password" required={true} />
         
         <div className="remember-me-button">
-          <label style={{ color: linkColor }}>
-            <input
-              type="checkbox"
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
+          <label style={{ color: themeStyles.linkColor }}>
+            <input type="checkbox" onChange={(e) => setRememberMe(e.target.checked)} />
             Remember me
           </label>
         </div>
         <br />
         
-        <button 
-          type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
-        >
-          Log In
-        </button>
+        <FormButton>Log In</FormButton>
         <br /><br />
 
-        <NavLink style={{...styles.forgot, color: linkColor}} to="/forgot_password">
+        <NavLink style={{...commonStyles.link, color: themeStyles.linkColor}} to="/forgot_password">
           Forgot your password?
         </NavLink>
 
-        <NavLink style={{...styles.a_account, color: linkColor}} to="/sign_up">
+        <NavLink style={{...commonStyles.accountLink, color: themeStyles.linkColor}} to="/sign_up">
           Don't have an account? Sign up.
         </NavLink>
-      </form>
 
-      <p id="error_text" style={styles.error_text}>{error}</p>
+        <div style={getBannerStyle("errorBannerStyle", showErrorBanner)}>
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+        
+        <div style={getBannerStyle("successBannerStyle", showSignupSuccess)}>
+          <FaCheckCircle style={commonStyles.bannerIconStyle} />
+          <span>Account created successfully! You can now log in with your credentials.</span>
+        </div>
+        
+        <div style={getBannerStyle("successBannerStyle", showPasswordResetSuccess)}>
+          <FaCheckCircle style={commonStyles.bannerIconStyle} />
+          <span>Success! The password has been changed! You can now log in with your new password.</span>
+        </div>
+      </form>
     </div>
   );
-};
-
-const styles = {
-  field: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "250px",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  button: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "300px",
-    cursor: "pointer",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  forgot: { textDecoration: "none" },
-  a_account: {
-    textDecoration: "none",
-    display: "block",
-    padding: "15px 0px",
-  },
-  error_text: {
-    color: "gray",
-    fontSize: "18px",
-    visibility: "hidden",
-    textAlign: "center",
-  },
-  logo: {
-    maxWidth: "150px",
-    height: "auto",
-    marginBottom: "20px",
-    borderRadius: "10px",
-  },
 };
 
 export default LoginForm;

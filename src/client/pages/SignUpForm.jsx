@@ -1,161 +1,97 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
+import { FaArrowLeft, FaExclamationCircle } from "react-icons/fa";
 import postAccountData from "../data_creation/postAccountData.js";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
-import selfieImg from '../assets/selfie.png';
+import FormInput from "../components/FormInput.jsx";
+import FormButton from "../components/FormButton.jsx";
+import commonStyles from "../styles/commonStyles.js";
+import selfieImg from '../assets/selfie_signup.png';
 
 const SignUpForm = () => {
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+  const themeStyles = commonStyles.getThemeStyles(theme);
 
   useEffect(() => {
     const style = document.createElement("style");
-    style.innerHTML = `
-      button:hover, a:hover {
-        background-color: ${theme === 'dark' ? '#444444' : '#f0f0f0'} !important;
-      }
-      
-      input:focus {
-        outline: none !important;
-        box-shadow: 0 0 0 2px ${theme === 'dark' ? '#555555' : '#e0e0e0'} !important;
-        border-color: ${theme === 'dark' ? '#666666' : '#cccccc'} !important;
-      }
-    `;
+    style.innerHTML = commonStyles.getDynamicCSS(theme);
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
 
-  const inputBg = theme === 'dark' ? '#333' : '#fff';
-  const inputColor = theme === 'dark' ? '#e0e0e0' : '#000';
-  const linkColor = theme === 'dark' ? '#b0b0b0' : '#9A9A9A';
-  const borderColor = theme === 'dark' ? '#444444' : '#dcdcdc';
-
   const signup = useMutation(postAccountData, {
-    onMutate: () => {
-      document.querySelector("#error_text").style.visibility = "hidden";
-    },
-    onSuccess: () => {
-      setError("Success! You signed up!");
-      document.querySelector("#error_text").style.color = "green";
-      document.querySelector("#error_text").style.visibility = "visible";
-      navigate("/login", { replace: true });
-    },
-    onError: (error) => {
-      setError(error.message);
-      document.querySelector("#error_text").style.color = "red";
-      document.querySelector("#error_text").style.visibility = "visible";
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => navigate("/login", { replace: true, state: { fromSignup: true } }),
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
     },
   });
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    signup.mutate({
+      email: formData.get("email") ?? "",
+      username: formData.get("username") ?? "",
+      password: formData.get("password") ?? "",
+    });
+  };
 
   return (
     <div>
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <img src={selfieImg} alt="Selfie" style={styles.logo} />
-      </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          signup.mutate({
-            email: formData.get("email") ?? "",
-            username: formData.get("username") ?? "",
-            password: formData.get("password") ?? "",
-          });
-        }}
-      >
-        <label htmlFor="email">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="email"
-            id="email"
-            type="text"
-            placeholder="Email"
-            required
-          />
-          <br />
-        </label>
-
-        <label htmlFor="username">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="username"
-            id="username"
-            type="text"
-            placeholder="Username"
-            required
-          />
-          <br />
-        </label>
-
-        <label htmlFor="password">
-          <input
-            style={{...styles.field, backgroundColor: inputBg, color: inputColor, marginBottom: "15px", borderColor: borderColor}}
-            name="password"
-            id="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <br />
-        </label>
-
-        <button 
-          type="submit" 
-          style={{...styles.button, backgroundColor: inputBg, color: inputColor, borderColor: borderColor}}
+      <div style={{...commonStyles.headerContainer, marginBottom: "20px"}}>
+        <NavLink
+          style={{
+            ...commonStyles.backButton,
+            backgroundColor: themeStyles.inputBg,
+            color: themeStyles.inputColor,
+            borderColor: themeStyles.borderColor,
+          }}
+          to="/"
         >
-          Create Account
-        </button>
+          <FaArrowLeft style={{ marginRight: '8px' }} /> Go back
+        </NavLink>
+      </div>
+      
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
+      </div>
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={commonStyles.gradientTitle(theme)} key={theme}>
+            Sign Up
+          </div>
+        </div>
+        
+        <FormInput name="email" placeholder="Email" required={true} />
+        <FormInput name="username" placeholder="Username" required={true} />
+        <FormInput name="password" type="password" placeholder="Password" required={true} />
+
+        <FormButton>Create Account</FormButton>
 
         <NavLink 
-          style={{...styles.a_account, color: linkColor}} 
+          style={{...commonStyles.accountLink, color: themeStyles.linkColor}} 
           to="/login"
         >
           Already have an account?
         </NavLink>
-      </form>
 
-      <p id="error_text" style={styles.error_text}>{error}</p>
+        <div style={{
+          ...commonStyles.baseBannerStyle,
+          ...commonStyles.errorBannerStyle(theme, showErrorBanner ? "flex" : "none"),
+        }}>
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+      </form>
     </div>
   );
-};
-
-const styles = {
-  field: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "250px",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  button: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    width: "300px",
-    cursor: "pointer",
-    padding: "10px 25px",
-    fontSize: "16px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  a_account: {
-    textDecoration: "none",
-    display: "block",
-    padding: "15px 0px",
-  },
-  error_text: {
-    color: "gray",
-    fontSize: "18px",
-    visibility: "hidden",
-    textAlign: "center",
-  },
-  logo: {
-    maxWidth: "150px",
-    height: "auto",
-    marginBottom: "20px",
-    borderRadius: "10px",
-  },
 };
 
 export default SignUpForm;
