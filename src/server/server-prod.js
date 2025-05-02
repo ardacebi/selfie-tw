@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 //import { createServer as createViteServer } from "vite";
 import { connectDB } from "./config/db.js";
 import AccountHandling from "./routes/AccountHandling.route.js";
+import NotesHandling from "./routes/NotesHandling.route.js";
 import { config } from "dotenv";
 
 config();
@@ -21,6 +22,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/account", AccountHandling);
+app.use("/api/notes", NotesHandling);
 app.use(
   express.static(path.join(projectRoot, "dist/client"), { index: false }),
 );

@@ -63,6 +63,13 @@ const BaseHomePage = () => {
           <FaCalendarAlt style={styles.calendarIcon} />
           Calendar
         </button>
+
+        <button
+          style={{            ...styles.button,             backgroundColor: themeStyles.inputBg,             color: themeStyles.inputColor,             borderColor: themeStyles.borderColor          }}
+          onClick={() => navigate("/calendar", { replace: true })}
+        >
+          Notes Editor
+        </button>
       </div>
     </div>
   );

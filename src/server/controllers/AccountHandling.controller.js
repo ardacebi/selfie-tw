@@ -201,3 +201,33 @@ export const getProfileIDByEmail = async (req, res) => {
       .json({ success: false, message: error.message, userID: null });
   }
 };
+
+export const checkUserHasNotes = async (req, res) => {
+  const { id } = req.params;
+  
+  if (!Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, message: "Invalid User ID" });
+  }
+
+  try {
+    const profile = await ProfileData.findById(id);
+    if (!profile) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    
+    const hasNotes = profile.ownedNotes.length > 0;
+    
+    return res.status(200).json({
+      success: true,
+      hasNotes,
+      count: profile.ownedNotes.length
+    });
+  } catch (error) {
+    console.error("Error checking if user has notes:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server Error", 
+      error: error.message 
+    });
+  }
+};
