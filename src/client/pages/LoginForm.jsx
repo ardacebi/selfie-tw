@@ -5,8 +5,10 @@ import { FaArrowLeft, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"
 import fetchLoginData from "../data_fetching/fetchLoginData.js";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
-import FormInput from "../components/FormInput.jsx";
-import FormButton from "../components/FormButton.jsx";
+import FormInput from "../components/FormInput";
+import FormButton from "../components/FormButton";
+import BlurredWindow from "../components/BlurredWindow";
+import AnimatedBackButton from "../components/AnimatedBackButton";
 import commonStyles from "../styles/commonStyles.js";
 import selfieImg from '../assets/selfie_locked.png';
 
@@ -21,6 +23,32 @@ const LoginForm = () => {
   const [showPasswordResetSuccess, setShowPasswordResetSuccess] = useState(false);
   const { setCurrentUser } = useContext(CurrentUserContext);
   const themeStyles = commonStyles.getThemeStyles(theme);
+  const [isCheckboxHovered, setIsCheckboxHovered] = useState(false);
+  const isDark = theme === 'dark';
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+  
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = commonStyles.linkHoverStyles(theme);
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, [isDark, theme]);
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -56,12 +84,6 @@ const LoginForm = () => {
     },
   });
 
-  // Banner styles
-  const getBannerStyle = (type, visible) => ({
-    ...commonStyles.baseBannerStyle,
-    ...commonStyles[type](theme, visible ? "flex" : "none")
-  });
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -71,70 +93,131 @@ const LoginForm = () => {
     });
   };
   
+  const handleCheckboxChange = (e) => {
+    setRememberMe(e.target.checked);
+  };
+  
   return (
-    <div>
-      <div style={{...commonStyles.headerContainer, marginBottom: "20px"}}>
-        <NavLink
-          style={{
-            ...commonStyles.backButton,
-            backgroundColor: themeStyles.inputBg,
-            color: themeStyles.inputColor,
-            borderColor: themeStyles.borderColor,
-          }}
-          to="/"
-        >
-          <FaArrowLeft style={{ marginRight: '8px' }} /> Go back
-        </NavLink>
+    <div style={{ width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ 
+        maxWidth: "450px",
+        margin: "0 auto",
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        marginTop: "10px",
+        marginBottom: "20px",
+        boxSizing: "border-box"
+      }}>
+        <AnimatedBackButton to="/" />
       </div>
       
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
-      </div>
-      
-      <form onSubmit={handleSubmit}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={commonStyles.gradientTitle(theme)} key={theme}>
-            Log In
+      <BlurredWindow width="450px">
+        <div style={commonStyles.pages.common.imageContainer}>
+          <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
+        </div>
+        
+        <form onSubmit={handleSubmit} style={{
+          ...commonStyles.form.container,
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          <div style={commonStyles.form.titleContainer}>
+            <div style={commonStyles.gradientTitle(theme)} key={theme}>
+              Log In
+            </div>
           </div>
-        </div>
-        
-        <FormInput name="username" placeholder="Username" required={true} />
-        <FormInput name="password" type="password" placeholder="Password" required={true} />
-        
-        <div className="remember-me-button">
-          <label style={{ color: themeStyles.linkColor }}>
-            <input type="checkbox" onChange={(e) => setRememberMe(e.target.checked)} />
-            Remember me
-          </label>
-        </div>
-        <br />
-        
-        <FormButton>Log In</FormButton>
-        <br /><br />
+          
+          <div style={{
+            ...commonStyles.form.inputContainer,
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <FormInput name="username" placeholder="Username" required={true} />
+            <FormInput name="password" type="password" placeholder="Password" required={true} />
+            
+            <div style={{
+              ...commonStyles.form.checkbox.container,
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <input 
+                id="remember-me-checkbox"
+                name="rememberMe"
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={handleCheckboxChange}
+                style={{ 
+                  opacity: 0,
+                  position: "absolute",
+                  width: 0,
+                  height: 0
+                }}
+              />
+              <label 
+                htmlFor="remember-me-checkbox" 
+                style={{
+                  ...commonStyles.form.checkbox.label,
+                  color: themeStyles.linkColor
+                }}
+                onMouseEnter={() => setIsCheckboxHovered(true)}
+                onMouseLeave={() => setIsCheckboxHovered(false)}
+              >
+                <div style={commonStyles.form.checkbox.outer(theme, rememberMe, isCheckboxHovered)}>
+                  <div style={commonStyles.form.checkbox.highlight(theme, isCheckboxHovered)}></div>
+                  <div style={{
+                    ...commonStyles.form.checkbox.inner(rememberMe),
+                    backgroundColor: isDark ? "#ffffff" : "#0066cc"
+                  }}></div>
+                </div>
+                Remember me
+              </label>
+            </div>
+            
+            <FormButton>Log In</FormButton>
+            
+            <div style={commonStyles.pages.common.centerAlignedContent}>
+              <NavLink 
+                style={commonStyles.pages.common.navLink(theme)} 
+                className="link-hover-effect"
+                to="/forgot_password"
+              >
+                Forgot your password?
+              </NavLink>
+            </div>
 
-        <NavLink style={{...commonStyles.link, color: themeStyles.linkColor}} to="/forgot_password">
-          Forgot your password?
-        </NavLink>
+            <div style={{ 
+              ...commonStyles.pages.common.centerAlignedContent, 
+              marginTop: "5px" 
+            }}>
+              <NavLink 
+                style={commonStyles.pages.common.navLink(theme)}
+                className="link-hover-effect"
+                to="/sign_up"
+              >
+                Don't have an account? Sign up.
+              </NavLink>
+            </div>
+          </div>
 
-        <NavLink style={{...commonStyles.accountLink, color: themeStyles.linkColor}} to="/sign_up">
-          Don't have an account? Sign up.
-        </NavLink>
-
-        <div style={getBannerStyle("errorBannerStyle", showErrorBanner)}>
-          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
-          <span>{error}</span>
-        </div>
-        
-        <div style={getBannerStyle("successBannerStyle", showSignupSuccess)}>
-          <FaCheckCircle style={commonStyles.bannerIconStyle} />
-          <span>Account created successfully! You can now log in with your credentials.</span>
-        </div>
-        
-        <div style={getBannerStyle("successBannerStyle", showPasswordResetSuccess)}>
-          <FaCheckCircle style={commonStyles.bannerIconStyle} />
-          <span>Success! The password has been changed! You can now log in with your new password.</span>
-        </div>
-      </form>
+          <div style={commonStyles.getBannerStyle("errorBannerStyle", showErrorBanner, theme)}>
+            <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+            <span>{error}</span>
+          </div>
+          
+          <div style={commonStyles.getBannerStyle("successBannerStyle", showSignupSuccess, theme)}>
+            <FaCheckCircle style={commonStyles.bannerIconStyle} />
+            <span>Account created successfully! You can now log in with your credentials.</span>
+          </div>
+          
+          <div style={commonStyles.getBannerStyle("successBannerStyle", showPasswordResetSuccess, theme)}>
+            <FaCheckCircle style={commonStyles.bannerIconStyle} />
+            <span>Success! The password has been changed! You can now log in with your new password.</span>
+          </div>
+        </form>
+      </BlurredWindow>
     </div>
   );
 };

@@ -12,6 +12,8 @@ const ThemeProvider = ({ children }) => {
   const [isSystemTheme, setIsSystemTheme] = useState(
     typeof window !== "undefined" && !localStorage.getItem("theme")
   );
+  
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -25,18 +27,30 @@ const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 600);
+    
     setIsSystemTheme(false);
     setTheme(theme === "light" ? "dark" : "light");
   };
 
   const resetToSystemTheme = () => {
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 600);
+    
     setIsSystemTheme(true);
     localStorage.removeItem("theme");
     setTheme(getSystemTheme());
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isSystemTheme, resetToSystemTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, isSystemTheme, resetToSystemTheme, isTransitioning }}>
       {children}
     </ThemeContext.Provider>
   );
