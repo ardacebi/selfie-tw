@@ -8,14 +8,14 @@ const EventDataSchema = new Schema(
     description: String,
     date: { type: Date, required: true },
     location: String,
-    type: { type: String, required: true, default: "basic" },
+    type: { type: String, required: true, default: "basic" }, // Types can be: basic, basic-recurring, study-session, exam, project
     hasPhases: Boolean,
     currentPhase: Number,
-    otherPhases: [{ _id: Number, phaseNumber: Number }],
-    headExamID: Number,
+    otherPhases: [{ _id: Schema.Types.ObjectId, phaseNumber: Number }],
+    headExamID: Schema.Types.ObjectId,
     childStudySessions: [{ _id: Number }],
     activityDueDate: { type: Date, required: true },
-    invited_users: [{ _id: Number }],
+    invited_users: [{ _id: Schema.Types.ObjectId }],
   },
   {
     timestamps: true,

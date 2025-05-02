@@ -358,6 +358,7 @@ const BaseHomePage = () => {
             }}
           />
         </div>
+
       </div>
     </div>
   );

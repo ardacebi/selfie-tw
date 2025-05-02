@@ -4,9 +4,10 @@ const { Schema, model, models } = mongoose;
 
 const NoteDataSchema = new Schema(
   {
-    title: { type: String, required: true },
-    body: { type: String, required: true },
-    category: { type: String, required: true },
+    title: { type: String, required: true, default: "New Note" },
+    creationDate: {type: Date, required: true, default: Date.now},
+    lastModifiedDate: {type: Date, required: true, default: Date.now},
+    body: { type: String, required: true, default: "" },
   },
   {
     timestamps: true,
