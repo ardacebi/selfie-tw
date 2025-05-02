@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
@@ -20,6 +20,20 @@ const App = () => {
   const { setCurrentUser } = useContext(CurrentUserContext);
   const { theme, isTransitioning } = useContext(ThemeContext);
   const animationRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
   
   useEffect(() => {
     setCurrentUser(savedUser());
@@ -100,7 +114,12 @@ const App = () => {
         )}
         <Navbar />
         <SubNavbar />
-        <main style={{...commonStyles.appShell.mainContent, paddingTop: '110px', position: 'relative', zIndex: 1}}>
+        <main style={{
+          ...commonStyles.appShell.mainContent, 
+          paddingTop: isMobile ? '65px' : '110px', 
+          position: 'relative', 
+          zIndex: 1
+        }}>
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<BaseHomePage />} />
