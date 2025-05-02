@@ -2,10 +2,11 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { FaArrowLeft, FaArrowRight, FaHome, FaSearch, FaSearchMinus, FaSearchPlus } from "react-icons/fa";
+import BlurredWindow from "../components/BlurredWindow";
 import commonStyles from "../styles/commonStyles";
 
 const CalendarPage = () => {
-  //These are setup variables for the calendar used through the entire page
+  // These are setup variables for the calendar used through the entire page
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const [calendarDate, setCalendarDate] = useState(currentDate);
@@ -14,6 +15,7 @@ const CalendarPage = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 992);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [hoveredButton, setHoveredButton] = useState(null);
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -116,133 +118,64 @@ const CalendarPage = () => {
   //Similar to renderMonth, but it does not return the year, only the month
   const monthName = month => getMonthName(month);
 
-  // Theme colors
-  const darkBoxBg = '#2e2e2e'; 
-  const lightBoxBg = '#ffffff';
-  const darkSelectedBg = '#2a4d69'; 
-  const lightSelectedBg = '#cce5ff';
-  const darkTodayBg = '#1e3d58'; 
-  const lightTodayBg = '#e6f7ff';
-  const darkOtherMonthBg = '#202020'; 
-  const lightOtherMonthBg = '#f9f9f9';
-  const darkEmptyBg = '#2c2c2c'; 
-  const lightEmptyBg = '#e0f0f0';
-  const darkBorderColor = '#444444';
-  const lightBorderColor = '#cccccc';
-  const darkTextColor = '#e0e0e0';
+  // Get calendar colors from centralized styles
+  const calendarColors = commonStyles.calendar.colors;
+  const themeColors = theme === 'dark' 
+    ? calendarColors.dark
+    : calendarColors.light;
   
-  const getResponsiveStyles = () => {
-    // Mobile styles
-    if (windowWidth < 576) {
-      return {
-        calendarBox: {
-          minHeight: "35px",
-          fontSize: "12px",
-          padding: "2px"
-        },
-        weekDay: {
-          fontSize: "9px",
-          padding: "2px"
-        },
-        button: {
-          padding: "4px 6px",
-          fontSize: "11px",
-          marginBottom: "5px"
-        },
-        calendarContainer: {
-          gap: "1px", 
-          padding: "4px"
-        },
-        yearCalendar: {
-          gridTemplateColumns: "repeat(3, 1fr)",
-          fontSize: "12px"
-        },
-        monthName: {
-          fontSize: "14px",
-          marginBottom: "10px"
-        },
-        headerButton: {
-          fontSize: "11px",
-          padding: "4px 8px",
-          width: "100%",
-          maxWidth: "120px",
-          margin: "5px auto",
-          display: "block"
-        }
-      };
-    }
-    // Tablet styles  
-    else if (windowWidth < 768) {
-      return {
-        calendarBox: {
-          minHeight: "40px",
-          fontSize: "13px",
-          padding: "3px"
-        },
-        weekDay: {
-          fontSize: "10px",
-          padding: "3px"
-        },
-        button: {
-          padding: "5px 8px",
-          fontSize: "12px"
-        },
-        calendarContainer: {
-          gap: "2px"
-        },
-        yearCalendar: {
-          gridTemplateColumns: "repeat(4, 1fr)"
-        },
-        monthName: {
-          fontSize: "16px"
-        }
-      };
-    }
-    // Default/desktop styles
-    return {};
-  };
-  
-  const responsiveStyles = getResponsiveStyles();
+  // Get responsive styles
+  const responsiveStyles = commonStyles.getResponsiveStyles(windowWidth).calendar || {};
   
   const getBoxStyle = (date, isToday, isSelected, isOtherMonth = false) => {
     isSelected = selectedDate && date && date.toDateString() === selectedDate.toDateString();
     
-    const baseStyle = isSelected 
-      ? (zoomLevel === 2 ? styles.calendar_day_week_box_selected : styles.calendar_box_selected)
-      : isToday
-        ? (zoomLevel === 2 ? styles.calendar_day_week_box_today : styles.calendar_box_today)
-        : isOtherMonth
-          ? styles.calendar_day_week_box_other_month
-          : (zoomLevel === 2 ? styles.calendar_day_week_box : styles.calendar_box);
+    // Base calendar box styles
+    const baseBoxStyle = {
+      ...commonStyles.calendar.box.base,
+      ...(zoomLevel === 2 ? { minHeight: isMobile ? "50px" : "80px" } : {})
+    };
     
-    const bgColor = isSelected
-      ? theme === 'dark' ? darkSelectedBg : lightSelectedBg
-      : isToday
-        ? theme === 'dark' ? darkTodayBg : lightTodayBg
-        : isOtherMonth
-          ? theme === 'dark' ? darkOtherMonthBg : lightOtherMonthBg
-          : theme === 'dark' ? darkBoxBg : lightBoxBg;
-      
-    const borderColor = isSelected
-      ? theme === 'dark' ? '#ffffff' : '#003366' // Make selected border more visible
-      : isToday
-        ? theme === 'dark' ? '#0066cc' : '#0066cc' // Consistent today border color
-        : theme === 'dark' ? darkBorderColor : lightBorderColor;
+    // Add selected/today/other month styling
+    const boxStyle = {
+      ...baseBoxStyle,
+      ...(isSelected && { 
+        ...commonStyles.calendar.box.selected,
+        backgroundColor: themeColors.selectedBg,
+        borderColor: theme === 'dark' ? '#ffffff' : '#003366'
+      }),
+      ...(isToday && !isSelected && { 
+        ...commonStyles.calendar.box.today,
+        backgroundColor: themeColors.todayBg,
+        borderColor: '#0066cc'
+      }),
+      ...(!isToday && !isSelected && {
+        backgroundColor: isOtherMonth 
+          ? (theme === 'dark' ? 'rgba(20, 20, 20, 0.7)' : themeColors.otherMonthBg)
+          : (theme === 'dark' ? 'rgba(20, 20, 30, 0.7)' : themeColors.boxBg),
+        borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : themeColors.borderColor
+      }),
+      ...(isOtherMonth && !isSelected && !isToday && {
+        ...commonStyles.calendar.box.otherMonth
+      }),
+      ...(responsiveStyles.box || {}),
+      ...(theme === 'dark' && {
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)'
+      })
+    };
     
     // Check if this day is currently being hovered
     const isHovered = hoveredDay && date && date.toDateString() === hoveredDay.toDateString();
     const hoverStyles = isHovered ? {
-      backgroundColor: theme === 'dark' ? '#3a3a3a' : '#f0f0f0',
-      transform: 'scale(1.05)',
+      backgroundColor: theme === 'dark' ? 'rgba(40, 40, 50, 0.8)' : '#f0f0f0',
+      transform: isMobile ? 'scale(1.02)' : 'scale(1.05)',
       boxShadow: theme === 'dark' ? '0 0 5px rgba(255,255,255,0.1)' : '0 0 5px rgba(0,0,0,0.1)',
     } : {};
     
     return {
-      ...baseStyle,
-      backgroundColor: bgColor,
-      borderColor: borderColor,
-      color: theme === 'dark' ? (isOtherMonth ? '#a0a0a0' : darkTextColor) : 'inherit',
-      ...(responsiveStyles.calendarBox || {}),
+      ...boxStyle,
+      color: theme === 'dark' ? (isOtherMonth ? '#a0a0a0' : themeColors.textColor) : 'inherit',
       ...hoverStyles
     };
   };
@@ -287,7 +220,7 @@ const CalendarPage = () => {
     // Add weekday headers
     ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(day => {
       // Show abbreviated day names on small screens
-      const displayDay = windowWidth < 576 ? day : (windowWidth < 768 ? day : day === "Lun" ? "Lunedì" : 
+      const displayDay = windowWidth < 576 ? day.charAt(0) : (windowWidth < 768 ? day : day === "Lun" ? "Lunedì" : 
                          day === "Mar" ? "Martedì" : day === "Mer" ? "Mercoledì" : 
                          day === "Gio" ? "Giovedì" : day === "Ven" ? "Venerdì" : 
                          day === "Sab" ? "Sabato" : "Domenica");
@@ -299,8 +232,11 @@ const CalendarPage = () => {
     for (let i = 0; i < firstDay; i++) {
       allDays.push(
         <div key={`empty-${i}`} style={{
-          ...styles.empty_calendar_box,
-          backgroundColor: theme === 'dark' ? darkEmptyBg : lightEmptyBg,
+          ...commonStyles.calendar.box.base,
+          backgroundColor: themeColors.emptyBg,
+          minHeight: isMobile ? "35px" : "60px",
+          borderRadius: "5px",
+          ...(responsiveStyles.box || {})
         }}></div>
       );
     }
@@ -342,7 +278,7 @@ const CalendarPage = () => {
     // Add weekday headers
     ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(day => {
       // Show abbreviated day names on small screens
-      const displayDay = windowWidth < 576 ? day : (windowWidth < 768 ? day : day === "Lun" ? "Lunedì" : 
+      const displayDay = windowWidth < 576 ? day.charAt(0) : (windowWidth < 768 ? day : day === "Lun" ? "Lunedì" : 
                          day === "Mar" ? "Martedì" : day === "Mer" ? "Mercoledì" : 
                          day === "Gio" ? "Giovedì" : day === "Ven" ? "Venerdì" : 
                          day === "Sab" ? "Sabato" : "Domenica");
@@ -413,7 +349,6 @@ const CalendarPage = () => {
       for (let i = firstWeekDay; dayCount <= 7 && i <= totalDays; i++) {
         const date = new Date(year, month, i);
         
-
         const isToday = 
             currentDate.getDate() === i && 
             currentDate.getMonth() === month && 
@@ -442,7 +377,6 @@ const CalendarPage = () => {
         for (let i = 1; dayCount <= 7; i++, dayCount++) {
           const date = new Date(nextYear, nextMonth, i);
           
-
           const isToday = 
               currentDate.getDate() === i && 
               currentDate.getMonth() === nextMonth && 
@@ -466,307 +400,187 @@ const CalendarPage = () => {
     return allDays;
   };
   
-  // Button style
-  const btnStyle = {
-    ...styles.button,
-    backgroundColor: theme === 'dark' ? '#333' : '#fff',
-    color: theme === 'dark' ? darkTextColor : '#000',
-    borderColor: theme === 'dark' ? darkBorderColor : lightBorderColor,
-    ...(responsiveStyles.button || {})
+  // Calendar button style
+  const getButtonStyle = (buttonId) => {
+    const isHovered = hoveredButton === buttonId;
+    const isDisabled = 
+      (buttonId === 'decreaseZoom' && zoomLevel === 0) || 
+      (buttonId === 'increaseZoom' && zoomLevel === 2);
+    
+    const baseStyle = commonStyles.calendar.button(theme, isHovered, isDisabled);
+    
+    // Make buttons smaller on mobile
+    if (isMobile) {
+      return {
+        ...baseStyle,
+        padding: '4px 8px',
+        fontSize: '12px',
+        minWidth: 'auto'
+      };
+    }
+      
+    return baseStyle;
   };
   
-  // Back home button style
-  const backHomeBtnStyle = {
-    ...btnStyle,
-    ...(responsiveStyles.headerButton || {})
-  };
-  
-  // Disabled button style
-  const disabledBtnStyle = {
-    ...btnStyle,
-    opacity: 0.5,
-    cursor: 'not-allowed',
-    backgroundColor: theme === 'dark' ? '#282828' : '#e0e0e0',
-  };
-  
-  // Calendar container style
-  const yearCalendarStyle = {
-    ...styles.year_calendar,
-    ...(responsiveStyles.yearCalendar || {})
-  };
-  
+  // Calendar container styles based on zoom level
   const calendarContainerStyle = {
     ...(zoomLevel === 0 
-      ? yearCalendarStyle 
-      : (zoomLevel === 1 ? styles.month_calendar : styles.week_calendar)),
-    backgroundColor: theme === 'dark' ? '#1a1a1a' : '#f0f0f0',
-    ...(responsiveStyles.calendarContainer || {})
+      ? commonStyles.calendar.container.year
+      : (zoomLevel === 1 
+          ? commonStyles.calendar.container.month 
+          : commonStyles.calendar.container.week)),
+    ...commonStyles.blurredBackdrop(theme),
+    ...(responsiveStyles.container || {}),
+    ...(zoomLevel === 0 && responsiveStyles.yearGrid ? { gridTemplateColumns: responsiveStyles.yearGrid.gridTemplateColumns } : {}),
+    // Reduce gap on mobile for tighter layout
+    gap: isMobile ? '1px' : '5px'
   };
   
-  // Common button container
+  // Button container component
   const ButtonContainer = ({ children }) => (
-    <div style={styles.buttonContainer}>{children}</div>
+    <div style={{
+      ...commonStyles.calendar.buttonContainer,
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: isMobile ? '5px' : '10px'
+    }}>{children}</div>
   );
 
-  // Update week_day style with responsive adjustment
+  // Week day header style
   const weekDayStyle = {
-    ...styles.week_day,
+    ...commonStyles.calendar.header.weekDay,
     ...(responsiveStyles.weekDay || {}),
-    color: theme === 'dark' ? darkTextColor : '#333333'
+    color: theme === 'dark' ? themeColors.textColor : '#333333',
+    padding: isMobile ? '2px' : '5px',
+    fontSize: isMobile ? '10px' : '14px'
   };
   
-  // Month name style with responsive adjustment
+  // Month name style
   const monthNameStyle = {
-    ...styles.month_name,
+    ...commonStyles.calendar.header.monthName,
     ...(responsiveStyles.monthName || {}),
-    color: theme === 'dark' ? darkTextColor : 'inherit'
+    color: theme === 'dark' ? themeColors.textColor : 'inherit',
+    fontSize: isMobile ? '16px' : '20px'
   };
   
   return (
     <div>
-      <div style={{
-        ...styles.headerContainer,
-        flexDirection: isMobile ? 'column' : 'row',
-      }}>
-        <button
-          style={{
-            ...backHomeBtnStyle,
-            ...(isButtonHovered ? styles.buttonHover : {})
-          }}
-          onMouseEnter={() => setIsButtonHovered(true)}
-          onMouseLeave={() => setIsButtonHovered(false)}
-          onClick={() => window.location.href = "/"}
-        >
-          <FaArrowLeft /> Go back
-        </button>
-      </div>
-      
-      <div style={styles.titleContainer}>
-        <h1 style={commonStyles.welcomeGradient(theme)} key={theme}>Calendar</h1>
-      </div>
-      
-      <div style={monthNameStyle}>
-        {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
-      </div>
-      
-      <ButtonContainer>
-        {zoomLevel === 0 && (
-          <>
-            <button style={btnStyle} onClick={changeToPrevYear}><FaArrowLeft /> {isMobile ? 'Prev Year' : 'Previous Year'}</button>
-            <button style={btnStyle} onClick={changeToNextYear}>{isMobile ? 'Next Year' : 'Next Year'} <FaArrowRight /></button>
-          </>
-        )}
-        
-        {zoomLevel === 1 && (
-          <>
-            <button style={btnStyle} onClick={changeToPrevMonth}><FaArrowLeft /> {isMobile ? 'Prev Month' : 'Previous Month'}</button>
-            <button style={btnStyle} onClick={changeToNextMonth}>{isMobile ? 'Next Month' : 'Next Month'} <FaArrowRight /></button>
-          </>
-        )}
-        
-        {zoomLevel === 2 && (
-          <>
-            <button style={btnStyle} onClick={changeToPrevWeek}><FaArrowLeft /> {isMobile ? 'Prev Week' : 'Previous Week'}</button>
-            <button style={btnStyle} onClick={changeToNextWeek}>{isMobile ? 'Next Week' : 'Next Week'} <FaArrowRight /></button>
-          </>
-        )}
-      </ButtonContainer>
-      
-      <div style={{
-        ...styles.calendarOuterContainer,
-        padding: isMobile ? '5px' : '10px',
-      }}>
-        <div style={calendarContainerStyle}>
-          {zoomLevel === 0 && renderYearCalendar()}
-          {zoomLevel === 1 && renderMonthCalendar()}
-          {zoomLevel === 2 && renderWeekCalendar()}
+      <BlurredWindow 
+        width={isMobile ? "95%" : "850px"} 
+        padding={isMobile ? "10px" : "20px"}>
+        <div style={commonStyles.calendar.header.title}>
+          <h1 style={{
+            ...commonStyles.welcomeGradient(theme),
+            fontSize: isMobile ? "24px" : "32px"
+          }} key={theme}>Calendar</h1>
         </div>
-      </div>
-      
-      <ButtonContainer>
-        <button 
-          style={zoomLevel === 0 ? disabledBtnStyle : btnStyle} 
-          onClick={decreaseZoomLevel} 
-          disabled={zoomLevel === 0}
-        >
-          <FaSearchMinus /> {isMobile ? 'Decrease' : 'Decrease Zoom'}
-        </button>
-        <button 
-          style={zoomLevel === 2 ? disabledBtnStyle : btnStyle} 
-          onClick={increaseZoomLevel} 
-          disabled={zoomLevel === 2}
-        >
-          <FaSearchPlus /> {isMobile ? 'Increase' : 'Increase Zoom'}
-        </button>
-      </ButtonContainer>
+        
+        <div style={monthNameStyle}>
+          {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
+        </div>
+        
+        <ButtonContainer>
+          {zoomLevel === 0 && (
+            <>
+              <button 
+                style={getButtonStyle('prevYear')} 
+                onClick={changeToPrevYear}
+                onMouseEnter={() => setHoveredButton('prevYear')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Year'}
+              </button>
+              <button 
+                style={getButtonStyle('nextYear')} 
+                onClick={changeToNextYear}
+                onMouseEnter={() => setHoveredButton('nextYear')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                {isMobile ? 'Next' : 'Next Year'} <FaArrowRight />
+              </button>
+            </>
+          )}
+          
+          {zoomLevel === 1 && (
+            <>
+              <button 
+                style={getButtonStyle('prevMonth')}
+                onClick={changeToPrevMonth}
+                onMouseEnter={() => setHoveredButton('prevMonth')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Month'}
+              </button>
+              <button 
+                style={getButtonStyle('nextMonth')}
+                onClick={changeToNextMonth}
+                onMouseEnter={() => setHoveredButton('nextMonth')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                {isMobile ? 'Next' : 'Next Month'} <FaArrowRight />
+              </button>
+            </>
+          )}
+          
+          {zoomLevel === 2 && (
+            <>
+              <button 
+                style={getButtonStyle('prevWeek')}
+                onClick={changeToPrevWeek}
+                onMouseEnter={() => setHoveredButton('prevWeek')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Week'}
+              </button>
+              <button 
+                style={getButtonStyle('nextWeek')}
+                onClick={changeToNextWeek}
+                onMouseEnter={() => setHoveredButton('nextWeek')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                {isMobile ? 'Next' : 'Next Week'} <FaArrowRight />
+              </button>
+            </>
+          )}
+        </ButtonContainer>
+        
+        <div style={{
+          ...commonStyles.calendar.container.outer,
+          padding: isMobile ? '2px' : '10px',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden'
+        }}>
+          <div style={calendarContainerStyle}>
+            {zoomLevel === 0 && renderYearCalendar()}
+            {zoomLevel === 1 && renderMonthCalendar()}
+            {zoomLevel === 2 && renderWeekCalendar()}
+          </div>
+        </div>
+        
+        <ButtonContainer>
+          <button 
+            style={getButtonStyle('decreaseZoom')}
+            onClick={decreaseZoomLevel} 
+            disabled={zoomLevel === 0}
+            onMouseEnter={() => setHoveredButton('decreaseZoom')}
+            onMouseLeave={() => setHoveredButton(null)}
+          >
+            <FaSearchMinus /> {isMobile ? 'Zoom -' : 'Decrease Zoom'}
+          </button>
+          <button 
+            style={getButtonStyle('increaseZoom')}
+            onClick={increaseZoomLevel} 
+            disabled={zoomLevel === 2}
+            onMouseEnter={() => setHoveredButton('increaseZoom')}
+            onMouseLeave={() => setHoveredButton(null)}
+          >
+            <FaSearchPlus /> {isMobile ? 'Zoom +' : 'Increase Zoom'}
+          </button>
+        </ButtonContainer>
+      </BlurredWindow>
     </div>
   );
-};
-
-const styles = {
-  month_calendar: {
-    display: "grid",
-    gridTemplateColumns: "repeat(7, 1fr)",
-    gridTemplateRows: "repeat(7, auto)",
-    gap: "5px",
-    padding: "10px",
-    borderRadius: "10px",
-    width: "100%",
-    maxWidth: "800px",
-    margin: "0 auto"
-  },
-  empty_calendar_box: {
-    minHeight: "60px",
-    borderRadius: "5px",
-  },
-  calendar_box: {
-    border: "1px solid #cccccc",
-    minHeight: "60px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.2s, border-color 0.3s",
-  },
-  calendar_box_selected: {
-    border: "2px solid #003366",
-    minHeight: "60px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transform: "scale(1.1)",
-  },
-  calendar_box_today: {
-    border: "2px solid #0066cc",
-    minHeight: "60px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transform: "scale(1.05)",
-  },
-  week_day: {
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "#333333",
-    padding: "5px",
-    fontSize: "14px",
-  },
-  month_name: {
-    textAlign: "center",
-    fontSize: "20px",
-    marginBottom: "20px",
-    fontWeight: "bold",
-  },
-  year_calendar: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-    gap: "10px",
-    padding: "10px",
-    borderRadius: "10px",
-    width: "100%",
-    maxWidth: "800px",
-    margin: "0 auto"
-  },
-  week_calendar: {
-    display: "grid",
-    gridTemplateColumns: "repeat(7, 1fr)",
-    gridTemplateRows: "repeat(2, auto)",
-    gap: "5px",
-    padding: "10px",
-    borderRadius: "10px",
-    width: "100%",
-    maxWidth: "800px",
-    margin: "0 auto"
-  },
-  calendar_day_week_box: {
-    border: "1px solid #cccccc",
-    minHeight: "80px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.2s, border-color 0.3s",
-  },
-  calendar_day_week_box_other_month: {
-    border: "1px solid #dddddd",
-    minHeight: "80px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-  },
-  calendar_day_week_box_selected: {
-    border: "2px solid #003366",
-    minHeight: "80px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transform: "scale(1.1)",
-  },
-  calendar_day_week_box_today: {
-    border: "2px solid #0066cc",
-    minHeight: "80px",
-    borderRadius: "5px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    transform: "scale(1.05)",
-  },
-  button: {
-    border: "2px solid #dcdcdc",
-    borderRadius: "10px",
-    padding: "8px 15px",
-    fontSize: "14px",
-    cursor: "pointer",
-    margin: "5px",
-    transition: "background-color 0.3s, color 0.3s, border-color 0.3s",
-  },
-  buttonHover: {
-    backgroundColor: "#f0f0f0",
-  },
-  buttonContainer: {
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    width: "100%",
-    margin: "10px 0",
-  },
-  title: {
-    textAlign: "center",
-    width: "100%",
-  },
-  headerContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "10px",
-    width: "100%",
-    marginTop: "10px"
-  },
-  calendarOuterContainer: {
-    display: "flex",
-    justifyContent: "center",
-    width: "100%",
-    maxWidth: "100%",
-    overflow: "auto"
-  },
-  titleContainer: {
-    textAlign: "center",
-    width: "100%",
-    marginBottom: "10px",
-  }
 };
 
 export default CalendarPage;

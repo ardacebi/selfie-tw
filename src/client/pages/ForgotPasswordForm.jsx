@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState, useContext, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import postNewPassword from "../data_creation/postNewPassword.js";
 import { ThemeContext } from "../contexts/ThemeContext.jsx";
-import FormInput from "../components/FormInput.jsx";
-import FormButton from "../components/FormButton.jsx";
+import FormInput from "../components/FormInput";
+import FormButton from "../components/FormButton";
+import BlurredWindow from "../components/BlurredWindow";
+import AnimatedBackButton from "../components/AnimatedBackButton";
 import commonStyles from "../styles/commonStyles.js";
 import selfieImg from '../assets/selfie_forgot.png';
 
@@ -15,6 +16,16 @@ const ForgotPasswordForm = () => {
   const [error, setError] = useState("");
   const themeStyles = commonStyles.getThemeStyles(theme);
   const isDark = theme === 'dark';
+  
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = commonStyles.linkHoverStyles(theme);
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, [isDark, theme]);
   
   useEffect(() => {
     const style = document.createElement("style");
@@ -44,70 +55,48 @@ const ForgotPasswordForm = () => {
   };
 
   return (
-    <div>
-      <div style={commonStyles.headerContainer}>
-        <NavLink
-          style={{
-            ...commonStyles.backButton,
-            backgroundColor: themeStyles.inputBg,
-            color: themeStyles.inputColor,
-            borderColor: themeStyles.borderColor,
-          }}
-          to="/"
-        >
-          <FaArrowLeft style={{ marginRight: '8px' }} /> Go back
-        </NavLink>
+    <div style={{ width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
+      <div style={{ 
+        maxWidth: "450px",
+        margin: "0 auto",
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        marginTop: "10px",
+        marginBottom: "20px",
+        boxSizing: "border-box"
+      }}>
+        <AnimatedBackButton to="/login" />
       </div>
       
-      <div style={{ textAlign: "center", marginBottom: "10px" }}>
-        <img src={selfieImg} alt="Selfie" style={{...commonStyles.logo, marginBottom: "5px"}} />
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={commonStyles.gradientTitle(theme)} key={theme}>Forgot Password</div>
+      <BlurredWindow width="450px">
+        <div style={commonStyles.pages.common.imageContainer}>
+          <img src={selfieImg} alt="Selfie" style={{...commonStyles.logo, marginBottom: "5px"}} />
         </div>
-        
-        <FormInput name="email" placeholder="Email" required={true} />
-        <FormInput name="password" type="password" placeholder="New Password" required={true} />
-        <FormButton>Change Password</FormButton>
-      </form>
 
-      <div style={{
-        marginTop: '20px',
-        padding: '12px',
-        backgroundColor: isDark ? '#444' : '#f8f8f8',
-        border: `1px solid ${isDark ? '#555' : '#ddd'}`,
-        borderRadius: '6px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        width: '278px',
-      }}>
-        <div style={{ 
-          marginRight: '10px',
-          backgroundColor: isDark ? '#666' : '#e0e0e0',
-          borderRadius: '50%',
-          width: '24px',
-          height: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          color: isDark ? '#fff' : '#444',
-          minWidth: '24px',
-          flexShrink: 0,
-        }}>i</div>
-        <p style={{
-          margin: 0,
-          fontSize: '12px',
-          color: isDark ? '#ccc' : '#666',
-        }}>
-          In production environments, password changes require email verification for security. This is not the case in this educational project. Without this verification, any user could change another user's password, which is not expected practice.
-        </p>
-      </div>
+        <form onSubmit={handleSubmit} style={commonStyles.form.container}>
+          <div style={commonStyles.form.titleContainer}>
+            <div style={commonStyles.gradientTitle(theme)} key={theme}>Forgot Password</div>
+          </div>
+          
+          <div style={commonStyles.form.inputContainer}>
+            <FormInput name="email" placeholder="Email" required={true} />
+            <FormInput name="password" type="password" placeholder="New Password" required={true} />
+            <FormButton>Change Password</FormButton>
+          </div>
+        </form>
 
-      <p id="error_text" style={{...commonStyles.errorText, fontFamily: "sans-serif"}}>{error}</p>
+        <div style={commonStyles.infoBox(theme)}>
+          <div style={commonStyles.infoIcon(theme)}>i</div>
+          <p style={commonStyles.infoText(theme)}>
+            In production environments, password changes require email verification for security. This is not the case in this educational project. Without this verification, any user could change another user's password, which is not expected practice.
+          </p>
+        </div>
+
+        <p id="error_text" style={{...commonStyles.errorText, fontFamily: "sans-serif", textAlign: "center", width: "100%"}}>{error}</p>
+      </BlurredWindow>
     </div>
   );
 };
