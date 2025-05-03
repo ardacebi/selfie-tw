@@ -16,6 +16,13 @@ const ThemeProvider = ({ children }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.documentElement.classList.remove('dark-theme', 'light-theme');
+      document.documentElement.classList.add(theme === 'dark' ? 'dark-theme' : 'light-theme');
+    }
+  }, [theme]);
+
+  useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => isSystemTheme && setTheme(getSystemTheme());
     mediaQuery.addEventListener("change", handleChange);

@@ -10,6 +10,7 @@ import BlurredWindow from "../components/BlurredWindow";
 import AnimatedBackButton from "../components/AnimatedBackButton";
 import commonStyles from "../styles/commonStyles.js";
 import selfieImg from '../assets/selfie_signup.png';
+import PageTransition from "../components/PageTransition";
 
 const SignUpForm = () => {
   const { theme } = useContext(ThemeContext);
@@ -70,68 +71,80 @@ const SignUpForm = () => {
   };
 
   return (
-    <div style={{ width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
-      {/* Updated header container with centered width matching BlurredWindow */}
-      <div style={{ 
-        maxWidth: "450px",
-        margin: "0 auto",
-        width: "100%",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        padding: "10px",
-        marginTop: "10px",
-        marginBottom: "20px",
-        boxSizing: "border-box"
-      }}>
-        <AnimatedBackButton to="/" />
-      </div>
-      
-      <BlurredWindow width="450px">
-        <div style={commonStyles.pages.common.imageContainer}>
-          <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
+    <PageTransition>
+      <div style={{ width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
+        {/* Updated header container with centered width matching BlurredWindow */}
+        <div style={{ 
+          maxWidth: "450px",
+          margin: "0 auto",
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          padding: "10px",
+          marginTop: "10px",
+          marginBottom: "20px",
+          boxSizing: "border-box"
+        }}>
+          <AnimatedBackButton to="/" />
         </div>
         
-        <form onSubmit={handleSubmit} style={{
-          ...commonStyles.form.container,
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <div style={commonStyles.form.titleContainer}>
-            <div style={commonStyles.gradientTitle(theme)} key={theme}>
-              Sign Up
-            </div>
-          </div>
-          
+        <BlurredWindow width="450px">
           <div style={{
-            ...commonStyles.form.inputContainer,
-            width: '100%',
-            boxSizing: 'border-box'
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%'
           }}>
-            <FormInput name="email" placeholder="Email" required={true} />
-            <FormInput name="username" placeholder="Username" required={true} />
-            <FormInput name="password" type="password" placeholder="Password" required={true} />
-
-            <FormButton>Create Account</FormButton>
-
-            <div style={commonStyles.pages.common.centerAlignedContent}>
-              <NavLink 
-                style={commonStyles.pages.common.navLink(theme)}
-                className="link-hover-effect"
-                to="/login"
-              >
-                Already have an account?
-              </NavLink>
+            <div style={commonStyles.pages.common.imageContainer}>
+              <img src={selfieImg} alt="Selfie" style={commonStyles.logo} />
             </div>
-          </div>
+            
+            <form onSubmit={handleSubmit} style={{
+              ...commonStyles.form.container,
+              width: '100%',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+            <div style={commonStyles.form.titleContainer}>
+              <div style={commonStyles.gradientTitle(theme)} key={theme}>
+                Sign Up
+              </div>
+            </div>
+            
+            <div style={{
+              ...commonStyles.form.inputContainer,
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <FormInput name="email" placeholder="Email" required={true} />
+              <FormInput name="username" placeholder="Username" required={true} />
+              <FormInput name="password" type="password" placeholder="Password" required={true} />
 
-          <div style={commonStyles.getBannerStyle("errorBannerStyle", showErrorBanner, theme)}>
-            <FaExclamationCircle style={commonStyles.bannerIconStyle} />
-            <span>{error}</span>
+              <FormButton>Create Account</FormButton>
+
+              <div style={commonStyles.pages.common.centerAlignedContent}>
+                <NavLink 
+                  style={commonStyles.pages.common.navLink(theme)}
+                  className="link-hover-effect"
+                  to="/login"
+                >
+                  Already have an account?
+                </NavLink>
+              </div>
+            </div>
+
+            <div style={commonStyles.getBannerStyle("errorBannerStyle", showErrorBanner, theme)}>
+              <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+              <span>{error}</span>
+            </div>
+          </form>
           </div>
-        </form>
-      </BlurredWindow>
-    </div>
+        </BlurredWindow>
+      </div>
+    </PageTransition>
   );
 };
 

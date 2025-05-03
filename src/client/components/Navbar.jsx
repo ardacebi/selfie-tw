@@ -54,7 +54,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("savedUser");
     setCurrentUser(null);
-    navigate("/", { replace: true });
+    navigate("/", { replace: true, state: { fromLogout: true } });
   };
   
   const handleTooltipToggle = (tooltipId, e) => {
