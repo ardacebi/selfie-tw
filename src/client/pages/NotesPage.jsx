@@ -75,23 +75,26 @@ const NotesPage = () => {
   }, [currentUser]);
 
   return (
-    <div className={`notes-page ${theme}`}>
+    <>
+    <div style={commonStyles.notes.titleWrapper}>
       <h1>Notes</h1>
-      {error && <div className="error-banner">{error}</div>}
-      <div className="notes-list">
-        {allNotes.map((note) => (
-          <div key={note._id} className="note-item">
-            <h2>{note.title}</h2>
-            <p>
-              Created on: {new Date(note.creationDate).toLocaleDateString()} |
-              Last modified:{" "}
-              {new Date(note.lastModifiedDate).toLocaleDateString()}
-            </p>
-            <div dangerouslySetInnerHTML={{ __html: note.HTMLbody }} />
-          </div>
-        ))}
-      </div>
     </div>
+      
+
+    <div style={commonStyles.notes.notesPage}>
+      {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
+      {allNotes.map((note) => (
+        <div key={note._id} style={commonStyles.notes.noteItem(theme)}>
+          <h2>{note.title}</h2>
+          <p>
+            Created on: {new Date(note.creationDate).toLocaleDateString()} | Last modified:{" "}
+            {new Date(note.lastModifiedDate).toLocaleDateString()}
+          </p>
+          <div dangerouslySetInnerHTML={{ __html: note.HTMLbody }} />
+        </div>
+      ))}
+    </div>
+    </>
   );
 };
 

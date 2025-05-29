@@ -316,6 +316,39 @@ const commonStyles = {
       margin: "10px 0",
     }
   },
+
+  // Notes styles
+  notes: {
+    // NotesPage grid container
+    notesPage: {
+      width: "100%",
+      padding: "20px",
+      display: "flex",
+      gap: "20px",
+      backgroundColor: "transparent",
+      alignItems: "center",
+      minHeight: "auto",
+    },
+
+    titleWrapper: {
+      textAlign: "center",
+      width: "100%",
+    },
+
+    // Individual note card
+    noteItem: (theme) => ({
+      backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+      padding: "15px",
+      marginBottom: "10px",
+      borderRadius: "10px",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+      "&:hover": {
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
+      },
+    }),
+  },
   
   // Blurred window/backdrop styles
   blurredBackdrop: (theme) => ({
