@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }) => {
 
   // If we're still loading the authentication state, don't redirect yet
   if (isLoading) {
-    // spinner?
+    //? spinner?
     return null;
   }
 

@@ -85,14 +85,14 @@ export const getAllUserNotes = async (req, res) => {
 };
 
 export const getNoteById = async (req, res) => {
-  const { noteId } = req.body;
+  const { noteID } = req.body;
 
-  if (!Types.ObjectId.isValid(noteId)) {
+  if (!Types.ObjectId.isValid(noteID)) {
     return res.status(404).json({ success: false, message: "Invalid Note ID" });
   }
 
   try {
-    const note = await NoteData.findById(noteId);
+    const note = await NoteData.findById(noteID);
     if (!note) {
       return res
         .status(404)
