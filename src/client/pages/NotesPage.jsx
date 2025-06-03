@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import {
@@ -15,6 +15,8 @@ import postNewNote from "../data_creation/postNewNote";
 import fetchAllNotesData from "../data_fetching/fetchAllNotesData";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { set } from "mongoose";
+import FormInput from "../components/FormInput";
+import { FaExclamationCircle } from "react-icons/fa";
 
 const NotesPage = () => {
   const { theme } = useContext(ThemeContext);
@@ -56,26 +58,72 @@ const NotesPage = () => {
 
   const { currentUser } = useContext(CurrentUserContext);
   const [allNotes, setAllNotes] = useState([]);
-  const [error, setError] = useState(null);
+
+  // Hover states for notes and buttons
   const [hoveredNoteId, setHoveredNoteId] = useState(null);
   const [newNoteHover, setNewNoteHover] = useState(false);
+  const [createNoteHover, setCreateNoteHover] = useState(false);
+  const [cancelNoteHover, setCancelNoteHover] = useState(false);
 
-  const fetchNotes = useMutation(fetchAllNotesData, {
+  const [showNewNoteForm, setShowNewNoteForm] = useState(false);
+
+  const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  const { data: notesData, refetch: refetchNotes } = useQuery(
+    ["notes", currentUser],
+    () => fetchAllNotesData({ userID: currentUser }),
+    { enabled: !!currentUser },
+  );
+
+  useEffect(() => {
+    if (notesData) {
+      setAllNotes(notesData.data);
+    }
+  }, [notesData]);
+
+  const postNote = useMutation(postNewNote, {
+    onMutate: () => setShowErrorBanner(false),
     onSuccess: (res) => {
-      setAllNotes(res.data);
-      setError(null); // Clear any previous errors
+      setShowNewNoteForm(false);
+      refetchNotes();
     },
-    onError: (error) => {
-      setError(error.message);
-      setAllNotes([]); // Clear notes on error
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
     },
   });
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchNotes.mutate({ userID: currentUser });
+  const handleNewNoteSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData(e.target);
+      const title = formData.get("title");
+      postNote.mutate({
+        title: title,
+        body: " ",
+        userID: currentUser,
+      });
+    } catch (err) {
+      setError(err.message);
+      setShowErrorBanner(true);
     }
-  }, [currentUser]);
+  };
 
   return (
     <div>
@@ -83,25 +131,105 @@ const NotesPage = () => {
         <h1>Notes</h1>
       </div>
 
-      <button 
-      onMouseEnter={() => setNewNoteHover(true)}
-      onMouseLeave={() => setNewNoteHover(false)}
-      style={{
-        ...commonStyles.notes.newNoteButton(theme),
-        ...(newNoteHover
-        ? commonStyles.notes.newNoteButtonHover(theme)
-        : {}),
+      {!showNewNoteForm && (
+        <div
+          style={commonStyles.getBannerStyle(
+            "errorBannerStyle",
+            showErrorBanner,
+            theme,
+          )}
+        >
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <button
+        onClick={() => setShowNewNoteForm(true)}
+        onMouseEnter={() => setNewNoteHover(true)}
+        onMouseLeave={() => setNewNoteHover(false)}
+        style={{
+          ...commonStyles.notes.newNoteButton(
+            theme,
+            isMobile || allNotes.length === 0, //If there are no notes, make the button full width
+          ),
+          ...(newNoteHover ? commonStyles.notes.noteButtonHover(theme) : {}),
         }}
       >
         New Note
       </button>
-      
 
-      <div style={commonStyles.notes.notesPage}>
-        {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
+      {showNewNoteForm && (
+        <div style={commonStyles.notes.newNoteFormOverlay}>
+          <div style={commonStyles.notes.newNoteFormContainer(theme)}>
+            <form onSubmit={handleNewNoteSubmit}>
+              <FormInput
+                name="title"
+                placeholder="Title"
+                required={true}
+                maxLength="25"
+              />
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  type="submit"
+                  onMouseEnter={() => setCreateNoteHover(true)}
+                  onMouseLeave={() => setCreateNoteHover(false)}
+                  style={{
+                    ...commonStyles.notes.createNoteButton(theme, false),
+                    ...(createNoteHover
+                      ? commonStyles.notes.noteButtonHover(theme)
+                      : {}),
+                  }}
+                >
+                  Create Note
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewNoteForm(false);
+                    setCancelNoteHover(false);
+                    setCreateNoteHover(false);
+                    setShowErrorBanner(false);
+                    setError("");
+                  }}
+                  onMouseEnter={() => setCancelNoteHover(true)}
+                  onMouseLeave={() => setCancelNoteHover(false)}
+                  style={{
+                    ...commonStyles.notes.cancelNoteButton(theme),
+                    ...(cancelNoteHover
+                      ? commonStyles.notes.noteButtonHover(theme)
+                      : {}),
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+
+            <div
+              style={commonStyles.getBannerStyle(
+                "errorBannerStyle",
+                showErrorBanner,
+                theme,
+              )}
+            >
+              <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+              <span>{error}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {allNotes.length === 0 && (
+        <div>
+          <p>There are no Notes at the moment!</p>
+        </div>
+      )}
+
+      <div style={commonStyles.notes.notesPage(isMobile)}>
         {allNotes.map((note) => (
           <div
-            key={note._id} 
+            key={note._id}
             onMouseEnter={() => setHoveredNoteId(note._id)}
             onMouseLeave={() => setHoveredNoteId(null)}
             style={{
@@ -113,14 +241,18 @@ const NotesPage = () => {
           >
             <h2>{note.title}</h2>
             <p style={commonStyles.notes.notesDate(theme)}>
-              Created on: {new Date(note.creationDate).toLocaleDateString()} | Last modified:{" "}
+              Created on: {new Date(note.creationDate).toLocaleDateString()} |
+              Last modified:{" "}
               {new Date(note.lastModifiedDate).toLocaleDateString()}
             </p>
-            <div dangerouslySetInnerHTML={{
-              __html: note.HTMLbody.length > 120
-              ? note.HTMLbody.substring(0, 120) + "..."
-              : note.HTMLbody
-            }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  note.HTMLbody.length > 120
+                    ? note.HTMLbody.substring(0, 120) + "..."
+                    : note.HTMLbody,
+              }}
+            />
           </div>
         ))}
       </div>

@@ -9,7 +9,7 @@ async function postNewNote({
     throw new Error("User not found");
   } else {
     const res = await fetch(`/api/notes/create_note/${userID}`, {
-      method: "PATCH",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },

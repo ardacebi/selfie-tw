@@ -41,7 +41,7 @@ export const createNote = async (req, res) => {
         .json({ success: false, message: "User not found, note not created" });
     }
 
-    res.status(200).json({ success: true, data: updatedProfileData });
+    res.status(200).json({ success: true, data: savedNote });
   } catch (error) {
     res
       .status(500)
