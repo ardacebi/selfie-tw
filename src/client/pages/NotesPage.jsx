@@ -14,6 +14,7 @@ import commonStyles from "../styles/commonStyles";
 import postNewNote from "../data_creation/postNewNote";
 import fetchAllNotesData from "../data_fetching/fetchAllNotesData";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { set } from "mongoose";
 
 const NotesPage = () => {
   const { theme } = useContext(ThemeContext);
@@ -56,6 +57,8 @@ const NotesPage = () => {
   const { currentUser } = useContext(CurrentUserContext);
   const [allNotes, setAllNotes] = useState([]);
   const [error, setError] = useState(null);
+  const [hoveredNoteId, setHoveredNoteId] = useState(null);
+  const [newNoteHover, setNewNoteHover] = useState(false);
 
   const fetchNotes = useMutation(fetchAllNotesData, {
     onSuccess: (res) => {
@@ -75,26 +78,53 @@ const NotesPage = () => {
   }, [currentUser]);
 
   return (
-    <>
-    <div style={commonStyles.notes.titleWrapper}>
-      <h1>Notes</h1>
-    </div>
+    <div>
+      <div style={commonStyles.notes.titleWrapper}>
+        <h1>Notes</h1>
+      </div>
+
+      <button 
+      onMouseEnter={() => setNewNoteHover(true)}
+      onMouseLeave={() => setNewNoteHover(false)}
+      style={{
+        ...commonStyles.notes.newNoteButton(theme),
+        ...(newNoteHover
+        ? commonStyles.notes.newNoteButtonHover(theme)
+        : {}),
+        }}
+      >
+        New Note
+      </button>
       
 
-    <div style={commonStyles.notes.notesPage}>
-      {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
-      {allNotes.map((note) => (
-        <div key={note._id} style={commonStyles.notes.noteItem(theme)}>
-          <h2>{note.title}</h2>
-          <p>
-            Created on: {new Date(note.creationDate).toLocaleDateString()} | Last modified:{" "}
-            {new Date(note.lastModifiedDate).toLocaleDateString()}
-          </p>
-          <div dangerouslySetInnerHTML={{ __html: note.HTMLbody }} />
-        </div>
-      ))}
+      <div style={commonStyles.notes.notesPage}>
+        {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
+        {allNotes.map((note) => (
+          <div
+            key={note._id} 
+            onMouseEnter={() => setHoveredNoteId(note._id)}
+            onMouseLeave={() => setHoveredNoteId(null)}
+            style={{
+              ...commonStyles.notes.noteItem(theme),
+              ...(hoveredNoteId === note._id
+                ? commonStyles.notes.noteItemHover
+                : {}),
+            }}
+          >
+            <h2>{note.title}</h2>
+            <p style={commonStyles.notes.notesDate(theme)}>
+              Created on: {new Date(note.creationDate).toLocaleDateString()} | Last modified:{" "}
+              {new Date(note.lastModifiedDate).toLocaleDateString()}
+            </p>
+            <div dangerouslySetInnerHTML={{
+              __html: note.HTMLbody.length > 120
+              ? note.HTMLbody.substring(0, 120) + "..."
+              : note.HTMLbody
+            }} />
+          </div>
+        ))}
+      </div>
     </div>
-    </>
   );
 };
 

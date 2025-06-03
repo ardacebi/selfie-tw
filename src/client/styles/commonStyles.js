@@ -324,10 +324,10 @@ const commonStyles = {
       width: "100%",
       padding: "20px",
       display: "flex",
+      flexWrap: "wrap",
       gap: "20px",
+      justifyContent: "flex-start",
       backgroundColor: "transparent",
-      alignItems: "center",
-      minHeight: "auto",
     },
 
     titleWrapper: {
@@ -341,12 +341,46 @@ const commonStyles = {
       padding: "15px",
       marginBottom: "10px",
       borderRadius: "10px",
+      border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       transition: "transform 0.2s ease, box-shadow 0.2s ease",
-      "&:hover": {
-        transform: "translateY(-2px)",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
-      },
+      width: "100%",
+      maxWidth: "clamp(150px, 25vw, 320px)",
+      flex: "1 1 250px",
+    }),
+
+    noteItemHover: {
+      transform: "translateY(-4px)",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.7)",
+      cursor: "pointer",
+    },
+
+    notesDate: (theme) => ({
+      fontSize: "12px",
+      marginTop: "-12px",
+      color: theme === "dark" ? "rgb(186, 186, 186)" : "rgb(52, 52, 52)",
+    }),
+
+    newNoteButton: (theme) => ({
+      border: "2px solid",
+      borderRadius: "10px",
+      padding: "10px 20px",
+      fontSize: "16px",
+      fontFamily: "sans-serif",
+      cursor: "pointer",
+      margin: "10px auto",
+      transition: "background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s",
+      backgroundColor: theme === 'dark' ? 'rgb(5, 5, 5)' : 'rgb(255, 255, 255)',
+      color: theme === 'dark' ? '#e0e0e0' : '#000',
+      borderColor: theme === 'dark' ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)",
+    }),
+
+    newNoteButtonHover: (theme) => ({
+      backgroundColor: theme === 'dark' ? 'rgb(238, 238, 238)' : 'rgb(5, 5, 5)',
+      borderColor: theme === 'dark' ? "rgb(213, 213, 213)" : "rgb(63, 63, 63)" ,
+      color: theme === 'dark' ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)',
+      transform: "translateY(-4px)",
+      boxShadow: theme === 'dark' ? "0 4px 8px rgba(255, 255, 255, 0.7)" : "0 4px 8px rgba(0, 0, 0, 0.7)" ,
     }),
   },
   
