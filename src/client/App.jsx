@@ -6,6 +6,7 @@ import ForgotPasswordForm from "./pages/ForgotPasswordForm";
 import BaseHomePage from "./pages/BaseHomePage";
 import CalendarPage from "./pages/CalendarPage";
 import NotesPage from "./pages/NotesPage";
+import NotesEditor from "./pages/NotesEditor";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
 import SubNavbar from "./components/SubNavbar";
@@ -182,6 +183,15 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <NotesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/notes/:noteID"
+              element={
+                <ProtectedRoute>
+                  <NotesEditor />
                 </ProtectedRoute>
               }
             />

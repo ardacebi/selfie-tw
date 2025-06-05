@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 const { Types } = mongoose;
 import NoteData from "../models/NoteData.model.js";
 import ProfileData from "../models/ProfileData.model.js";
-import { marked } from "marked";
 
 export const createNote = async (req, res) => {
   const { title, creationDate, lastModifiedDate, body } = req.body;
@@ -73,7 +72,7 @@ export const getAllUserNotes = async (req, res) => {
       title: n.title,
       creationDate: n.creationDate,
       lastModifiedDate: n.lastModifiedDate,
-      HTMLbody: marked.parse(n.body), // Convert Markdown to HTML
+      body: n.body,
     }));
 
     res.status(200).json({ success: true, data: result });
@@ -106,7 +105,7 @@ export const getNoteById = async (req, res) => {
         title: note.title,
         creationDate: note.creationDate,
         lastModifiedDate: note.lastModifiedDate,
-        HTMLbody: marked.parse(note.body), // Convert Markdown to HTML
+        body: note.body,
       },
     });
   } catch (error) {
