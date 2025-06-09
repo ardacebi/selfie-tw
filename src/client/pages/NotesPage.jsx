@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { marked } from "marked";
@@ -17,12 +17,15 @@ const NotesPage = () => {
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const [allNotes, setAllNotes] = useState([]);
+  const [noteSorting, setNoteSorting] = useState("alphabetical");
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   // Hover states for notes and buttons
   const [hoveredNoteId, setHoveredNoteId] = useState(null);
   const [newNoteHover, setNewNoteHover] = useState(false);
   const [createNoteHover, setCreateNoteHover] = useState(false);
   const [cancelNoteHover, setCancelNoteHover] = useState(false);
+  const [dropdownNoteHover, setDropdownNoteHover] = useState(false);
 
   const [showNewNoteForm, setShowNewNoteForm] = useState(false);
 
@@ -88,6 +91,21 @@ const NotesPage = () => {
     }
   };
 
+  const sortedNotes = useMemo(() => {
+    if (!allNotes || allNotes.length === 0) return [];
+    else {
+      return [...allNotes].sort((a, b) => {
+        if (noteSorting === "alphabetical") {
+          return a.title.localeCompare(b.title);
+        } else if (noteSorting === "creationDate") {
+          return new Date(b.creationDate) - new Date(a.creationDate);
+        } else if (noteSorting === "lastModifiedDate") {
+          return new Date(b.lastModifiedDate) - new Date(a.lastModifiedDate);
+        }
+      });
+    }
+  }, [allNotes, noteSorting]);
+
   return (
     <div>
       <div style={commonStyles.notes.titleWrapper}>
@@ -121,6 +139,68 @@ const NotesPage = () => {
       >
         New Note
       </button>
+
+      <div style={{ position: "relative", float: "right" }}>
+        {allNotes.length > 0 && (
+          <button
+            onClick={() => setShowSortDropdown(!showSortDropdown)}
+            onMouseEnter={() => setDropdownNoteHover(true)}
+            onMouseLeave={() => setDropdownNoteHover(false)}
+            style={{
+              ...commonStyles.notes.dropdownNoteButton(theme),
+              ...(dropdownNoteHover
+                ? commonStyles.notes.dropdownNoteButtonHover(theme)
+                : {}),
+            }}
+          >
+            {noteSorting === "alphabetical"
+              ? "Alphabetical"
+              : noteSorting === "creationDate"
+                ? "Creation Date"
+                : "Last Modified Date"}
+          </button>
+        )}
+
+        {/* Dropdown Menu */}
+        {allNotes.length > 0 && (
+          <div
+            style={{
+              ...commonStyles.notes.dropdownMenuInactive(theme),
+              ...(showSortDropdown
+                ? commonStyles.notes.dropdownMenuActive
+                : {}),
+            }}
+          >
+            <div
+              onClick={() => {
+                setNoteSorting("alphabetical");
+                setShowSortDropdown(false);
+              }}
+              style={commonStyles.notes.dropdownMenuItem(theme)}
+            >
+              Alphabetical
+            </div>
+            <div
+              onClick={() => {
+                setNoteSorting("creationDate");
+                setShowSortDropdown(false);
+              }}
+              style={commonStyles.notes.dropdownMenuItem(theme)}
+            >
+              Creation Date
+            </div>
+            <div
+              onClick={() => {
+                setNoteSorting("lastModifiedDate");
+                setShowSortDropdown(false);
+              }}
+              style={commonStyles.notes.dropdownMenuItem(theme)}
+            >
+              Last Modified Date
+            </div>
+          </div>
+        )}
+      </div>
 
       {showNewNoteForm && (
         <div style={commonStyles.notes.newNoteFormOverlay}>
@@ -190,7 +270,7 @@ const NotesPage = () => {
       )}
 
       <div style={commonStyles.notes.notesPage(isMobile)}>
-        {allNotes.map((note) => {
+        {sortedNotes.map((note) => {
           const HTMLbody = marked.parse(note.body);
 
           return (

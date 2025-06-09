@@ -459,6 +459,56 @@ const commonStyles = {
       borderColor: theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)",
       minWidth: "120px",
     }),
+
+    dropdownNoteButton: (theme) => ({
+      border: theme === "dark" ? "2px" : "2px solid",
+      borderColor: theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)",
+      borderRadius: "4px",
+      padding: "10px 20px",
+      fontSize: "16px",
+      fontFamily: "sans-serif",
+      cursor: "pointer",
+      transition: "transform 0.3s, box-shadow 0.3s",
+      backgroundColor:
+        theme === "dark" ? "rgba(46,46,46,0.85)" : "rgba(255,255,255,0.85)",
+      color: theme === "dark" ? "#e0e0e0" : "#000",
+      minWidth: "100px",
+    }),
+
+    dropdownNoteButtonHover: (theme) => ({
+      transform: "scale(1.05)",
+      boxShadow:
+        theme === "dark"
+          ? "0px 0px 5px rgba(255, 255, 255, 0.7)"
+          : "0px 0px 5px rgba(0, 0, 0, 0.7)",
+    }),
+
+    dropdownMenuInactive: (theme) => ({
+      backgroundColor:
+        theme === "dark" ? "rgba(46,46,46,0.5)" : "rgba(255,255,255,0.5)",
+      opacity: 0,
+      transform: "translateY(-10px)",
+      transition: "opacity 0.2s ease, transform 0.3s ease-out",
+      position: "absolute",
+      margin: "10px 5% 10px auto",
+      right: "0",
+      top: "calc(100% + 5px)", // positions just below the button with a 5px gap
+      color: theme === "dark" ? "#e0e0e0" : "#000",
+      borderRadius: "2px",
+    }),
+
+    dropdownMenuActive: {
+      opacity: 1,
+      transform: "translateY(0)",
+    },
+
+    dropdownMenuItem: (theme) => ({
+      cursor: "pointer",
+      textAlign: "center",
+      borderColor:
+        theme === "dark" ? "rgba(63, 63, 63, 0.4)" : "rgba(213, 213, 213, 0.4)",
+      border: "1px solid",
+    }),
   },
 
   // Blurred window/backdrop styles

@@ -125,15 +125,31 @@ export const updateNote = async (req, res) => {
     });
   }
 
-  const newNoteData = new NoteData({
-    title,
-    creationDate,
-    lastModifiedDate,
-    body,
-  });
-
   const { id } = req.params;
   if (!Types.ObjectId.isValid(id)) {
     return res.status(404).json({ success: false, message: "Invalid User ID" });
   }
-}
+  try {
+    const updatedNote = await NoteData.findByIdAndUpdate(
+      id,
+      {
+        title,
+        creationDate,
+        lastModifiedDate,
+        body,
+      },
+      { new: true },
+    );
+
+    if (!updatedNote)
+      return res
+        .status(404)
+        .json({ success: false, message: "Note not found" });
+
+    res.status(200).json({ success: true, data: updatedNote });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: error.message });
+  }
+};
