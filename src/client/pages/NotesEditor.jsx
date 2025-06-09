@@ -14,6 +14,10 @@ const NotesEditor = () => {
   const [error, setError] = useState("");
   const [showErrorBanner, setShowErrorBanner] = useState(false);
 
+  const [editMode, setEditMode] = useState(true);
+  const [editedBody, setEditedBody] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
+
   const { data: noteData, refetch: refetchNote } = useQuery(
     ["noteData", noteID],
     () => fetchNoteData({ noteID: noteID, userID: currentUser }),
@@ -26,6 +30,17 @@ const NotesEditor = () => {
     },
   );
 
+  useEffect(() => {
+    setEditMode(true);
+  }, [noteID]);
+
+  useEffect(() => {
+    if (noteData && noteData.data) {
+      setEditedBody(noteData.data.body);
+      setEditedTitle(noteData.data.title);
+    }
+  }, [noteData]);
+
   return (
     <div>
       {showErrorBanner && (
@@ -33,15 +48,42 @@ const NotesEditor = () => {
           <p>{error}</p>
         </div>
       )}
-      {console.log("Note Data:", noteData)}
+
+
       {noteData ? (
         <div>
-          <h1>{noteData.data.title}</h1>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: marked.parse(noteData.data.body || ""),
-            }}
-          ></div>
+          
+          {editMode ? (
+            <div>
+            <div>
+              <button onClick={() => setEditMode(false)}>View Mode</button>
+              <button>Save</button>
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+            />
+          </div>
+            <textarea
+              value={editedBody}
+              onChange={(e) => setEditedBody(e.target.value)}
+              rows="10"
+              cols="50"
+            />
+            </div>
+          ) : (
+            <div>
+              <button onClick={() => setEditMode(true)}>Edit</button>
+              <h1>{noteData.data.title}</h1>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(noteData?.data.body || ""),
+              }}
+            ></div>
+            </div>
+         )}
+
+
           <p>
             Last edited:{" "}
             {new Date(noteData.data.lastModifiedDate).toLocaleString()}

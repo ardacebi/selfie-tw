@@ -114,3 +114,26 @@ export const getNoteById = async (req, res) => {
       .json({ success: false, message: "Server Error", error: error.message });
   }
 };
+
+export const updateNote = async (req, res) => {
+  const { title, creationDate, lastModifiedDate, body } = req.body;
+
+  if (!title && !body && !creationDate && !lastModifiedDate) {
+    return res.status(400).json({
+      success: false,
+      message: "you need at least one field to update",
+    });
+  }
+
+  const newNoteData = new NoteData({
+    title,
+    creationDate,
+    lastModifiedDate,
+    body,
+  });
+
+  const { id } = req.params;
+  if (!Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "Invalid User ID" });
+  }
+}
