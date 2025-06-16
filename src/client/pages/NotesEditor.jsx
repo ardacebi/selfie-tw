@@ -6,9 +6,14 @@ import patchNoteData from "../data_creation/patchNoteData";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { marked } from "marked";
+import { ThemeContext } from "../contexts/ThemeContext";
+import { FaExclamationCircle } from "react-icons/fa";
+import commonStyles from "../styles/commonStyles";
+import AnimatedBackButton from "../components/AnimatedBackButton";
 
 const NotesEditor = () => {
   const navigate = useNavigate();
+  const { theme } = useContext(ThemeContext);
   const { noteID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
   const { currentDate } = useContext(CurrentDateContext);
@@ -58,14 +63,21 @@ const NotesEditor = () => {
   return (
     <div>
       {showErrorBanner && (
-        <div>
-          <p>{error}</p>
+        <div
+          style={commonStyles.getBannerStyle(
+            "errorBannerStyle",
+            showErrorBanner,
+            theme,
+          )}
+        >
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
         </div>
       )}
 
       {noteData ? (
         <div>
-          <button onClick={() => navigate("/notes")}>Back to Notes </button>
+          <AnimatedBackButton to="/notes" text="Back to Notes" />
           {editMode ? (
             <div>
               <div>
