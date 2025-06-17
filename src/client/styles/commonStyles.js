@@ -1,3 +1,5 @@
+import { text } from "express";
+
 const commonStyles = {
   // Form fields
   field: {
@@ -417,17 +419,6 @@ const commonStyles = {
       width: isMobile ? "50%" : "auto",
     }),
 
-    noteButtonHover: (theme) => ({
-      backgroundColor: theme === "dark" ? "rgb(238, 238, 238)" : "rgb(5, 5, 5)",
-      borderColor: theme === "dark" ? "rgb(213, 213, 213)" : "rgb(63, 63, 63)",
-      color: theme === "dark" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)",
-      transform: "translateY(-4px)",
-      boxShadow:
-        theme === "dark"
-          ? "0 4px 8px rgba(255, 255, 255, 0.7)"
-          : "0 4px 8px rgba(0, 0, 0, 0.7)",
-    }),
-
     createNoteButton: (theme) => ({
       border: "2px solid",
       borderRadius: "10px",
@@ -460,6 +451,17 @@ const commonStyles = {
       minWidth: "120px",
     }),
 
+    noteButtonHover: (theme) => ({
+      backgroundColor: theme === "dark" ? "rgb(238, 238, 238)" : "rgb(5, 5, 5)",
+      borderColor: theme === "dark" ? "rgb(213, 213, 213)" : "rgb(63, 63, 63)",
+      color: theme === "dark" ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)",
+      transform: "translateY(-4px)",
+      boxShadow:
+        theme === "dark"
+          ? "0 4px 8px rgba(255, 255, 255, 0.7)"
+          : "0 4px 8px rgba(0, 0, 0, 0.7)",
+    }),
+
     dropdownNoteButton: (theme) => ({
       border: theme === "dark" ? "2px" : "2px solid",
       borderColor: theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)",
@@ -472,7 +474,6 @@ const commonStyles = {
       backgroundColor:
         theme === "dark" ? "rgba(46,46,46,0.85)" : "rgba(255,255,255,0.85)",
       color: theme === "dark" ? "#e0e0e0" : "#000",
-      minWidth: "100px",
     }),
 
     dropdownNoteButtonHover: (theme) => ({
@@ -509,6 +510,69 @@ const commonStyles = {
         theme === "dark" ? "rgba(63, 63, 63, 0.4)" : "rgba(213, 213, 213, 0.4)",
       border: "1px solid",
     }),
+
+    editor: {
+      container: (isMobile) => ({
+        margin: "0 auto",
+        padding: isMobile ? "20px" : "40px",
+        boxSizing: "border-box",
+      }),
+
+      noteEditButton: (theme, isHovered = false, isDisabled = false) => ({
+        border: `2px solid ${theme === "dark" ? "rgba(255, 255, 255, 0.1)" : "#dcdcdc"}`,
+        borderRadius: "10px",
+        padding: "8px 15px",
+        fontSize: "14px",
+        cursor: isDisabled ? "not-allowed" : "pointer",
+        margin: "5px",
+        alignSelf: "flex-start",
+        marginTop: "10px",
+        backgroundColor: isDisabled
+          ? theme === "dark"
+            ? "rgba(20, 20, 20, 0.7)"
+            : "#e0e0e0"
+          : theme === "dark"
+            ? "rgba(20, 20, 30, 0.7)"
+            : "#fff",
+        color: theme === "dark" ? "#e0e0e0" : "#000",
+        opacity: isDisabled ? 0.5 : 1,
+        backdropFilter: theme === "dark" ? "blur(10px)" : "none",
+        WebkitBackdropFilter: theme === "dark" ? "blur(10px)" : "none",
+        transition:
+          "background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s ease, box-shadow 0.2s ease",
+        ...(isHovered && !isDisabled
+          ? {
+              transform: "scale(1.05)",
+              boxShadow:
+                theme === "dark"
+                  ? "0 4px 15px rgba(255, 255, 255, 0.1)"
+                  : "0 4px 15px rgba(0, 0, 0, 0.1)",
+            }
+          : {}),
+      }),
+
+      noteTitle: (isMobile) => ({
+        fontSize: isMobile ? "20px" : "26px",
+        marginTop: "24px",
+        fontWeight: "bold",
+        textAlign: "left",
+      }),
+
+      noteDates: (theme) => ({
+        marginTop: "10px",
+        fontSize: "14px",
+        textAlign: "right",
+        color: theme === "dark" ? "rgb(186, 186, 186)" : "rgb(52, 52, 52)",
+      }),
+
+      noteBody: (isMobile) => ({
+        fontSize: isMobile ? "16px" : "18px",
+        lineHeight: isMobile ? "1.4" : "1.6",
+        textAlign: "left",
+        wordBreak: "break-word",
+        marginTop: "16px",
+      }),
+    },
   },
 
   // Blurred window/backdrop styles

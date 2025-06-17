@@ -17,7 +17,7 @@ const NotesPage = () => {
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const [allNotes, setAllNotes] = useState([]);
-  const [noteSorting, setNoteSorting] = useState("alphabetical");
+  const [noteSorting, setNoteSorting] = useState("creationDate");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   // Hover states for notes and buttons
@@ -64,8 +64,8 @@ const NotesPage = () => {
     onSuccess: (res) => {
       setShowNewNoteForm(false);
       const newNoteID = res.data._id;
-      navigate(`/notes/${newNoteID}`);
       refetchNotes();
+      navigate(`/notes/${newNoteID}`);
     },
     onError: (err) => {
       setError(err.message);
