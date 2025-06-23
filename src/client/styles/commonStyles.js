@@ -1,5 +1,3 @@
-import { text } from "express";
-
 const commonStyles = {
   // Form fields
   field: {
@@ -361,7 +359,6 @@ const commonStyles = {
       transition: "transform 0.2s ease, box-shadow 0.2s ease",
       width: "100%",
       maxWidth: "250px",
-      maxHeight: "400px",
       flex: "1 1 250px",
     }),
 
@@ -466,7 +463,8 @@ const commonStyles = {
       border: theme === "dark" ? "2px" : "2px solid",
       borderColor: theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)",
       borderRadius: "4px",
-      padding: "10px 20px",
+      padding: "8px 15px",
+      margin: "auto 15px",
       fontSize: "16px",
       fontFamily: "sans-serif",
       cursor: "pointer",
@@ -492,10 +490,11 @@ const commonStyles = {
       transition: "opacity 0.2s ease, transform 0.3s ease-out",
       position: "absolute",
       margin: "10px 5% 10px auto",
-      right: "0",
-      top: "calc(100% + 5px)", // positions just below the button with a 5px gap
+      left: 10,
+      right: "auto",
       color: theme === "dark" ? "#e0e0e0" : "#000",
       borderRadius: "2px",
+      zIndex: 10,
     }),
 
     dropdownMenuActive: {
@@ -513,8 +512,13 @@ const commonStyles = {
 
     editor: {
       container: (isMobile) => ({
+        display: "flex",
+        flexWrap: "nowrap",
+        flexDirection: "column",
         margin: "0 auto",
         padding: isMobile ? "20px" : "40px",
+        width: isMobile ? "95vw" : "90vw",
+        alignItems: "stretch",
         boxSizing: "border-box",
       }),
 
@@ -551,26 +555,69 @@ const commonStyles = {
           : {}),
       }),
 
-      noteTitle: (isMobile) => ({
-        fontSize: isMobile ? "20px" : "26px",
+      noteTitle: (theme, isMobile) => ({
+        wordBreak: "break-word",
+        fontSize: isMobile ? "40px" : "56px",
+        width: "100%",
         marginTop: "24px",
+        marginBottom: isMobile ? "-7px" : "0px",
         fontWeight: "bold",
         textAlign: "left",
+        textShadow:
+          theme === "dark"
+            ? "-1px -1px 0 rgb(0, 0, 0), 1px -1px 0 rgb(0, 0, 0), -1px 1px 0 rgb(0, 0, 0), 1px 1px 0 rgb(0, 0, 0)"
+            : "-1px -1px 0 rgb(255, 255, 255), 1px -1px 0 rgb(255, 255, 255), -1px 1px 0 rgb(255, 255, 255), 1px 1px 0 rgb(255, 255, 255)",
       }),
 
-      noteDates: (theme) => ({
-        marginTop: "10px",
-        fontSize: "14px",
+      noteDates: (theme, isMobile) => ({
+        fontSize: isMobile ? "13px" : "15px",
         textAlign: "right",
-        color: theme === "dark" ? "rgb(186, 186, 186)" : "rgb(52, 52, 52)",
+        width: isMobile ? "100%" : "auto",
+        textShadow:
+          theme === "dark"
+            ? "-0.5px -0.5px 0 rgb(0, 0, 0), 0.5px -0.5px 0 rgb(0, 0, 0), -0.5px 0.5px 0 rgb(0, 0, 0), 0.5px 0.5px 0 rgb(0, 0, 0)"
+            : "-0.5px -0.5px 0 rgb(255, 255, 255), 0.5px -0.5px 0 rgb(255, 255, 255), -0.5px 0.5px 0 rgb(255, 255, 255), 0.5px 0.5px 0 rgb(255, 255, 255)",
+        fontWeight: isMobile ? "bold" : "normal",
       }),
 
-      noteBody: (isMobile) => ({
+      noteBody: (theme, isMobile) => ({
+        width: "100%",
         fontSize: isMobile ? "16px" : "18px",
         lineHeight: isMobile ? "1.4" : "1.6",
         textAlign: "left",
         wordBreak: "break-word",
-        marginTop: "16px",
+        marginTop: isMobile ? "40px" : "35px",
+        textShadow:
+          theme === "dark"
+            ? "-0.5px -0.5px 0 rgb(0, 0, 0), 0.5px -0.5px 0 rgb(0, 0, 0), -0.5px 0.5px 0 rgb(0, 0, 0), 0.5px 0.5px 0 rgb(0, 0, 0)"
+            : "-0.5px -0.5px 0 rgb(255, 255, 255), 0.5px -0.5px 0 rgb(255, 255, 255), -0.5px 0.5px 0 rgb(255, 255, 255), 0.5px 0.5px 0 rgb(255, 255, 255)",
+      }),
+
+      editingTitle: (theme, isMobile, editedTitleWidth) => ({
+        maxWidth: isMobile ? "60vw" : "25vw",
+        minWidth: "5vw",
+        width: editedTitleWidth ? `${editedTitleWidth}px` : undefined,
+        transition: "width 0.2s",
+        color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        fontWeight: "bold",
+        borderRadius: "10px",
+        border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
+        textAlign: "center",
+        height: isMobile ? "32px" : "40px",
+        margin: "25px 0px",
+      }),
+
+      editingBody: (theme, isMobile) => ({
+        width: isMobile ? "80vw" : "60vw",
+        maxHeight: "60vh",
+        padding: "10px",
+        fontSize: "16px",
+        borderRadius: "5px",
+        border: `1px solid ${theme === "dark" ? "#444" : "#ccc"}`,
+        backgroundColor: theme === "dark" ? "#222" : "#fff",
+        color: theme === "dark" ? "#fff" : "#000",
+        resize: "none",
       }),
     },
   },

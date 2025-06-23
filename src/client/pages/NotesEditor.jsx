@@ -1,5 +1,5 @@
-import { useContext, useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useContext, useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import fetchNoteData from "../data_fetching/fetchNoteData";
 import patchNoteData from "../data_creation/patchNoteData";
@@ -12,7 +12,6 @@ import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
 
 const NotesEditor = () => {
-  const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
   const { noteID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
@@ -30,6 +29,10 @@ const NotesEditor = () => {
   const [editedTitle, setEditedTitle] = useState("");
 
   const [isMobile, setIsMobile] = useState(false);
+
+  const titleRef = useRef(null);
+  const [titleRefWidth, setTitleRefWidth] = useState(null);
+  const bodyRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -79,6 +82,19 @@ const NotesEditor = () => {
     },
   });
 
+  useEffect(() => {
+    if (titleRef.current) {
+      setTitleRefWidth(titleRef.current.offsetWidth + 20);
+    }
+  }, [editedTitle, titleRef.current]);
+
+  useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.style.height = "auto";
+      bodyRef.current.style.height = bodyRef.current.scrollHeight + "px";
+    }
+  }, [editedBody, editMode]);
+
   return (
     <div style={commonStyles.notes.editor.container(isMobile)}>
       {showErrorBanner && (
@@ -98,7 +114,6 @@ const NotesEditor = () => {
         <div>
           <div
             style={{
-              maxWidth: "450px",
               margin: "0 auto",
               width: "100%",
               display: "flex",
@@ -112,12 +127,30 @@ const NotesEditor = () => {
           </div>
 
           {editMode ? (
-            <div>
-              <div>
+            /* This div is the edit items container */
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: isMobile ? "space-between" : "flex-start",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              {/* This div is the edit buttons container */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: isMobile ? "space-between" : "flex-start",
+                  gap: isMobile ? "0px" : "3.5vw",
+                  alignItems: "center",
+                }}
+              >
                 <button
                   onMouseEnter={() => setViewButtonHover(true)}
                   onMouseLeave={() => setViewButtonHover(false)}
-                  style={commonStyles.notes.noteEditButton(
+                  style={commonStyles.notes.editor.noteEditButton(
                     theme,
                     viewButtonHover,
                   )}
@@ -132,7 +165,7 @@ const NotesEditor = () => {
                 <button
                   onMouseEnter={() => setSaveButtonHover(true)}
                   onMouseLeave={() => setSaveButtonHover(false)}
-                  style={commonStyles.notes.noteEditButton(
+                  style={commonStyles.notes.editor.noteEditButton(
                     theme,
                     saveButtonHover,
                   )}
@@ -151,20 +184,56 @@ const NotesEditor = () => {
                 >
                   Save
                 </button>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
                 <input
                   type="text"
                   value={editedTitle}
                   onChange={(e) => {
                     setEditedTitle(e.target.value);
                   }}
+                  style={commonStyles.notes.editor.editingTitle(
+                    theme,
+                    isMobile,
+                    titleRefWidth,
+                  )}
+                  maxLength="50"
+                />
+
+                <span
+                  ref={titleRef}
+                  style={{
+                    position: "absolute",
+                    visibility: "hidden",
+                    whiteSpace: "pre",
+                    fontSize: commonStyles.notes.editor.editingTitle(
+                      theme,
+                      isMobile,
+                    ).fontSize,
+                    fontWeight: "bold",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {editedTitle || " "}
+                </span>
+              </div>
+
+              <div>
+                <textarea
+                  ref={bodyRef}
+                  value={editedBody}
+                  onChange={(e) => setEditedBody(e.target.value)}
+                  rows="6"
+                  style={commonStyles.notes.editor.editingBody(theme, isMobile)}
                 />
               </div>
-              <textarea
-                value={editedBody}
-                onChange={(e) => setEditedBody(e.target.value)}
-                rows="10"
-                cols="50"
-              />
             </div>
           ) : (
             <div>
@@ -182,21 +251,36 @@ const NotesEditor = () => {
               >
                 Edit
               </button>
-              <h1 style={commonStyles.notes.editor.noteTitle(isMobile)}>
-                {editedTitle}
-              </h1>
-              <div style={commonStyles.notes.editor.noteDates(theme)}>
-                <p>
-                  Last edited:{" "}
-                  {new Date(noteData.data.lastModifiedDate).toLocaleString()}
-                </p>
-                <p>
-                  Created at:{" "}
-                  {new Date(noteData.data.creationDate).toLocaleString()}
-                </p>
+
+              {/* This div is used as a container for the note title and dates */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <h1
+                  style={commonStyles.notes.editor.noteTitle(theme, isMobile)}
+                >
+                  {editedTitle}
+                </h1>
+                <div
+                  style={commonStyles.notes.editor.noteDates(theme, isMobile)}
+                >
+                  <p>
+                    Last edited:{" "}
+                    {new Date(noteData.data.lastModifiedDate).toLocaleString()}
+                  </p>
+                  <p>
+                    Created at:{" "}
+                    {new Date(noteData.data.creationDate).toLocaleString()}
+                  </p>
+                </div>
               </div>
               <div
-                style={commonStyles.notes.editor.noteBody(isMobile)}
+                style={commonStyles.notes.editor.noteBody(theme, isMobile)}
                 dangerouslySetInnerHTML={{
                   __html: marked.parse(editedBody || ""),
                 }}

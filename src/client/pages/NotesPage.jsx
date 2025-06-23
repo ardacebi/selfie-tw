@@ -125,81 +125,89 @@ const NotesPage = () => {
         </div>
       )}
 
-      <button
-        onClick={() => setShowNewNoteForm(true)}
-        onMouseEnter={() => setNewNoteHover(true)}
-        onMouseLeave={() => setNewNoteHover(false)}
+      <div
         style={{
-          ...commonStyles.notes.newNoteButton(
-            theme,
-            isMobile || allNotes.length < 5, //If there are less then five notes, make the button big as it is visualized from mobile
-          ),
-          ...(newNoteHover ? commonStyles.notes.noteButtonHover(theme) : {}),
+          display: "flex",
+          justifyContent: "space-between",
+          flexDirection: isMobile ? "column" : "row",
         }}
       >
-        New Note
-      </button>
+        <button
+          onClick={() => setShowNewNoteForm(true)}
+          onMouseEnter={() => setNewNoteHover(true)}
+          onMouseLeave={() => setNewNoteHover(false)}
+          style={{
+            ...commonStyles.notes.newNoteButton(
+              theme,
+              isMobile || allNotes.length < 5, //If there are less then five notes, make the button big as it is visualized from mobile
+            ),
+            ...(newNoteHover ? commonStyles.notes.noteButtonHover(theme) : {}),
+          }}
+        >
+          New Note
+        </button>
 
-      <div style={{ position: "relative", float: "right" }}>
-        {allNotes.length > 0 && (
-          <button
-            onClick={() => setShowSortDropdown(!showSortDropdown)}
-            onMouseEnter={() => setDropdownNoteHover(true)}
-            onMouseLeave={() => setDropdownNoteHover(false)}
-            style={{
-              ...commonStyles.notes.dropdownNoteButton(theme),
-              ...(dropdownNoteHover
-                ? commonStyles.notes.dropdownNoteButtonHover(theme)
-                : {}),
-            }}
-          >
-            {noteSorting === "alphabetical"
-              ? "Alphabetical"
-              : noteSorting === "creationDate"
-                ? "Creation Date"
-                : "Last Modified Date"}
-          </button>
-        )}
+        <div style={{ position: "relative" }}>
+          {allNotes.length > 0 && (
+            <button
+              onClick={() => setShowSortDropdown(!showSortDropdown)}
+              onMouseEnter={() => setDropdownNoteHover(true)}
+              onMouseLeave={() => setDropdownNoteHover(false)}
+              style={{
+                ...commonStyles.notes.dropdownNoteButton(theme),
+                ...(dropdownNoteHover
+                  ? commonStyles.notes.dropdownNoteButtonHover(theme)
+                  : {}),
+              }}
+            >
+              {noteSorting === "alphabetical"
+                ? "Alphabetical"
+                : noteSorting === "creationDate"
+                  ? "Creation Date"
+                  : "Last Modified Date"}
+            </button>
+          )}
 
-        {/* Dropdown Menu */}
-        {allNotes.length > 0 && (
-          <div
-            style={{
-              ...commonStyles.notes.dropdownMenuInactive(theme),
-              ...(showSortDropdown
-                ? commonStyles.notes.dropdownMenuActive
-                : {}),
-            }}
-          >
+          {/* Dropdown Menu */}
+          {allNotes.length > 0 && (
             <div
-              onClick={() => {
-                setNoteSorting("alphabetical");
-                setShowSortDropdown(false);
+              style={{
+                ...commonStyles.notes.dropdownMenuInactive(theme),
+                ...(showSortDropdown
+                  ? commonStyles.notes.dropdownMenuActive
+                  : {}),
               }}
-              style={commonStyles.notes.dropdownMenuItem(theme)}
             >
-              Alphabetical
+              <div
+                onClick={() => {
+                  setNoteSorting("alphabetical");
+                  setShowSortDropdown(false);
+                }}
+                style={commonStyles.notes.dropdownMenuItem(theme)}
+              >
+                Alphabetical
+              </div>
+              <div
+                onClick={() => {
+                  setNoteSorting("creationDate");
+                  setShowSortDropdown(false);
+                }}
+                style={commonStyles.notes.dropdownMenuItem(theme)}
+              >
+                Creation Date
+              </div>
+              <div
+                onClick={() => {
+                  setNoteSorting("lastModifiedDate");
+                  setShowSortDropdown(false);
+                }}
+                style={commonStyles.notes.dropdownMenuItem(theme)}
+              >
+                Last Modified Date
+              </div>
             </div>
-            <div
-              onClick={() => {
-                setNoteSorting("creationDate");
-                setShowSortDropdown(false);
-              }}
-              style={commonStyles.notes.dropdownMenuItem(theme)}
-            >
-              Creation Date
-            </div>
-            <div
-              onClick={() => {
-                setNoteSorting("lastModifiedDate");
-                setShowSortDropdown(false);
-              }}
-              style={commonStyles.notes.dropdownMenuItem(theme)}
-            >
-              Last Modified Date
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {showNewNoteForm && (
@@ -210,7 +218,7 @@ const NotesPage = () => {
                 name="title"
                 placeholder="Title"
                 required={true}
-                maxLength="25"
+                maxLength="50"
               />
               <div style={{ marginTop: "10px" }}>
                 <button
@@ -293,6 +301,7 @@ const NotesPage = () => {
                 {new Date(note.lastModifiedDate).toLocaleDateString()}
               </p>
               <div
+                style={{ wordBreak: "break-word" }}
                 dangerouslySetInnerHTML={{
                   __html:
                     HTMLbody.length > 120
