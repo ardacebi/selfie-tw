@@ -1,19 +1,12 @@
-async function postNewNote({
-  title,
-  creationDate,
-  lastModifiedDate,
-  body,
-  userID,
-}) {
+async function fetchAllNotesData({ userID }) {
   if (userID === null) {
     throw new Error("User not found");
   } else {
-    const res = await fetch(`/api/notes/create_note/${userID}`, {
-      method: "POST",
+    const res = await fetch(`/api/notes/get_all_user_notes/${userID}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, creationDate, lastModifiedDate, body }),
     });
 
     if (!res.ok) {
@@ -25,4 +18,4 @@ async function postNewNote({
   }
 }
 
-export default postNewNote;
+export default fetchAllNotesData;

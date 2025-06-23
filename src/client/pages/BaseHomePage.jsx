@@ -4,7 +4,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { useContext, useEffect, useState, useRef } from "react";
 import { FaCalendarAlt, FaClock, FaStickyNote } from "react-icons/fa";
 import commonStyles from "../styles/commonStyles";
-import selfieImg from '../assets/selfie.png';
+import selfieImg from "../assets/selfie.png";
 import BlurredWindow from "../components/BlurredWindow";
 import AnimatedButton from "../components/AnimatedButton";
 import PageTransition from "../components/PageTransition";
@@ -15,7 +15,9 @@ const BaseHomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const themeStyles = commonStyles.getThemeStyles(theme);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 992);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 992,
+  );
   const blurredWindowRef = useRef(null);
   const [blurredWindowWidth, setBlurredWindowWidth] = useState(450);
   const [hoveredButton, setHoveredButton] = useState(null);
@@ -27,25 +29,27 @@ const BaseHomePage = () => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       if (blurredWindowRef.current) {
-        const computedWidth = blurredWindowRef.current.getBoundingClientRect().width;
+        const computedWidth =
+          blurredWindowRef.current.getBoundingClientRect().width;
         setBlurredWindowWidth(computedWidth);
       }
     };
-    
-    window.addEventListener('resize', handleResize);
-    
+
+    window.addEventListener("resize", handleResize);
+
     setTimeout(() => {
       if (blurredWindowRef.current) {
-        const computedWidth = blurredWindowRef.current.getBoundingClientRect().width;
+        const computedWidth =
+          blurredWindowRef.current.getBoundingClientRect().width;
         setBlurredWindowWidth(computedWidth);
       }
     }, 100);
-    
+
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `button:hover, a:hover {background-color: ${themeStyles.hoverBg} !important;}`;
@@ -95,26 +99,29 @@ const BaseHomePage = () => {
   const isDark = theme === 'dark';
   const getNavStyle = (isActive, isHovered) => ({
     ...commonStyles.button,
-    backgroundColor: isActive 
-      ? themeStyles.activeBg 
-      : isDark 
-        ? 'rgba(20, 20, 30, 0.7)'
+    backgroundColor: isActive
+      ? themeStyles.activeBg
+      : isDark
+        ? "rgba(20, 20, 30, 0.7)"
         : themeStyles.inputBg,
     color: themeStyles.inputColor,
     borderColor: themeStyles.borderColor,
-    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-    boxShadow: isHovered 
-      ? (isDark ? '0 4px 15px rgba(255, 255, 255, 0.1)' : '0 4px 15px rgba(0, 0, 0, 0.1)') 
-      : 'none',
-    backdropFilter: isDark ? 'blur(10px)' : 'none',
-    WebkitBackdropFilter: isDark ? 'blur(10px)' : 'none',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, color 0.3s, border-color 0.3s',
+    transform: isHovered ? "scale(1.05)" : "scale(1)",
+    boxShadow: isHovered
+      ? isDark
+        ? "0 4px 15px rgba(255, 255, 255, 0.1)"
+        : "0 4px 15px rgba(0, 0, 0, 0.1)"
+      : "none",
+    backdropFilter: isDark ? "blur(10px)" : "none",
+    WebkitBackdropFilter: isDark ? "blur(10px)" : "none",
+    transition:
+      "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, color 0.3s, border-color 0.3s",
   });
 
   const formatTime = (time) => {
-    const hours = time.getHours().toString().padStart(2, '0');
-    const minutes = time.getMinutes().toString().padStart(2, '0');
-    const seconds = time.getSeconds().toString().padStart(2, '0');
+    const hours = time.getHours().toString().padStart(2, "0");
+    const minutes = time.getMinutes().toString().padStart(2, "0");
+    const seconds = time.getSeconds().toString().padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
   };
 
@@ -195,36 +202,43 @@ const BaseHomePage = () => {
   }
   
   const gapWidth = 20;
-  
+
   // 3 columns on wider screens, 2 on mobile
   const columns = windowWidth >= 600 ? 3 : 2;
-  
-  const buttonWidth = Math.max(120, (blurredWindowWidth - (gapWidth * (columns - 1))) / columns);
-  const buttonHeight = buttonWidth * 0.60;
+
+  const buttonWidth = Math.max(
+    120,
+    (blurredWindowWidth - gapWidth * (columns - 1)) / columns,
+  );
+  const buttonHeight = buttonWidth * 0.6;
 
   const getButtonContainerStyle = (buttonId) => {
     const isHovered = hoveredButton === buttonId;
-    
+
     return {
       width: buttonWidth,
       height: buttonHeight,
-      margin: '0 auto',
-      position: 'relative',
-      backgroundColor: isDark ? 'rgba(20, 20, 30, 0.7)' : 'rgba(255, 255, 255, 0.8)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
-      borderRadius: '16px',
-      overflow: 'hidden',
-      boxShadow: isDark 
-        ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset' 
-        : '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset',
-      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.05)',
-      transform: isHovered ? 'scale(1.08)' : 'scale(1)',
-      transition: 'transform 0.2s ease',
+      margin: "0 auto",
+      position: "relative",
+      backgroundColor: isDark
+        ? "rgba(20, 20, 30, 0.7)"
+        : "rgba(255, 255, 255, 0.8)",
+      backdropFilter: "blur(10px)",
+      WebkitBackdropFilter: "blur(10px)",
+      borderRadius: "16px",
+      overflow: "hidden",
+      boxShadow: isDark
+        ? "0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset"
+        : "0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset",
+      border: isDark
+        ? "1px solid rgba(255, 255, 255, 0.1)"
+        : "1px solid rgba(0, 0, 0, 0.05)",
+      transform: isHovered ? "scale(1.08)" : "scale(1)",
+      transition: "transform 0.2s ease",
       zIndex: isHovered ? 10 : 1,
     };
   };
-  
+
   return (
     <PageTransition key={pageKey}>
       <div style={styles.container}>
@@ -460,8 +474,17 @@ const BaseHomePage = () => {
 
 const styles = {
   container: { padding: "20px", textAlign: "center", width: "100%" },
-  form: { padding: "10px", display: "inline-block", marginTop: "20px", marginBottom: "20px" },
-  navContainer: { display: "flex", flexDirection: "column", alignItems: "center" },
+  form: {
+    padding: "10px",
+    display: "inline-block",
+    marginTop: "20px",
+    marginBottom: "20px",
+  },
+  navContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
   button: { ...commonStyles.button, width: "auto", minWidth: "120px" },
   userIdBox: { display: 'inline-block', border: '2px solid', borderRadius: '10px', padding: '5px 10px', marginTop: '5px' },
   userId: { fontFamily: 'monospace', fontSize: '18px', margin: '0' },

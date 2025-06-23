@@ -101,13 +101,13 @@ export const accountLogin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "This user does not exist." });
     }
-    
+
     if (usernameProfileData.password !== password) {
       return res
         .status(404)
         .json({ success: false, message: "The password is incorrect." });
     }
-    
+
     res.status(200).json({ success: true, data: usernameProfileData });
   } catch (error) {
     console.log("Error profile could not be found:", error);
@@ -202,32 +202,41 @@ export const getProfileIDByEmail = async (req, res) => {
   }
 };
 
-export const checkUserHasNotes = async (req, res) => {
-  const { id } = req.params;
-  
-  if (!Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ success: false, message: "Invalid User ID" });
+export const userOwnsNote = async (req, res) => {
+  const { userID, noteID } = req.body;
+
+  if (!Types.ObjectId.isValid(userID) || !Types.ObjectId.isValid(noteID)) {
+    return res.status(400).json({ success: false, message: "Invalid IDs" });
   }
 
   try {
-    const profile = await ProfileData.findById(id);
+    const profile = await ProfileData.findById(userID);
     if (!profile) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found", isOwner: null });
     }
-    
-    const hasNotes = profile.ownedNotes.length > 0;
-    
+
+    const ownsNote = profile.ownedNotes.includes(noteID);
+
+    if (!ownsNote) {
+      return res.status(400).json({
+        success: false,
+        message: "User does not own this note",
+        isOwner: false,
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      hasNotes,
-      count: profile.ownedNotes.length
+      message: "User owns this note",
+      isOwner: true,
     });
   } catch (error) {
-    console.error("Error checking if user has notes:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Server Error", 
-      error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      isOwner: null,
     });
   }
 };

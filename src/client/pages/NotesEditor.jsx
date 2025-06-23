@@ -1,13 +1,298 @@
 import { useContext, useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import fetchNoteData from "../data_fetching/fetchNoteData";
+import patchNoteData from "../data_creation/patchNoteData";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
+import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { FaArrowLeft, FaArrowRight, FaHome, FaSearch, FaSearchMinus, FaSearchPlus } from "react-icons/fa";
+import { FaExclamationCircle } from "react-icons/fa";
 import commonStyles from "../styles/commonStyles";
-import postNewNote from "../data_creation/postNewNote";
+import AnimatedBackButton from "../components/AnimatedBackButton";
 
 const NotesEditor = () => {
   const { theme } = useContext(ThemeContext);
+  const { noteID } = useParams();
+  const { currentUser } = useContext(CurrentUserContext);
   const { currentDate } = useContext(CurrentDateContext);
 
+  const [viewButtonHover, setViewButtonHover] = useState(false);
+  const [saveButtonHover, setSaveButtonHover] = useState(false);
+  const [editButtonHover, setEditButtonHover] = useState(false);
 
-}
+  const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+
+  const [editMode, setEditMode] = useState(true);
+  const [editedBody, setEditedBody] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  const titleRef = useRef(null);
+  const [titleRefWidth, setTitleRefWidth] = useState(null);
+  const bodyRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  const { data: noteData, refetch: refetchNote } = useQuery(
+    ["noteData", noteID],
+    () => fetchNoteData({ noteID: noteID, userID: currentUser }),
+    {
+      enabled: !!currentUser && !!noteID,
+      onError: (err) => {
+        setError(err.message);
+        setShowErrorBanner(true);
+      },
+    },
+  );
+
+  useEffect(() => {
+    setEditMode(true);
+  }, [noteID]);
+
+  useEffect(() => {
+    if (noteData && noteData.data) {
+      setEditedBody(noteData.data.body);
+      setEditedTitle(noteData.data.title);
+    }
+  }, [noteData]);
+
+  const patchNote = useMutation(patchNoteData, {
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => {
+      refetchNote();
+      setEditMode(false);
+    },
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
+    },
+  });
+
+  useEffect(() => {
+    if (titleRef.current) {
+      setTitleRefWidth(titleRef.current.offsetWidth + 20);
+    }
+  }, [editedTitle, titleRef.current]);
+
+  useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.style.height = "auto";
+      bodyRef.current.style.height = bodyRef.current.scrollHeight + "px";
+    }
+  }, [editedBody, editMode]);
+
+  return (
+    <div style={commonStyles.notes.editor.container(isMobile)}>
+      {showErrorBanner && (
+        <div
+          style={commonStyles.getBannerStyle(
+            "errorBannerStyle",
+            showErrorBanner,
+            theme,
+          )}
+        >
+          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {noteData ? (
+        <div>
+          <div
+            style={{
+              margin: "0 auto",
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              padding: "5px",
+              boxSizing: "border-box",
+            }}
+          >
+            <AnimatedBackButton to="/notes" text="Back to Notes" />
+          </div>
+
+          {editMode ? (
+            /* This div is the edit items container */
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: isMobile ? "space-between" : "flex-start",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              {/* This div is the edit buttons container */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: isMobile ? "space-between" : "flex-start",
+                  gap: isMobile ? "0px" : "3.5vw",
+                  alignItems: "center",
+                }}
+              >
+                <button
+                  onMouseEnter={() => setViewButtonHover(true)}
+                  onMouseLeave={() => setViewButtonHover(false)}
+                  style={commonStyles.notes.editor.noteEditButton(
+                    theme,
+                    viewButtonHover,
+                  )}
+                  onClick={() => {
+                    setEditMode(false);
+                    setSaveButtonHover(false);
+                    setViewButtonHover(false);
+                  }}
+                >
+                  View Mode
+                </button>
+                <button
+                  onMouseEnter={() => setSaveButtonHover(true)}
+                  onMouseLeave={() => setSaveButtonHover(false)}
+                  style={commonStyles.notes.editor.noteEditButton(
+                    theme,
+                    saveButtonHover,
+                  )}
+                  onClick={() => {
+                    patchNote.mutate({
+                      noteID: noteID,
+                      title: editedTitle,
+                      body: editedBody,
+                      lastModifiedDate: currentDate,
+                      creationDate: noteData.data.creationDate,
+                    });
+                    refetchNote();
+                    setSaveButtonHover(false);
+                    setViewButtonHover(false);
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => {
+                    setEditedTitle(e.target.value);
+                  }}
+                  style={commonStyles.notes.editor.editingTitle(
+                    theme,
+                    isMobile,
+                    titleRefWidth,
+                  )}
+                  maxLength="50"
+                />
+
+                <span
+                  ref={titleRef}
+                  style={{
+                    position: "absolute",
+                    visibility: "hidden",
+                    whiteSpace: "pre",
+                    fontSize: commonStyles.notes.editor.editingTitle(
+                      theme,
+                      isMobile,
+                    ).fontSize,
+                    fontWeight: "bold",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {editedTitle || " "}
+                </span>
+              </div>
+
+              <div>
+                <textarea
+                  ref={bodyRef}
+                  value={editedBody}
+                  onChange={(e) => setEditedBody(e.target.value)}
+                  rows="6"
+                  style={commonStyles.notes.editor.editingBody(theme, isMobile)}
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <button
+                onMouseEnter={() => setEditButtonHover(true)}
+                onMouseLeave={() => setEditButtonHover(false)}
+                style={commonStyles.notes.editor.noteEditButton(
+                  theme,
+                  editButtonHover,
+                )}
+                onClick={() => {
+                  setEditMode(true);
+                  setEditButtonHover(false);
+                }}
+              >
+                Edit
+              </button>
+
+              {/* This div is used as a container for the note title and dates */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <h1
+                  style={commonStyles.notes.editor.noteTitle(theme, isMobile)}
+                >
+                  {editedTitle}
+                </h1>
+                <div
+                  style={commonStyles.notes.editor.noteDates(theme, isMobile)}
+                >
+                  <p>
+                    Last edited:{" "}
+                    {new Date(noteData.data.lastModifiedDate).toLocaleString()}
+                  </p>
+                  <p>
+                    Created at:{" "}
+                    {new Date(noteData.data.creationDate).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div
+                style={commonStyles.notes.editor.noteBody(theme, isMobile)}
+                dangerouslySetInnerHTML={{
+                  __html: marked.parse(editedBody || ""),
+                }}
+              ></div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p>Loading note...</p>
+      )}
+    </div>
+  );
+};
+
+export default NotesEditor;
