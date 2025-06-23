@@ -36,7 +36,8 @@ app.use("*", async (req, res) => {
       await fs.readFile(path.resolve("index.html"), "utf-8"),
     );
     const { render } = await vite.ssrLoadModule("/src/app-entry-server.jsx");
-    const html = template.replace(`not rendered body`, render);
+    const renderedContent = render(url);
+    const html = template.replace(`not rendered body`, renderedContent);
 
     res.status(200).set({ "Content-Type": "text/html" }).end(html);
   } catch (e) {

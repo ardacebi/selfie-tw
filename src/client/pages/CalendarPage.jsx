@@ -4,6 +4,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { FaArrowLeft, FaArrowRight, FaHome, FaSearch, FaSearchMinus, FaSearchPlus } from "react-icons/fa";
 import BlurredWindow from "../components/BlurredWindow";
 import commonStyles from "../styles/commonStyles";
+import PageTransition from "../components/PageTransition";
 
 const CalendarPage = () => {
   // These are setup variables for the calendar used through the entire page
@@ -464,122 +465,124 @@ const CalendarPage = () => {
   };
   
   return (
-    <div>
-      <BlurredWindow 
-        width={isMobile ? "95%" : "850px"} 
-        padding={isMobile ? "10px" : "20px"}>
-        <div style={commonStyles.calendar.header.title}>
-          <h1 style={{
-            ...commonStyles.welcomeGradient(theme),
-            fontSize: isMobile ? "24px" : "32px"
-          }} key={theme}>Calendar</h1>
-        </div>
-        
-        <div style={monthNameStyle}>
-          {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
-        </div>
-        
-        <ButtonContainer>
-          {zoomLevel === 0 && (
-            <>
-              <button 
-                style={getButtonStyle('prevYear')} 
-                onClick={changeToPrevYear}
-                onMouseEnter={() => setHoveredButton('prevYear')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Year'}
-              </button>
-              <button 
-                style={getButtonStyle('nextYear')} 
-                onClick={changeToNextYear}
-                onMouseEnter={() => setHoveredButton('nextYear')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                {isMobile ? 'Next' : 'Next Year'} <FaArrowRight />
-              </button>
-            </>
-          )}
-          
-          {zoomLevel === 1 && (
-            <>
-              <button 
-                style={getButtonStyle('prevMonth')}
-                onClick={changeToPrevMonth}
-                onMouseEnter={() => setHoveredButton('prevMonth')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Month'}
-              </button>
-              <button 
-                style={getButtonStyle('nextMonth')}
-                onClick={changeToNextMonth}
-                onMouseEnter={() => setHoveredButton('nextMonth')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                {isMobile ? 'Next' : 'Next Month'} <FaArrowRight />
-              </button>
-            </>
-          )}
-          
-          {zoomLevel === 2 && (
-            <>
-              <button 
-                style={getButtonStyle('prevWeek')}
-                onClick={changeToPrevWeek}
-                onMouseEnter={() => setHoveredButton('prevWeek')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Week'}
-              </button>
-              <button 
-                style={getButtonStyle('nextWeek')}
-                onClick={changeToNextWeek}
-                onMouseEnter={() => setHoveredButton('nextWeek')}
-                onMouseLeave={() => setHoveredButton(null)}
-              >
-                {isMobile ? 'Next' : 'Next Week'} <FaArrowRight />
-              </button>
-            </>
-          )}
-        </ButtonContainer>
-        
-        <div style={{
-          ...commonStyles.calendar.container.outer,
-          padding: isMobile ? '2px' : '10px',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          overflow: 'hidden'
-        }}>
-          <div style={calendarContainerStyle}>
-            {zoomLevel === 0 && renderYearCalendar()}
-            {zoomLevel === 1 && renderMonthCalendar()}
-            {zoomLevel === 2 && renderWeekCalendar()}
+    <PageTransition>
+      <div>
+        <BlurredWindow 
+          width={isMobile ? "95%" : "850px"} 
+          padding={isMobile ? "10px" : "20px"}>
+          <div style={commonStyles.calendar.header.title}>
+            <h1 style={{
+              ...commonStyles.welcomeGradient(theme),
+              fontSize: isMobile ? "24px" : "32px"
+            }} key={theme}>Calendar</h1>
           </div>
-        </div>
-        
-        <ButtonContainer>
-          <button 
-            style={getButtonStyle('decreaseZoom')}
-            onClick={decreaseZoomLevel} 
-            disabled={zoomLevel === 0}
-            onMouseEnter={() => setHoveredButton('decreaseZoom')}
-            onMouseLeave={() => setHoveredButton(null)}
-          >
-            <FaSearchMinus /> {isMobile ? 'Zoom -' : 'Decrease Zoom'}
-          </button>
-          <button 
-            style={getButtonStyle('increaseZoom')}
-            onClick={increaseZoomLevel} 
-            disabled={zoomLevel === 2}
-            onMouseEnter={() => setHoveredButton('increaseZoom')}
-            onMouseLeave={() => setHoveredButton(null)}
-          >
-            <FaSearchPlus /> {isMobile ? 'Zoom +' : 'Increase Zoom'}
-          </button>
-        </ButtonContainer>
-      </BlurredWindow>
-    </div>
+          
+          <div style={monthNameStyle}>
+            {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
+          </div>
+          
+          <ButtonContainer>
+            {zoomLevel === 0 && (
+              <>
+                <button 
+                  style={getButtonStyle('prevYear')} 
+                  onClick={changeToPrevYear}
+                  onMouseEnter={() => setHoveredButton('prevYear')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Year'}
+                </button>
+                <button 
+                  style={getButtonStyle('nextYear')} 
+                  onClick={changeToNextYear}
+                  onMouseEnter={() => setHoveredButton('nextYear')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  {isMobile ? 'Next' : 'Next Year'} <FaArrowRight />
+                </button>
+              </>
+            )}
+            
+            {zoomLevel === 1 && (
+              <>
+                <button 
+                  style={getButtonStyle('prevMonth')}
+                  onClick={changeToPrevMonth}
+                  onMouseEnter={() => setHoveredButton('prevMonth')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Month'}
+                </button>
+                <button 
+                  style={getButtonStyle('nextMonth')}
+                  onClick={changeToNextMonth}
+                  onMouseEnter={() => setHoveredButton('nextMonth')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  {isMobile ? 'Next' : 'Next Month'} <FaArrowRight />
+                </button>
+              </>
+            )}
+            
+            {zoomLevel === 2 && (
+              <>
+                <button 
+                  style={getButtonStyle('prevWeek')}
+                  onClick={changeToPrevWeek}
+                  onMouseEnter={() => setHoveredButton('prevWeek')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  <FaArrowLeft /> {isMobile ? 'Prev' : 'Previous Week'}
+                </button>
+                <button 
+                  style={getButtonStyle('nextWeek')}
+                  onClick={changeToNextWeek}
+                  onMouseEnter={() => setHoveredButton('nextWeek')}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  {isMobile ? 'Next' : 'Next Week'} <FaArrowRight />
+                </button>
+              </>
+            )}
+          </ButtonContainer>
+          
+          <div style={{
+            ...commonStyles.calendar.container.outer,
+            padding: isMobile ? '2px' : '10px',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={calendarContainerStyle}>
+              {zoomLevel === 0 && renderYearCalendar()}
+              {zoomLevel === 1 && renderMonthCalendar()}
+              {zoomLevel === 2 && renderWeekCalendar()}
+            </div>
+          </div>
+          
+          <ButtonContainer>
+            <button 
+              style={getButtonStyle('decreaseZoom')}
+              onClick={decreaseZoomLevel} 
+              disabled={zoomLevel === 0}
+              onMouseEnter={() => setHoveredButton('decreaseZoom')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <FaSearchMinus /> {isMobile ? 'Zoom -' : 'Decrease Zoom'}
+            </button>
+            <button 
+              style={getButtonStyle('increaseZoom')}
+              onClick={increaseZoomLevel} 
+              disabled={zoomLevel === 2}
+              onMouseEnter={() => setHoveredButton('increaseZoom')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <FaSearchPlus /> {isMobile ? 'Zoom +' : 'Increase Zoom'}
+            </button>
+          </ButtonContainer>
+        </BlurredWindow>
+      </div>
+    </PageTransition>
   );
 };
 
