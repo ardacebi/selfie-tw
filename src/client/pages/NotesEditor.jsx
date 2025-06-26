@@ -7,6 +7,7 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { NoteEditModeContext } from "../contexts/NoteEditModeContext";
 import { FaExclamationCircle } from "react-icons/fa";
 import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
@@ -16,6 +17,7 @@ const NotesEditor = () => {
   const { noteID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
   const { currentDate } = useContext(CurrentDateContext);
+  const { editMode, setEditMode } = useContext(NoteEditModeContext);
 
   const [viewButtonHover, setViewButtonHover] = useState(false);
   const [saveButtonHover, setSaveButtonHover] = useState(false);
@@ -24,7 +26,6 @@ const NotesEditor = () => {
   const [error, setError] = useState("");
   const [showErrorBanner, setShowErrorBanner] = useState(false);
 
-  const [editMode, setEditMode] = useState(true);
   const [editedBody, setEditedBody] = useState("");
   const [editedTitle, setEditedTitle] = useState("");
 
@@ -58,10 +59,6 @@ const NotesEditor = () => {
       },
     },
   );
-
-  useEffect(() => {
-    setEditMode(true);
-  }, [noteID]);
 
   useEffect(() => {
     if (noteData && noteData.data) {

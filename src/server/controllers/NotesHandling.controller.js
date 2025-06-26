@@ -153,3 +153,33 @@ export const updateNote = async (req, res) => {
       .json({ success: false, message: "Server Error", error: error.message });
   }
 };
+
+export const deleteNote = async (req, res) => {
+  const { id } = req.params;
+
+  if (!Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "Invalid Note ID" });
+  }
+
+  try {
+    const deletedNote = await NoteData.findByIdAndDelete(id);
+    if (!deletedNote) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Note not found" });
+    }
+
+    await ProfileData.updateMany(
+      { ownedNotes: id },
+      { $pull: { ownedNotes: id } },
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "Note deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: error.message });
+  }
+};
