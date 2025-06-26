@@ -348,6 +348,11 @@ const commonStyles = {
       width: "100%",
     },
 
+    noteContent: {
+      display: "flex",
+      flexDirection: "row",
+    },
+
     // Individual note card
     noteItem: (theme) => ({
       backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
@@ -373,6 +378,19 @@ const commonStyles = {
       marginTop: "-12px",
       color: theme === "dark" ? "rgb(186, 186, 186)" : "rgb(52, 52, 52)",
     }),
+
+    noteDeleteButton: {
+      border: "transparent",
+      backgroundColor: "transparent",
+      transition: "transform 0.2s",
+      maxWidth: "30px",
+      alignSelf: "flex-end",
+      cursor: "pointer",
+    },
+
+    noteDeleteButtonHover: {
+      transform: "scale(1.5)",
+    },
 
     newNoteFormOverlay: {
       position: "fixed",
@@ -1055,21 +1073,25 @@ const commonStyles = {
 
       homeButton: (theme) => ({
         ...commonStyles.button,
-        backgroundColor: theme === 'dark' ? '#333' : '#fff',
-        color: theme === 'dark' ? '#e0e0e0' : '#000',
-        borderColor: theme === 'dark' ? '#444444' : '#dcdcdc',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textDecoration: 'none',
-        width: '180px',
-        marginTop: '10px',
-        transition: "background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s ease, box-shadow 0.2s ease",
-        '&:hover': {
-          transform: 'scale(1.05)',
-          boxShadow: theme === 'dark' ? '0 4px 15px rgba(255, 255, 255, 0.1)' : '0 4px 15px rgba(0, 0, 0, 0.1)',
-          backgroundColor: theme === 'dark' ? '#444' : '#f0f0f0'
-        }
+        backgroundColor: theme === "dark" ? "#333" : "#fff",
+        color: theme === "dark" ? "#e0e0e0" : "#000",
+        borderColor: theme === "dark" ? "#444444" : "#dcdcdc",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        textDecoration: "none",
+        width: "180px",
+        marginTop: "10px",
+        transition:
+          "background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          transform: "scale(1.05)",
+          boxShadow:
+            theme === "dark"
+              ? "0 4px 15px rgba(255, 255, 255, 0.1)"
+              : "0 4px 15px rgba(0, 0, 0, 0.1)",
+          backgroundColor: theme === "dark" ? "#444" : "#f0f0f0",
+        },
       }),
     },
 
