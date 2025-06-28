@@ -4,10 +4,11 @@ async function patchNoteData({
   lastModifiedDate,
   creationDate,
   body,
+  tags = [],
 }) {
   if (noteID === null) {
     throw new Error("Note ID is required");
-  } else if (!title || !lastModifiedDate || !creationDate || !body) {
+  } else if (!title || !lastModifiedDate || !creationDate || !body || !tags) {
     throw new Error("All fields are required");
   } else {
     const res = await fetch(`/api/notes/update_note/${noteID}`, {
@@ -15,7 +16,13 @@ async function patchNoteData({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, lastModifiedDate, creationDate, body }),
+      body: JSON.stringify({
+        title,
+        lastModifiedDate,
+        creationDate,
+        body,
+        tags,
+      }),
     });
 
     if (!res.ok) {

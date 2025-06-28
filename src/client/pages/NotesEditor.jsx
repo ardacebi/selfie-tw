@@ -28,6 +28,8 @@ const NotesEditor = () => {
 
   const [editedBody, setEditedBody] = useState("");
   const [editedTitle, setEditedTitle] = useState("");
+  const [editedTags, setEditedTags] = useState("");
+  const [arrayTags, setArrayTags] = useState([]);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -64,6 +66,8 @@ const NotesEditor = () => {
     if (noteData && noteData.data) {
       setEditedBody(noteData.data.body);
       setEditedTitle(noteData.data.title);
+      setEditedTags(noteData.data.tags.join(", "));
+      setArrayTags(noteData.data.tags || []);
     }
   }, [noteData]);
 
@@ -93,7 +97,7 @@ const NotesEditor = () => {
   }, [editedBody, editMode]);
 
   return (
-    <div style={commonStyles.notes.editor.container(isMobile)}>
+    <div style={commonStyles.notes.editor.container(theme, isMobile)}>
       {showErrorBanner && (
         <div
           style={commonStyles.getBannerStyle(
@@ -173,6 +177,7 @@ const NotesEditor = () => {
                       body: editedBody,
                       lastModifiedDate: currentDate,
                       creationDate: noteData.data.creationDate,
+                      tags: arrayTags,
                     });
                     refetchNote();
                     setSaveButtonHover(false);
@@ -193,6 +198,7 @@ const NotesEditor = () => {
                 <input
                   type="text"
                   value={editedTitle}
+                  placeholder="Title"
                   onChange={(e) => {
                     setEditedTitle(e.target.value);
                   }}
@@ -222,10 +228,41 @@ const NotesEditor = () => {
                 </span>
               </div>
 
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignSelf: "flex-start",
+                }}
+              >
+                <input
+                  type="text"
+                  value={editedTags}
+                  placeholder="Tags (comma separated)"
+                  onChange={(e) => {
+                    setEditedTags(e.target.value);
+                    setArrayTags(
+                      e.target.value
+                        ? [
+                            ...new Set(
+                              e.target.value
+                                .split(",")
+                                .map((tag) => tag.trim())
+                                .filter(Boolean),
+                            ),
+                          ]
+                        : [],
+                    );
+                  }}
+                  style={commonStyles.notes.editor.editingTags(theme, isMobile)}
+                />
+              </div>
+
               <div>
                 <textarea
                   ref={bodyRef}
                   value={editedBody}
+                  placeholder="Write your note here..."
                   onChange={(e) => setEditedBody(e.target.value)}
                   rows="6"
                   style={commonStyles.notes.editor.editingBody(theme, isMobile)}
@@ -275,6 +312,23 @@ const NotesEditor = () => {
                     {new Date(noteData.data.creationDate).toLocaleString()}
                   </p>
                 </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginTop: "10px",
+                  flexWrap: "wrap",
+                }}
+              >
+                {arrayTags &&
+                  arrayTags.map((tag) => {
+                    return (
+                      <div key={tag} style={commonStyles.notes.tagItem(theme)}>
+                        {tag}
+                      </div>
+                    );
+                  })}
               </div>
               <div
                 style={commonStyles.notes.editor.noteBody(theme, isMobile)}
