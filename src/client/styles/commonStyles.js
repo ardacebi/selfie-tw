@@ -550,7 +550,7 @@ const commonStyles = {
           : "rgb(0,0,0)",
       transition: "transform 0.2s ease",
       transform: isHovered || isSelected ? "scale(1.2)" : "scale(1)",
-      cursor: "pointer",
+      cursor: isHovered ? "pointer" : "default",
     }),
 
     editor: {
