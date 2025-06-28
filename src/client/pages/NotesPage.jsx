@@ -24,6 +24,7 @@ const NotesPage = () => {
   const [allNotes, setAllNotes] = useState([]);
   const [noteSorting, setNoteSorting] = useState("creationDate");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [filterTag, setFilterTag] = useState(null);
 
   // Hover states for notes and buttons
   const [hoveredNoteId, setHoveredNoteId] = useState(null);
@@ -32,6 +33,7 @@ const NotesPage = () => {
   const [cancelNoteHover, setCancelNoteHover] = useState(false);
   const [dropdownNoteHover, setDropdownNoteHover] = useState(false);
   const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
+  const [hoveredTag, setHoveredTag] = useState(null);
 
   const [showNewNoteForm, setShowNewNoteForm] = useState(false);
 
@@ -85,11 +87,22 @@ const NotesPage = () => {
     try {
       const formData = new FormData(e.target);
       const title = formData.get("title");
+      const tags = formData.get("tags");
       postNote.mutate({
         title: title,
         creationDate: currentDate,
         lastModifiedDate: currentDate,
         body: " ",
+        tags: tags
+          ? [
+              ...new Set(
+                tags
+                  .split(",")
+                  .map((tag) => tag.trim())
+                  .filter(Boolean),
+              ),
+            ]
+          : [],
         userID: currentUser,
       });
     } catch (err) {
@@ -113,20 +126,26 @@ const NotesPage = () => {
   const sortedNotes = useMemo(() => {
     if (!allNotes || allNotes.length === 0) return [];
     else {
-      return [...allNotes].sort((a, b) => {
+      const filteredNotes = filterTag
+        ? allNotes.filter((note) => note.tags && note.tags.includes(filterTag))
+        : allNotes;
+
+      return [...filteredNotes].sort((a, b) => {
         if (noteSorting === "alphabetical") {
           return a.title.localeCompare(b.title);
         } else if (noteSorting === "creationDate") {
           return new Date(b.creationDate) - new Date(a.creationDate);
         } else if (noteSorting === "lastModifiedDate") {
           return new Date(b.lastModifiedDate) - new Date(a.lastModifiedDate);
+        } else if (noteSorting === "bodyLength") {
+          return b.body.length - a.body.length;
         }
       });
     }
-  }, [allNotes, noteSorting]);
+  }, [allNotes, noteSorting, filterTag]);
 
   return (
-    <div>
+    <div style={commonStyles.blurredBackdrop(theme)}>
       <div style={commonStyles.notes.titleWrapper}>
         <h1>Notes</h1>
       </div>
@@ -158,7 +177,7 @@ const NotesPage = () => {
           style={{
             ...commonStyles.notes.newNoteButton(
               theme,
-              isMobile || allNotes.length < 1, //If there are no notes, make the button big as it is visualized from mobile
+              isMobile || sortedNotes.length < 1, //If there are no notes, make the button big as it is visualized from mobile
             ),
             ...(newNoteHover ? commonStyles.notes.noteButtonHover(theme) : {}),
           }}
@@ -167,7 +186,7 @@ const NotesPage = () => {
         </button>
 
         <div style={{ position: "relative" }}>
-          {allNotes.length > 0 && (
+          {sortedNotes.length > 1 && (
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
               onMouseEnter={() => setDropdownNoteHover(true)}
@@ -183,12 +202,14 @@ const NotesPage = () => {
                 ? "Alphabetical"
                 : noteSorting === "creationDate"
                   ? "Creation Date"
-                  : "Last Modified Date"}
+                  : noteSorting === "lastModifiedDate"
+                    ? "Last Modified Date"
+                    : "Body Length"}
             </button>
           )}
 
           {/* Dropdown Menu */}
-          {allNotes.length > 0 && (
+          {sortedNotes.length > 1 && (
             <div
               style={{
                 ...commonStyles.notes.dropdownMenuInactive(theme),
@@ -224,6 +245,15 @@ const NotesPage = () => {
               >
                 Last Modified Date
               </div>
+              <div
+                onClick={() => {
+                  setNoteSorting("bodyLength");
+                  setShowSortDropdown(false);
+                }}
+                style={commonStyles.notes.dropdownMenuItem(theme)}
+              >
+                Body Length
+              </div>
             </div>
           )}
         </div>
@@ -238,6 +268,11 @@ const NotesPage = () => {
                 placeholder="Title"
                 required={true}
                 maxLength="50"
+              />
+              <FormInput
+                name="tags"
+                placeholder="Tags (comma separated)"
+                required={false}
               />
               <div style={{ marginTop: "10px" }}>
                 <button
@@ -290,7 +325,7 @@ const NotesPage = () => {
         </div>
       )}
 
-      {allNotes.length === 0 && (
+      {sortedNotes.length === 0 && (
         <div>
           <p>There are no Notes at the moment!</p>
         </div>
@@ -326,8 +361,8 @@ const NotesPage = () => {
                     style={{ wordBreak: "break-word" }}
                     dangerouslySetInnerHTML={{
                       __html:
-                        HTMLbody.length > 120
-                          ? HTMLbody.substring(0, 120) + "..."
+                        HTMLbody.length > 200
+                          ? HTMLbody.substring(0, 200) + "..."
                           : HTMLbody,
                     }}
                   />
@@ -360,6 +395,42 @@ const NotesPage = () => {
                   </IconContext.Provider>
                 </button>
               </div>
+              {note.tags && note.tags.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "10px",
+                    maxWidth: "250px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {note.tags.map((tag) => {
+                    return (
+                      <div
+                        key={tag}
+                        onMouseEnter={() => setHoveredTag(tag)}
+                        onMouseLeave={() => setHoveredTag(null)}
+                        style={commonStyles.notes.tagItem(
+                          theme,
+                          hoveredTag === tag && hoveredNoteId === note._id,
+                          filterTag === tag,
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (filterTag === tag) {
+                            setFilterTag(null);
+                          } else {
+                            setFilterTag(tag);
+                          }
+                        }}
+                      >
+                        {tag}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}

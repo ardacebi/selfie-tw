@@ -4,12 +4,12 @@ import NoteData from "../models/NoteData.model.js";
 import ProfileData from "../models/ProfileData.model.js";
 
 export const createNote = async (req, res) => {
-  const { title, creationDate, lastModifiedDate, body } = req.body;
+  const { title, creationDate, lastModifiedDate, body, tags } = req.body;
 
-  if (!title || !body) {
+  if (!title) {
     return res.status(400).json({
       success: false,
-      message: "Please provide title and body",
+      message: "Please provide a title for the note",
     });
   }
 
@@ -17,7 +17,8 @@ export const createNote = async (req, res) => {
     title,
     creationDate,
     lastModifiedDate,
-    body,
+    body: body || " ",
+    tags: tags || [],
   });
 
   const { id } = req.params;
@@ -73,6 +74,7 @@ export const getAllUserNotes = async (req, res) => {
       creationDate: n.creationDate,
       lastModifiedDate: n.lastModifiedDate,
       body: n.body,
+      tags: n.tags || [],
     }));
 
     res.status(200).json({ success: true, data: result });
@@ -106,6 +108,7 @@ export const getNoteById = async (req, res) => {
         creationDate: note.creationDate,
         lastModifiedDate: note.lastModifiedDate,
         body: note.body,
+        tags: note.tags || [],
       },
     });
   } catch (error) {
@@ -116,9 +119,9 @@ export const getNoteById = async (req, res) => {
 };
 
 export const updateNote = async (req, res) => {
-  const { title, creationDate, lastModifiedDate, body } = req.body;
+  const { title, creationDate, lastModifiedDate, body, tags } = req.body;
 
-  if (!title && !body && !creationDate && !lastModifiedDate) {
+  if (!title && !body && !creationDate && !lastModifiedDate && !tags) {
     return res.status(400).json({
       success: false,
       message: "you need at least one field to update",
@@ -137,6 +140,7 @@ export const updateNote = async (req, res) => {
         creationDate,
         lastModifiedDate,
         body,
+        tags,
       },
       { new: true },
     );

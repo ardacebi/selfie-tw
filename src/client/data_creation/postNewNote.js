@@ -3,6 +3,7 @@ async function postNewNote({
   creationDate,
   lastModifiedDate,
   body,
+  tags,
   userID,
 }) {
   if (userID === null) {
@@ -13,7 +14,13 @@ async function postNewNote({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, creationDate, lastModifiedDate, body }),
+      body: JSON.stringify({
+        title,
+        creationDate,
+        lastModifiedDate,
+        body,
+        tags,
+      }),
     });
 
     if (!res.ok) {

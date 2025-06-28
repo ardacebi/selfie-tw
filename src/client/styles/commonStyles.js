@@ -528,16 +528,55 @@ const commonStyles = {
       border: "1px solid",
     }),
 
+    tagItem: (theme, isHovered, isSelected) => ({
+      backgroundColor: isSelected
+        ? theme === "dark"
+          ? "rgb(255, 255, 255)"
+          : "rgb(0,0,0)"
+        : theme === "dark"
+          ? "rgb(0,0,0)"
+          : "rgb(255, 255, 255)",
+      border: "1px solid",
+      borderRadius: "25px",
+      padding: "3px 6px",
+      margin: "5px",
+      fontSize: "12px",
+      color: isSelected
+        ? theme === "dark"
+          ? "rgb(0,0,0)"
+          : "rgb(255, 255, 255)"
+        : theme === "dark"
+          ? "rgb(255, 255, 255)"
+          : "rgb(0,0,0)",
+      transition: "transform 0.2s ease",
+      transform: isHovered || isSelected ? "scale(1.2)" : "scale(1)",
+      cursor: "pointer",
+    }),
+
     editor: {
-      container: (isMobile) => ({
+      container: (theme, isMobile) => ({
         display: "flex",
         flexWrap: "nowrap",
         flexDirection: "column",
         margin: "0 auto",
         padding: isMobile ? "20px" : "40px",
         width: isMobile ? "95vw" : "90vw",
+        height: "auto",
         alignItems: "stretch",
         boxSizing: "border-box",
+        backgroundColor:
+          theme === "dark"
+            ? "rgba(20, 20, 30, 0.7)"
+            : "rgba(255, 255, 255, 0.8)",
+        borderRadius: "16px",
+        border:
+          theme === "dark"
+            ? "1px solid rgba(255, 255, 255, 0.1)"
+            : "1px solid rgba(0, 0, 0, 0.05)",
+        boxShadow:
+          theme === "dark"
+            ? "0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset"
+            : "0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset",
       }),
 
       noteEditButton: (theme, isHovered = false, isDisabled = false) => ({
@@ -575,7 +614,7 @@ const commonStyles = {
 
       noteTitle: (theme, isMobile) => ({
         wordBreak: "break-word",
-        fontSize: isMobile ? "40px" : "56px",
+        fontSize: isMobile ? "60px" : "56px",
         width: "100%",
         marginTop: "24px",
         marginBottom: isMobile ? "-7px" : "0px",
@@ -588,7 +627,7 @@ const commonStyles = {
       }),
 
       noteDates: (theme, isMobile) => ({
-        fontSize: isMobile ? "13px" : "15px",
+        fontSize: isMobile ? "17px" : "15px",
         textAlign: "right",
         width: isMobile ? "100%" : "auto",
         textShadow:
@@ -600,14 +639,14 @@ const commonStyles = {
 
       noteBody: (theme, isMobile) => ({
         width: "100%",
-        fontSize: isMobile ? "16px" : "18px",
-        lineHeight: isMobile ? "1.4" : "1.6",
+        fontSize: isMobile ? "23px" : "18px",
+        lineHeight: isMobile ? "1.8" : "1.6",
         textAlign: "left",
         wordBreak: "break-word",
         marginTop: isMobile ? "40px" : "35px",
         textShadow:
           theme === "dark"
-            ? "-0.5px -0.5px 0 rgb(0, 0, 0), 0.5px -0.5px 0 rgb(0, 0, 0), -0.5px 0.5px 0 rgb(0, 0, 0), 0.5px 0.5px 0 rgb(0, 0, 0)"
+            ? "-0.5px -0.5px 0 rgb(0, 0, 0), 0.5px -0.5px 0 rgb(0, 0, 0), -0.5px 1.5px 0 rgb(0, 0, 0), 0.5px 0.5px 0 rgb(0, 0, 0)"
             : "-0.5px -0.5px 0 rgb(255, 255, 255), 0.5px -0.5px 0 rgb(255, 255, 255), -0.5px 0.5px 0 rgb(255, 255, 255), 0.5px 0.5px 0 rgb(255, 255, 255)",
       }),
 
@@ -622,8 +661,19 @@ const commonStyles = {
         borderRadius: "10px",
         border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
         textAlign: "center",
-        height: isMobile ? "32px" : "40px",
+        height: isMobile ? "44px" : "40px",
         margin: "25px 0px",
+      }),
+
+      editingTags: (theme, isMobile) => ({
+        width: "15vw",
+        color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        borderRadius: "10px",
+        border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
+        textAlign: "left",
+        height: isMobile ? "33px" : "30px",
+        marginBottom: "10px",
       }),
 
       editingBody: (theme, isMobile) => ({
