@@ -382,15 +382,17 @@ const commonStyles = {
     noteDeleteButton: {
       border: "transparent",
       backgroundColor: "transparent",
-      transition: "transform 0.2s",
+      transition: "transform 0.2s ease, margin 0.2s ease",
       maxWidth: "30px",
       alignSelf: "flex-end",
       cursor: "pointer",
     },
 
-    noteDeleteButtonHover: {
-      transform: "scale(1.5)",
-    },
+    noteDeleteButtonHover: (isMobile) => ({
+      transform: isMobile ? "scale(1.15)" : "scale(1.5)",
+      margin: isMobile ? "0 2px" : null,
+      transition: "transform 0.2s ease, margin 0.2s ease",
+    }),
 
     newNoteFormOverlay: {
       position: "fixed",
@@ -564,6 +566,8 @@ const commonStyles = {
         height: "auto",
         alignItems: "stretch",
         boxSizing: "border-box",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
         backgroundColor:
           theme === "dark"
             ? "rgba(20, 20, 30, 0.7)"

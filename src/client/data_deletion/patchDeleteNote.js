@@ -4,33 +4,20 @@ async function patchDeleteNote({ noteID, userID }) {
   } else if (userID === null) {
     throw new Error("Provide a userID");
   } else {
-    const res1 = await fetch(`/api/account/user_owns_note`, {
-      method: "POST",
+    const res = await fetch(`/api/notes/delete_note/${noteID}`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-
-      body: JSON.stringify({ noteID, userID }),
+      body: JSON.stringify({ userID }),
     });
 
-    if (!res1.ok) {
-      const { message } = await res1.json();
+    if (!res.ok) {
+      const { message } = await res.json();
       throw new Error(`${message}`);
-    } else {
-      const res2 = await fetch(`/api/notes/delete_note/${noteID}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res2.ok) {
-        const { message } = await res2.json();
-        throw new Error(`${message}`);
-      }
-
-      return res2.json();
     }
+
+    return res.json();
   }
 }
 

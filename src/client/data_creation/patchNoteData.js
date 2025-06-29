@@ -1,13 +1,16 @@
 async function patchNoteData({
   noteID,
+  userID,
   title,
   lastModifiedDate,
   creationDate,
   body,
   tags = [],
 }) {
-  if (noteID === null) {
+  if (!noteID) {
     throw new Error("Note ID is required");
+  } else if (!userID) {
+    throw new Error("User not found");
   } else if (!title || !lastModifiedDate || !creationDate || !body || !tags) {
     throw new Error("All fields are required");
   } else {
@@ -21,6 +24,7 @@ async function patchNoteData({
         lastModifiedDate,
         creationDate,
         body,
+        userID,
         tags,
       }),
     });
