@@ -173,6 +173,7 @@ const NotesEditor = () => {
                   onClick={() => {
                     patchNote.mutate({
                       noteID: noteID,
+                      userID: currentUser,
                       title: editedTitle,
                       body: editedBody,
                       lastModifiedDate: currentDate,

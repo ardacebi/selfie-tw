@@ -7,10 +7,11 @@ import commonStyles from "../styles/commonStyles";
 import postNewNote from "../data_creation/postNewNote";
 import fetchAllNotesData from "../data_fetching/fetchAllNotesData";
 import patchDeleteNote from "../data_deletion/patchDeleteNote";
+import postDuplicateNote from "../data_creation/postDuplicateNote";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import FormInput from "../components/FormInput";
-import { FaExclamationCircle } from "react-icons/fa";
+import { FaExclamationCircle, FaCopy } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { IconContext } from "react-icons";
 import { NoteEditModeContext } from "../contexts/NoteEditModeContext";
@@ -24,7 +25,7 @@ const NotesPage = () => {
   const [allNotes, setAllNotes] = useState([]);
   const [noteSorting, setNoteSorting] = useState("creationDate");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [filterTag, setFilterTag] = useState(null);
+  const [filterTags, setFilterTags] = useState([]);
 
   // Hover states for notes and buttons
   const [hoveredNoteId, setHoveredNoteId] = useState(null);
@@ -33,6 +34,7 @@ const NotesPage = () => {
   const [cancelNoteHover, setCancelNoteHover] = useState(false);
   const [dropdownNoteHover, setDropdownNoteHover] = useState(false);
   const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
+  const [copyButtonHovered, setCopyButtonHovered] = useState(false);
   const [hoveredTag, setHoveredTag] = useState(null);
 
   const [showNewNoteForm, setShowNewNoteForm] = useState(false);
@@ -123,11 +125,26 @@ const NotesPage = () => {
     },
   });
 
+  const postDuplicateNoteMutation = useMutation(postDuplicateNote, {
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => {
+      refetchNotes();
+      setHoveredNoteId(null);
+    },
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
+    },
+  });
+
   const sortedNotes = useMemo(() => {
     if (!allNotes || allNotes.length === 0) return [];
     else {
-      const filteredNotes = filterTag
-        ? allNotes.filter((note) => note.tags && note.tags.includes(filterTag))
+      const filteredNotes = filterTags.length
+        ? allNotes.filter(
+            (note) =>
+              note.tags && filterTags.every((tag) => note.tags.includes(tag)),
+          )
         : allNotes;
 
       return [...filteredNotes].sort((a, b) => {
@@ -142,7 +159,7 @@ const NotesPage = () => {
         }
       });
     }
-  }, [allNotes, noteSorting, filterTag]);
+  }, [allNotes, noteSorting, filterTags]);
 
   return (
     <div style={commonStyles.blurredBackdrop(theme)}>
@@ -374,7 +391,7 @@ const NotesPage = () => {
                   style={{
                     ...commonStyles.notes.noteDeleteButton,
                     ...(deleteButtonHovered === note._id
-                      ? commonStyles.notes.noteDeleteButtonHover
+                      ? commonStyles.notes.noteDeleteButtonHover(isMobile)
                       : {}),
                   }}
                   onClick={(e) => {
@@ -392,6 +409,34 @@ const NotesPage = () => {
                     }}
                   >
                     <RiDeleteBin5Fill />
+                  </IconContext.Provider>
+                </button>
+                <button
+                  type="button"
+                  onMouseEnter={() => setCopyButtonHovered(note._id)}
+                  onMouseLeave={() => setCopyButtonHovered(null)}
+                  style={{
+                    ...commonStyles.notes.noteDeleteButton,
+                    ...(copyButtonHovered === note._id
+                      ? commonStyles.notes.noteDeleteButtonHover(isMobile)
+                      : {}),
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    postDuplicateNoteMutation.mutate({
+                      noteID: note._id,
+                      userID: currentUser,
+                      creationDate: currentDate,
+                    });
+                  }}
+                >
+                  <IconContext.Provider
+                    value={{
+                      color: theme === "dark" ? "white" : "black",
+                      size: isMobile ? "30px" : "20px",
+                    }}
+                  >
+                    <FaCopy />
                   </IconContext.Provider>
                 </button>
               </div>
@@ -414,14 +459,14 @@ const NotesPage = () => {
                         style={commonStyles.notes.tagItem(
                           theme,
                           hoveredTag === tag && hoveredNoteId === note._id,
-                          filterTag === tag,
+                          filterTags.includes(tag),
                         )}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (filterTag === tag) {
-                            setFilterTag(null);
+                          if (filterTags.includes(tag)) {
+                            setFilterTags(filterTags.filter((t) => t !== tag));
                           } else {
-                            setFilterTag(tag);
+                            setFilterTags([...filterTags, tag]);
                           }
                         }}
                       >
