@@ -8,14 +8,11 @@ const EventDataSchema = new Schema(
     description: String,
     date: { type: Date, required: true },
     location: String,
-    type: { type: String, required: true, default: "basic" }, // Types can be: basic, basic-recurring, study-session, exam, project
-    hasPhases: Boolean,
-    currentPhase: Number,
-    otherPhases: [{ _id: Schema.Types.ObjectId, phaseNumber: Number }],
-    headExamID: Schema.Types.ObjectId,
-    childStudySessions: [{ _id: Number }],
-    activityDueDate: { type: Date, required: true },
-    invited_users: [{ _id: Schema.Types.ObjectId }],
+    type: { type: String, required: true, default: "basic" }, // Types can be: basic or recurring
+    frequency_type: { type: String, default: "daily" }, // Frequency for recurring events. it can be daily, multipleAWeek, weekly, monthly, yearly
+    frequencyWeekDays: { type: [Number], default: [] }, // For multipleAWeek and weekly events, it can be 0 (Sunday) to 6 (Saturday)
+    repetition: { type: Number, default: 1 }, // How many times the event should repeat
+    place: String,
   },
   {
     timestamps: true,

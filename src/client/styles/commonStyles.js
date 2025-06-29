@@ -195,6 +195,7 @@ const commonStyles = {
         minHeight: "60px",
         borderRadius: "5px",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         cursor: "pointer",
@@ -326,6 +327,18 @@ const commonStyles = {
       flexWrap: "wrap",
       width: "100%",
       margin: "10px 0",
+    },
+
+    events: {
+      buttonEventCreate: (isHovered) => ({
+        border: "transparent",
+        backgroundColor: "transparent",
+        transition: "transform 0.2s ease",
+        maxWidth: "30px",
+        cursor: "pointer",
+        margin: "5px",
+        transform: isHovered ? "scale(1.3)" : "scale(1)",
+      }),
     },
   },
 
