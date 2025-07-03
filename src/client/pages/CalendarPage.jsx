@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext";
 import {
   FaArrowLeft,
@@ -8,17 +9,23 @@ import {
   FaSearch,
   FaSearchMinus,
   FaSearchPlus,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { IconContext } from "react-icons";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import BlurredWindow from "../components/BlurredWindow";
 import commonStyles from "../styles/commonStyles";
 import PageTransition from "../components/PageTransition";
+import postNewEvent from "../data_creation/postNewEvent.js";
+import fetchAllEventsData from "../data_fetching/fetchAllEventsData.js";
+import { NewEventForm, DisplayEvents } from "../components/Events.jsx";
 
 const CalendarPage = () => {
   // These are setup variables for the calendar used through the entire page
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [zoomLevel, setZoomLevel] = useState(1); // 0: year, 1: month, 2: week
   const [eventCreateHovered, setEventCreateHovered] = useState(null);
@@ -28,10 +35,14 @@ const CalendarPage = () => {
   const [hoveredDay, setHoveredDay] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [hoveredButton, setHoveredButton] = useState(null);
+  const [newEventCreateDate, setNewEventCreateDate] = useState(null);
+
+  const [showNewEventForm, setShowNewEventForm] = useState(false);
+  const [allEvents, setAllEvents] = useState([]);
 
   useEffect(() => {
     const style = document.createElement("style");
-    style.innerHTML = `button:hover {background-color: ${theme === "dark" ? "#444444" : "#f0f0f0"} !important;}`;
+    style.innerHTML = `.global-hover:hover {background-color: ${theme === "dark" ? "#444444" : "#f0f0f0"} !important;}`;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, [theme]);
@@ -48,6 +59,21 @@ const CalendarPage = () => {
   }, []);
 
   const isMobile = windowWidth < 576;
+
+  const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+
+  const { data: eventsData, refetch: refetchEvents } = useQuery(
+    ["userEvents", currentUser],
+    () => fetchAllEventsData({ userID: currentUser }),
+    { enabled: !!currentUser, refetchOnMount: true, staleTime: 0 },
+  );
+
+  useEffect(() => {
+    if (eventsData) {
+      setAllEvents(eventsData.data);
+    }
+  }, [eventsData]);
 
   // Helper functions
   //Takes the year and the month and returns the amount of days of that month in that year
@@ -192,7 +218,7 @@ const CalendarPage = () => {
 
     // Base calendar box styles
     const baseBoxStyle = {
-      ...commonStyles.calendar.box.base,
+      ...commonStyles.calendar.box.base(isMobile),
       ...(zoomLevel === 2 ? { minHeight: isMobile ? "50px" : "80px" } : {}),
     };
 
@@ -336,7 +362,7 @@ const CalendarPage = () => {
         <div
           key={`empty-${i}`}
           style={{
-            ...commonStyles.calendar.box.base,
+            ...commonStyles.calendar.box.base(isMobile),
             backgroundColor: themeColors.emptyBg,
             minHeight: isMobile ? "35px" : "60px",
             borderRadius: "5px",
@@ -370,6 +396,10 @@ const CalendarPage = () => {
             )}
             onMouseEnter={() => setEventCreateHovered(i)}
             onMouseLeave={() => setEventCreateHovered(null)}
+            onClick={() => {
+              setShowNewEventForm(true);
+              setNewEventCreateDate(date);
+            }}
           >
             <IconContext.Provider
               value={{
@@ -380,6 +410,13 @@ const CalendarPage = () => {
               <FaCirclePlus />
             </IconContext.Provider>
           </button>
+          <DisplayEvents
+            allEvents={allEvents}
+            date={date}
+            isMobile={isMobile}
+            error={error}
+            setError={setError}
+          />
         </div>,
       );
     }
@@ -635,10 +672,35 @@ const CalendarPage = () => {
             {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
           </div>
 
+          {!showNewEventForm && (
+            <div
+              style={commonStyles.getBannerStyle(
+                "errorBannerStyle",
+                showErrorBanner,
+                theme,
+              )}
+            >
+              <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <NewEventForm
+            showForm={showNewEventForm}
+            setShowForm={setShowNewEventForm}
+            refetchAllEventsData={refetchEvents}
+            date={newEventCreateDate}
+            setShowErrorBanner={setShowErrorBanner}
+            showErrorBanner={showErrorBanner}
+            setError={setError}
+            error={error}
+          />
+
           <ButtonContainer>
             {zoomLevel === 0 && (
               <>
                 <button
+                  className="global-hover"
                   style={getButtonStyle("prevYear")}
                   onClick={changeToPrevYear}
                   onMouseEnter={() => setHoveredButton("prevYear")}
@@ -647,6 +709,7 @@ const CalendarPage = () => {
                   <FaArrowLeft /> {isMobile ? "Prev" : "Previous Year"}
                 </button>
                 <button
+                  className="global-hover"
                   style={getButtonStyle("nextYear")}
                   onClick={changeToNextYear}
                   onMouseEnter={() => setHoveredButton("nextYear")}
@@ -681,6 +744,7 @@ const CalendarPage = () => {
             {zoomLevel === 2 && (
               <>
                 <button
+                  className="global-hover"
                   style={getButtonStyle("prevWeek")}
                   onClick={changeToPrevWeek}
                   onMouseEnter={() => setHoveredButton("prevWeek")}
@@ -689,6 +753,7 @@ const CalendarPage = () => {
                   <FaArrowLeft /> {isMobile ? "Prev" : "Previous Week"}
                 </button>
                 <button
+                  className="global-hover"
                   style={getButtonStyle("nextWeek")}
                   onClick={changeToNextWeek}
                   onMouseEnter={() => setHoveredButton("nextWeek")}
@@ -718,6 +783,7 @@ const CalendarPage = () => {
 
           <ButtonContainer>
             <button
+              className="global-hover"
               style={getButtonStyle("decreaseZoom")}
               onClick={decreaseZoomLevel}
               disabled={zoomLevel === 0}
@@ -727,6 +793,7 @@ const CalendarPage = () => {
               <FaSearchMinus /> {isMobile ? "Zoom -" : "Decrease Zoom"}
             </button>
             <button
+              className="global-hover"
               style={getButtonStyle("increaseZoom")}
               onClick={increaseZoomLevel}
               disabled={zoomLevel === 2}

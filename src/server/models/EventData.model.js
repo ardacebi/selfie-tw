@@ -9,7 +9,7 @@ const EventDataSchema = new Schema(
     date: { type: Date, required: true },
     location: String,
     type: { type: String, required: true, default: "basic" }, // Types can be: basic or recurring
-    frequency_type: { type: String, default: "daily" }, // Frequency for recurring events. it can be daily, multipleAWeek, weekly, monthly, yearly
+    frequencyType: { type: String, default: "daily" }, // Frequency for recurring events. it can be daily, multipleAWeek, weekly, monthly, yearly
     frequencyWeekDays: { type: [Number], default: [] }, // For multipleAWeek and weekly events, it can be 0 (Sunday) to 6 (Saturday)
     repetition: { type: Number, default: 1 }, // How many times the event should repeat
     place: String,

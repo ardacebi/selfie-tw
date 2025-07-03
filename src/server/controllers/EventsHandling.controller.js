@@ -10,7 +10,7 @@ export const createEvent = async (req, res) => {
     date,
     location,
     type,
-    frequency_type,
+    frequencyType,
     frequencyWeekDays,
     repetition,
     place,
@@ -29,7 +29,7 @@ export const createEvent = async (req, res) => {
     date,
     location,
     type: type || "basic",
-    frequency_type: frequency_type || "daily",
+    frequencyType: frequencyType || "daily",
     frequencyWeekDays: frequencyWeekDays || [],
     repetition: repetition || null,
     place: place || "",
@@ -56,6 +56,46 @@ export const createEvent = async (req, res) => {
     }
 
     res.status(200).json({ success: true, data: savedEvent });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: error.message });
+  }
+};
+
+export const getAllUserEvents = async (req, res) => {
+  const { userID } = req.params;
+
+  if (!Types.ObjectId.isValid(userID)) {
+    return res.status(404).json({ success: false, message: "Invalid User ID" });
+  }
+
+  try {
+    const profileData = await ProfileData.findById(userID);
+    if (!profileData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const profileEvents = profileData.ownedEvents;
+
+    const events = await EventData.find({ _id: { $in: profileEvents } });
+
+    const result = events.map((event) => ({
+      _id: event._id,
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      location: event.location,
+      type: event.type,
+      frequencyType: event.frequencyType,
+      frequencyWeekDays: event.frequencyWeekDays,
+      repetition: event.repetition,
+      place: event.place,
+    }));
+
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
     res
       .status(500)

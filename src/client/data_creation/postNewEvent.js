@@ -4,7 +4,7 @@ async function postNewEvent({
   date,
   location,
   type,
-  frequency_type,
+  frequencyType,
   frequencyWeekDays,
   repetition,
   place,
@@ -26,11 +26,10 @@ async function postNewEvent({
         date,
         location,
         type,
-        frequency_type,
+        frequencyType,
         frequencyWeekDays,
         repetition,
         place,
-        tags,
       }),
     });
 
