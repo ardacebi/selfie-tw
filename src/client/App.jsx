@@ -13,10 +13,6 @@ import SubNavbar from "./components/SubNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { ThemeContext } from "./contexts/ThemeContext";
-import {
-  initStarAnimation,
-  starBackgroundStyles,
-} from "./styles/starBackground";
 import commonStyles from "./styles/commonStyles";
 
 const savedUser = () => window?.localStorage?.getItem("savedUser") ?? null;
@@ -120,28 +116,6 @@ const App = () => {
       ></div>
 
       <div style={{ ...commonStyles.appShell.page, color: colors.text }}>
-        {isDark && (
-          <div
-            className={`star-background-container ${isTransitioning ? "transitioning" : ""}`}
-            style={starBackgroundStyles.canvasContainer}
-          >
-            <canvas
-              id="backgroundCanvas"
-              style={{
-                ...starBackgroundStyles.canvas,
-                ...starBackgroundStyles.backgroundCanvas,
-              }}
-            ></canvas>
-            <canvas
-              id="starsCanvas"
-              style={starBackgroundStyles.canvas}
-            ></canvas>
-            <canvas
-              id="milkyWayCanvas"
-              style={starBackgroundStyles.canvas}
-            ></canvas>
-          </div>
-        )}
         <Navbar />
         <SubNavbar />
         <main
