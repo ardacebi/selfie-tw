@@ -347,16 +347,22 @@ const commonStyles = {
         flexDirection: "column",
       }),
 
-      eventBox: (type) => ({
+      eventBox: (type, isHovered) => ({
         backgroundColor:
           type === "basic"
-            ? "rgba(255, 49, 49, 0.45)"
-            : "rgba(49, 49, 255, 0.45)",
+            ? isHovered
+              ? "rgba(255, 122, 122, 0.7)"
+              : "rgba(255, 49, 49, 0.45)"
+            : isHovered
+              ? "rgba(122, 122, 255, 0.7)"
+              : "rgba(49, 49, 255, 0.45)",
         borderRadius: "10px",
         border: "2px solid",
         borderColor: type === "basic" ? "rgb(255, 49, 49)" : "rgb(49, 49, 255)",
         textAlign: "center",
         wordBreak: "break-word",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease, background-color 0.2s ease",
       }),
     },
   },

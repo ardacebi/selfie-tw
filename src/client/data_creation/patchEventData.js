@@ -1,4 +1,4 @@
-async function postNewEvent({
+async function patchEventData({
   title,
   description,
   date,
@@ -8,15 +8,18 @@ async function postNewEvent({
   frequencyType,
   frequencyWeekDays,
   repetition,
+  eventID,
   userID,
 }) {
-  if (!userID) {
+  if (!eventID) {
+    throw new Error("Event ID is required");
+  } else if (!userID) {
     throw new Error("User not found");
-  } else if (!title || !date || !type) {
-    throw new Error("Please provide title, date and type for the event");
+  } else if (!title || !description || !date || !type) {
+    throw new Error("you need the essential parameters to update an event");
   } else {
-    const res = await fetch(`/api/events/create_event/${userID}`, {
-      method: "POST",
+    const res = await fetch(`/api/events/update_event/${eventID}`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
@@ -30,6 +33,7 @@ async function postNewEvent({
         frequencyType,
         frequencyWeekDays,
         repetition,
+        userID,
       }),
     });
 
@@ -42,4 +46,4 @@ async function postNewEvent({
   }
 }
 
-export default postNewEvent;
+export default patchEventData;

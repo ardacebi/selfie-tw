@@ -107,6 +107,7 @@ export const DisplayEvents = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const [hoveredEvent, setHoveredEvent] = useState(null);
 
   const todayEvents = allEvents.filter(
     (e) => new Date(e.date).toDateString() === date.toDateString(),
@@ -119,7 +120,12 @@ export const DisplayEvents = ({
           return (
             <div
               key={event._id}
-              style={commonStyles.calendar.events.eventBox(event.type)}
+              onMouseEnter={() => setHoveredEvent(event._id)}
+              onMouseLeave={() => setHoveredEvent(null)}
+              style={commonStyles.calendar.events.eventBox(
+                event.type,
+                hoveredEvent === event._id,
+              )}
             >
               <div>
                 {isMobile && event.title.length > 9
