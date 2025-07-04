@@ -11,6 +11,8 @@ const FormInput = ({
   style = {},
   marginBottom = "15px",
   maxLength,
+  value = "",
+  onChange = () => {},
 }) => {
   const { theme } = useContext(ThemeContext);
   const themeStyles = commonStyles.getThemeStyles(theme);
@@ -62,6 +64,8 @@ const FormInput = ({
         maxLength={maxLength || Infinity}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onChange={onChange}
+        value={value}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />

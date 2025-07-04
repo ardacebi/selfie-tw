@@ -1,16 +1,20 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import fetchNoteData from "../data_fetching/fetchNoteData";
-import patchNoteData from "../data_creation/patchNoteData";
+import fetchEventData from "../data_fetching/fetchEventData";
+import patchEventData from "../data_creation/patchEventData";
+import patchDeleteEvent from "../data_deletion/patchDeleteEvent";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { NoteEditModeContext } from "../contexts/NoteEditModeContext";
 import { FaExclamationCircle } from "react-icons/fa";
 import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
+import BlurredWindow from "../components/BlurredWindow";
+import PageTransition from "../components/PageTransition";
+import FormInput from "../components/FormInput";
+import FormButton from "../components/FormButton";
 
 const EventsEditor = () => {
   const { theme } = useContext(ThemeContext);
@@ -26,6 +30,7 @@ const EventsEditor = () => {
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedDate, setEditedDate] = useState("");
+  const [formattedDate, setFormattedDate] = useState("");
   const [editedDuration, setEditedDuration] = useState(null);
   const [editedLocation, setEditedLocation] = useState("");
   const [editedType, setEditedType] = useState(null);
@@ -34,10 +39,6 @@ const EventsEditor = () => {
   const [editedRepetition, setEditedRepetition] = useState(0);
 
   const [isMobile, setIsMobile] = useState(false);
-
-  const titleRef = useRef(null);
-  const [titleRefWidth, setTitleRefWidth] = useState(null);
-  const bodyRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -52,11 +53,11 @@ const EventsEditor = () => {
     };
   }, []);
 
-  const { data: noteData, refetch: refetchNote } = useQuery(
-    ["noteData", noteID],
-    () => fetchNoteData({ noteID: noteID, userID: currentUser }),
+  const { data: eventData, refetch: refetchEvent } = useQuery(
+    ["eventData", eventID],
+    () => fetchEventData({ eventID: eventID, userID: currentUser }),
     {
-      enabled: !!currentUser && !!noteID,
+      enabled: !!currentUser && !!eventID,
       onError: (err) => {
         setError(err.message);
         setShowErrorBanner(true);
@@ -65,19 +66,42 @@ const EventsEditor = () => {
   );
 
   useEffect(() => {
-    if (noteData && noteData.data) {
-      setEditedBody(noteData.data.body);
-      setEditedTitle(noteData.data.title);
-      setEditedTags(noteData.data.tags.join(", "));
-      setArrayTags(noteData.data.tags || []);
+    if (eventData) {
+      setEditedTitle(eventData.data.title || "");
+      setEditedDescription(eventData.data.description || "");
+      setEditedDate(eventData.data.date || "");
+      setEditedDuration(eventData.data.duration || null);
+      setEditedLocation(eventData.data.location || "");
+      setEditedType(eventData.data.type || null);
+      setEditedFrequencyType(eventData.data.frequencyType || null);
+      setEditedFrequencyWeekDays(eventData.data.frequencyWeekDays || []);
+      setEditedRepetition(eventData.data.repetition || 0);
     }
-  }, [noteData]);
+  }, [eventData]);
 
-  const patchNote = useMutation(patchNoteData, {
+  useEffect(() => {
+    if (editedDate) {
+      const dateObj = new Date(editedDate);
+      const formatted =
+        Number(editedDuration) === 0
+          ? dateObj.toISOString().slice(0, 10)
+          : dateObj.toISOString().slice(0, 16);
+      setFormattedDate(formatted);
+    }
+  }, [editedDate, editedDuration]);
+
+  const formatToDate = (formattedDate) => {
+    const date = new Date(formattedDate);
+    const fullNumber = (number) => (number < 10 ? "0" + number : number);
+    return `${date.getFullYear()}-${fullNumber(date.getMonth() + 1)}-${fullNumber(date.getDate())} ${fullNumber(
+      date.getHours(),
+    )}:${fullNumber(date.getMinutes())}:${fullNumber(date.getSeconds())}`;
+  };
+
+  const patchEvent = useMutation(patchEventData, {
     onMutate: () => setShowErrorBanner(false),
     onSuccess: () => {
-      refetchNote();
-      setEditMode(false);
+      refetchEvent();
     },
     onError: (err) => {
       setError(err.message);
@@ -85,267 +109,163 @@ const EventsEditor = () => {
     },
   });
 
-  useEffect(() => {
-    if (titleRef.current) {
-      setTitleRefWidth(titleRef.current.offsetWidth + 20);
-    }
-  }, [editedTitle, titleRef.current]);
-
-  useEffect(() => {
-    if (bodyRef.current) {
-      bodyRef.current.style.height = "auto";
-      bodyRef.current.style.height = bodyRef.current.scrollHeight + "px";
-    }
-  }, [editedBody, editMode]);
-
   return (
-    <div style={commonStyles.notes.editor.container(theme, isMobile)}>
-      {showErrorBanner && (
-        <div
-          style={commonStyles.getBannerStyle(
-            "errorBannerStyle",
-            showErrorBanner,
-            theme,
-          )}
+    <PageTransition>
+      <div>
+        <BlurredWindow
+          width={isMobile ? "95%" : "850px"}
+          padding={isMobile ? "10px" : "20px"}
         >
-          <FaExclamationCircle style={commonStyles.bannerIconStyle} />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {noteData ? (
-        <div>
-          <div
-            style={{
-              margin: "0 auto",
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              padding: "5px",
-              boxSizing: "border-box",
-            }}
-          >
-            <AnimatedBackButton to="/notes" text="Back to Notes" />
-          </div>
-
-          {editMode ? (
-            /* This div is the edit items container */
+          {showErrorBanner && (
             <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: isMobile ? "space-between" : "flex-start",
-                alignItems: "center",
-                width: "100%",
-              }}
+              style={commonStyles.getBannerStyle(
+                "errorBannerStyle",
+                showErrorBanner,
+                theme,
+              )}
             >
-              {/* This div is the edit buttons container */}
+              <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {eventData ? (
+            <div>
               <div
                 style={{
+                  margin: "0 auto",
+                  width: "100%",
                   display: "flex",
-                  flexDirection: "row",
-                  justifyContent: isMobile ? "space-between" : "flex-start",
-                  gap: isMobile ? "0px" : "3.5vw",
+                  justifyContent: "flex-start",
                   alignItems: "center",
+                  padding: "5px",
+                  boxSizing: "border-box",
                 }}
               >
-                <button
-                  onMouseEnter={() => setViewButtonHover(true)}
-                  onMouseLeave={() => setViewButtonHover(false)}
-                  style={commonStyles.notes.editor.noteEditButton(
-                    theme,
-                    viewButtonHover,
-                  )}
+                <AnimatedBackButton to="/calendar" text="Back to Calendar" />
+              </div>
+
+              <form>
+                <FormInput
+                  name="title"
+                  placeholder="Title"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  required={true}
+                  maxLength="20"
+                />
+                <FormInput
+                  name="description"
+                  placeholder="Description"
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                  maxLength="200"
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="date"
+                  type={
+                    Number(editedDuration) === 0 ? "date" : "datetime-local"
+                  }
+                  value={formattedDate || ""}
+                  onChange={(e) => setEditedDate(e.target.value)}
+                  required={true}
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="duration"
+                  type="number"
+                  placeholder="Duration (in minutes)"
+                  value={editedDuration || ""}
+                  onChange={(e) => setEditedDuration(e.target.value)}
+                />
+                <FormInput
+                  name="location"
+                  placeholder="Location"
+                  value={editedLocation}
+                  onChange={(e) => setEditedLocation(e.target.value)}
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="type"
+                  placeholder="Type (basic or recurring)"
+                  value={editedType || ""}
+                  onChange={(e) => setEditedType(e.target.value)}
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="frequencyType"
+                  placeholder="Frequency Type (daily, weekly, monthly)"
+                  value={editedFrequencyType || ""}
+                  onChange={(e) => setEditedFrequencyType(e.target.value)}
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="frequencyWeekDays"
+                  placeholder="Frequency Week Days (comma-separated, e.g., Mon,Tue)"
+                  value={editedFrequencyWeekDays.join(", ")}
+                  onChange={(e) =>
+                    setEditedFrequencyWeekDays(
+                      e.target.value.split(",").map((day) => day.trim()),
+                    )
+                  }
+                  style={{ marginTop: "10px" }}
+                />
+                <FormInput
+                  name="repetition"
+                  type="number"
+                  placeholder="Repetition (number of times to repeat)"
+                  value={editedRepetition || ""}
+                  onChange={(e) => setEditedRepetition(e.target.value)}
+                  style={{ marginTop: "10px" }}
+                />
+                <FormButton
+                  type="button"
                   onClick={() => {
-                    setEditMode(false);
-                    setSaveButtonHover(false);
-                    setViewButtonHover(false);
-                  }}
-                >
-                  View Mode
-                </button>
-                <button
-                  onMouseEnter={() => setSaveButtonHover(true)}
-                  onMouseLeave={() => setSaveButtonHover(false)}
-                  style={commonStyles.notes.editor.noteEditButton(
-                    theme,
-                    saveButtonHover,
-                  )}
-                  onClick={() => {
-                    patchNote.mutate({
-                      noteID: noteID,
+                    const startDate = new Date(editedDate);
+
+                    const durationMinutes = Number(editedDuration);
+
+                    const endDate = new Date(
+                      startDate.getTime() + durationMinutes * 60000,
+                    );
+
+                    if (
+                      startDate.toISOString().slice(0, 10) !==
+                      endDate.toISOString().slice(0, 10)
+                    ) {
+                      setError(
+                        "The event's duration extends to the next day. Please adjust the duration.",
+                      );
+                      setShowErrorBanner(true);
+                      return;
+                    }
+
+                    patchEvent.mutate({
+                      eventID: eventID,
                       userID: currentUser,
                       title: editedTitle,
-                      body: editedBody,
-                      lastModifiedDate: currentDate,
-                      creationDate: noteData.data.creationDate,
-                      tags: arrayTags,
+                      description: editedDescription,
+                      date: editedDate,
+                      duration: editedDuration,
+                      location: editedLocation,
+                      type: editedType,
+                      frequencyType: editedFrequencyType,
+                      frequencyWeekDays: editedFrequencyWeekDays,
+                      repetition: editedRepetition,
                     });
-                    refetchNote();
-                    setSaveButtonHover(false);
-                    setViewButtonHover(false);
                   }}
                 >
                   Save
-                </button>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                <input
-                  type="text"
-                  value={editedTitle}
-                  placeholder="Title"
-                  onChange={(e) => {
-                    setEditedTitle(e.target.value);
-                  }}
-                  style={commonStyles.notes.editor.editingTitle(
-                    theme,
-                    isMobile,
-                    titleRefWidth,
-                  )}
-                  maxLength="50"
-                />
-
-                <span
-                  ref={titleRef}
-                  style={{
-                    position: "absolute",
-                    visibility: "hidden",
-                    whiteSpace: "pre",
-                    fontSize: commonStyles.notes.editor.editingTitle(
-                      theme,
-                      isMobile,
-                    ).fontSize,
-                    fontWeight: "bold",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {editedTitle || " "}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignSelf: "flex-start",
-                }}
-              >
-                <input
-                  type="text"
-                  value={editedTags}
-                  placeholder="Tags (comma separated)"
-                  onChange={(e) => {
-                    setEditedTags(e.target.value);
-                    setArrayTags(
-                      e.target.value
-                        ? [
-                            ...new Set(
-                              e.target.value
-                                .split(",")
-                                .map((tag) => tag.trim())
-                                .filter(Boolean),
-                            ),
-                          ]
-                        : [],
-                    );
-                  }}
-                  style={commonStyles.notes.editor.editingTags(theme, isMobile)}
-                />
-              </div>
-
-              <div>
-                <textarea
-                  ref={bodyRef}
-                  value={editedBody}
-                  placeholder="Write your note here..."
-                  onChange={(e) => setEditedBody(e.target.value)}
-                  rows="6"
-                  style={commonStyles.notes.editor.editingBody(theme, isMobile)}
-                />
-              </div>
+                </FormButton>
+              </form>
             </div>
           ) : (
-            <div>
-              <button
-                onMouseEnter={() => setEditButtonHover(true)}
-                onMouseLeave={() => setEditButtonHover(false)}
-                style={commonStyles.notes.editor.noteEditButton(
-                  theme,
-                  editButtonHover,
-                )}
-                onClick={() => {
-                  setEditMode(true);
-                  setEditButtonHover(false);
-                }}
-              >
-                Edit
-              </button>
-
-              {/* This div is used as a container for the note title and dates */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: isMobile ? "column" : "row",
-                  alignItems: isMobile ? "flex-start" : "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <h1
-                  style={commonStyles.notes.editor.noteTitle(theme, isMobile)}
-                >
-                  {editedTitle}
-                </h1>
-                <div
-                  style={commonStyles.notes.editor.noteDates(theme, isMobile)}
-                >
-                  <p>
-                    Last edited:{" "}
-                    {new Date(noteData.data.lastModifiedDate).toLocaleString()}
-                  </p>
-                  <p>
-                    Created at:{" "}
-                    {new Date(noteData.data.creationDate).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  marginTop: "10px",
-                  flexWrap: "wrap",
-                }}
-              >
-                {arrayTags &&
-                  arrayTags.map((tag) => {
-                    return (
-                      <div key={tag} style={commonStyles.notes.tagItem(theme)}>
-                        {tag}
-                      </div>
-                    );
-                  })}
-              </div>
-              <div
-                style={commonStyles.notes.editor.noteBody(theme, isMobile)}
-                dangerouslySetInnerHTML={{
-                  __html: marked.parse(editedBody || ""),
-                }}
-              ></div>
-            </div>
+            <p>Loading event...</p>
           )}
-        </div>
-      ) : (
-        <p>Loading note...</p>
-      )}
-    </div>
+        </BlurredWindow>
+      </div>
+    </PageTransition>
   );
 };
 

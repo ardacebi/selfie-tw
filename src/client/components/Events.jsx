@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import commonStyles from "../styles/commonStyles.js";
 import FormInput from "./FormInput";
 import { FaExclamationCircle } from "react-icons/fa";
@@ -22,12 +23,17 @@ export const NewEventForm = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const navigate = useNavigate();
 
   const postNewEventMutation = useMutation(postNewEvent, {
     onMutate: () => setShowErrorBanner(false),
-    onSuccess: () => {
+    onSuccess: (res) => {
       setError("");
       setShowErrorBanner(false);
+      setShowForm(false);
+      refetchAllEventsData();
+      const newEventId = res.data._id;
+      navigate(`/calendar/${newEventId}`);
     },
     onError: (err) => {
       setError(err.message);
@@ -46,8 +52,6 @@ export const NewEventForm = ({
         type: "basic",
         userID: currentUser,
       });
-      refetchAllEventsData();
-      setShowForm(false);
     } catch (err) {
       setError(err.message);
       setShowErrorBanner(true);
@@ -108,6 +112,7 @@ export const DisplayEvents = ({
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const [hoveredEvent, setHoveredEvent] = useState(null);
+  const navigate = useNavigate();
 
   const todayEvents = allEvents.filter(
     (e) => new Date(e.date).toDateString() === date.toDateString(),
@@ -122,6 +127,7 @@ export const DisplayEvents = ({
               key={event._id}
               onMouseEnter={() => setHoveredEvent(event._id)}
               onMouseLeave={() => setHoveredEvent(null)}
+              onClick={() => navigate(`/calendar/${event._id}`)}
               style={commonStyles.calendar.events.eventBox(
                 event.type,
                 hoveredEvent === event._id,

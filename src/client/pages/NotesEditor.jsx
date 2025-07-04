@@ -87,7 +87,7 @@ const NotesEditor = () => {
     if (titleRef.current) {
       setTitleRefWidth(titleRef.current.offsetWidth + 20);
     }
-  }, [editedTitle, titleRef.current]);
+  }, [editedTitle, titleRef.current, editMode]);
 
   useEffect(() => {
     if (bodyRef.current) {

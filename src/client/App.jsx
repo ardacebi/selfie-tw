@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { ThemeContext } from "./contexts/ThemeContext";
 import commonStyles from "./styles/commonStyles";
+import EventsEditor from "./pages/EventsEditor";
 
 const savedUser = () => window?.localStorage?.getItem("savedUser") ?? null;
 
@@ -76,15 +77,6 @@ const App = () => {
         const backgroundCanvas = document.getElementById("backgroundCanvas");
         const starsCanvas = document.getElementById("starsCanvas");
         const milkyWayCanvas = document.getElementById("milkyWayCanvas");
-
-        const cleanupFn = initStarAnimation(
-          backgroundCanvas,
-          starsCanvas,
-          milkyWayCanvas,
-          animationRef,
-        );
-
-        return cleanupFn;
       }, 0);
     }
 
@@ -139,6 +131,15 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <CalendarPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/calendar/:eventID"
+              element={
+                <ProtectedRoute>
+                  <EventsEditor />
                 </ProtectedRoute>
               }
             />
