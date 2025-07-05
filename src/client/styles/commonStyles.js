@@ -363,6 +363,7 @@ const commonStyles = {
         wordBreak: "break-word",
         transform: isHovered ? "scale(1.05)" : "scale(1)",
         transition: "transform 0.2s ease, background-color 0.2s ease",
+        margin: "5px",
       }),
     },
   },

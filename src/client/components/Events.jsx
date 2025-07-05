@@ -101,10 +101,74 @@ export const NewEventForm = ({
   );
 };
 
+const eventsFilterer = (allEvents, date, remapDay) => {
+  return allEvents.filter((e) => {
+    const eventStart = new Date(e.date);
+
+    if (eventStart.toDateString() === date.toDateString()) {
+      return true;
+    }
+
+    if (e.type === "basic") {
+      return eventStart.toDateString() === date.toDateString();
+    } else {
+      if (date < eventStart) return false;
+
+      const millisecondsInADay = 86400000;
+
+      // Get the difference in days between the event start date and the current date
+      const diffDays = Math.floor((date - eventStart) / millisecondsInADay);
+
+      // Get the difference in years between the event start date and the current date
+      const yearDiff = date.getFullYear() - eventStart.getFullYear();
+
+      switch (e.frequencyType) {
+        case "daily": {
+          return (
+            diffDays >= 0 && (diffDays < e.repetition || e.repetition === 0)
+          );
+        }
+
+        case "weekly": {
+          const diffWeeks = Math.floor(diffDays / 7);
+
+          return (
+            diffWeeks >= 0 &&
+            (diffWeeks < e.repetition || e.repetition === 0) &&
+            e.frequencyWeekDays.includes(remapDay(date.getDay()))
+          );
+        }
+        case "monthly": {
+          const monthDiff =
+            yearDiff * 12 + (date.getMonth() - eventStart.getMonth());
+          return (
+            monthDiff >= 0 &&
+            (monthDiff < e.repetition || e.repetition === 0) &&
+            eventStart.getDate() === date.getDate()
+          );
+        }
+
+        case "yearly": {
+          return (
+            yearDiff >= 0 &&
+            (yearDiff < e.repetition || e.repetition === 0) &&
+            eventStart.getMonth() === date.getMonth() &&
+            eventStart.getDate() === date.getDate()
+          );
+        }
+
+        default:
+          return false;
+      }
+    }
+  });
+};
+
 export const DisplayEvents = ({
   allEvents = [],
   date,
   isMobile,
+  remapDay,
   error,
   setError,
 }) => {
@@ -114,9 +178,7 @@ export const DisplayEvents = ({
   const [hoveredEvent, setHoveredEvent] = useState(null);
   const navigate = useNavigate();
 
-  const todayEvents = allEvents.filter(
-    (e) => new Date(e.date).toDateString() === date.toDateString(),
-  );
+  const todayEvents = eventsFilterer(allEvents, date || currentDate, remapDay);
 
   return (
     <div style={commonStyles.calendar.events.eventsContainer(theme, isMobile)}>
@@ -133,10 +195,15 @@ export const DisplayEvents = ({
                 hoveredEvent === event._id,
               )}
             >
-              <div>
+              <div style={{ margin: "5px" }}>
                 {isMobile && event.title.length > 9
                   ? `${event.title.slice(0, 9)}...`
                   : event.title}
+              </div>
+              <div style={{ fontSize: isMobile ? "9px" : "10px" }}>
+                {event.description && isMobile && event.description?.length > 40
+                  ? `${event.description.slice(0, 40)}...`
+                  : event.description}
               </div>
             </div>
           );

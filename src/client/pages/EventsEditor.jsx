@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Form } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import fetchEventData from "../data_fetching/fetchEventData";
 import patchEventData from "../data_creation/patchEventData";
@@ -15,6 +15,7 @@ import BlurredWindow from "../components/BlurredWindow";
 import PageTransition from "../components/PageTransition";
 import FormInput from "../components/FormInput";
 import FormButton from "../components/FormButton";
+import FormSelect from "../components/FormSelect";
 
 const EventsEditor = () => {
   const { theme } = useContext(ThemeContext);
@@ -23,6 +24,7 @@ const EventsEditor = () => {
   const { currentDate } = useContext(CurrentDateContext);
 
   const [saveButtonHover, setSaveButtonHover] = useState(false);
+  const [hasEndDate, setHasEndDate] = useState(false);
 
   const [error, setError] = useState("");
   const [showErrorBanner, setShowErrorBanner] = useState(false);
@@ -31,7 +33,8 @@ const EventsEditor = () => {
   const [editedDescription, setEditedDescription] = useState("");
   const [editedDate, setEditedDate] = useState("");
   const [formattedDate, setFormattedDate] = useState("");
-  const [editedDuration, setEditedDuration] = useState(null);
+  const [editedEventEnd, setEditedEventEnd] = useState(null);
+  const [formattedEventEnd, setFormattedEventEnd] = useState("");
   const [editedLocation, setEditedLocation] = useState("");
   const [editedType, setEditedType] = useState(null);
   const [editedFrequencyType, setEditedFrequencyType] = useState(null);
@@ -39,6 +42,8 @@ const EventsEditor = () => {
   const [editedRepetition, setEditedRepetition] = useState(0);
 
   const [isMobile, setIsMobile] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -70,32 +75,46 @@ const EventsEditor = () => {
       setEditedTitle(eventData.data.title || "");
       setEditedDescription(eventData.data.description || "");
       setEditedDate(eventData.data.date || "");
-      setEditedDuration(eventData.data.duration || null);
+      setEditedEventEnd(eventData.data.eventEnd || null);
       setEditedLocation(eventData.data.location || "");
       setEditedType(eventData.data.type || null);
       setEditedFrequencyType(eventData.data.frequencyType || null);
       setEditedFrequencyWeekDays(eventData.data.frequencyWeekDays || []);
       setEditedRepetition(eventData.data.repetition || 0);
+      setHasEndDate(!!eventData.data.eventEnd);
     }
   }, [eventData]);
 
   useEffect(() => {
     if (editedDate) {
       const dateObj = new Date(editedDate);
+      const timeZoneOffset = dateObj.getTimezoneOffset() * 60000;
       const formatted =
-        Number(editedDuration) === 0
-          ? dateObj.toISOString().slice(0, 10)
-          : dateObj.toISOString().slice(0, 16);
+        editedEventEnd === null
+          ? new Date(dateObj - timeZoneOffset).toISOString().slice(0, 10)
+          : new Date(dateObj - timeZoneOffset).toISOString().slice(0, 16);
       setFormattedDate(formatted);
     }
-  }, [editedDate, editedDuration]);
 
-  const formatToDate = (formattedDate) => {
-    const date = new Date(formattedDate);
-    const fullNumber = (number) => (number < 10 ? "0" + number : number);
-    return `${date.getFullYear()}-${fullNumber(date.getMonth() + 1)}-${fullNumber(date.getDate())} ${fullNumber(
-      date.getHours(),
-    )}:${fullNumber(date.getMinutes())}:${fullNumber(date.getSeconds())}`;
+    if (editedEventEnd) {
+      const dateObj = new Date(editedEventEnd);
+      const timeZoneOffset = dateObj.getTimezoneOffset() * 60000;
+      const formatted = new Date(dateObj - timeZoneOffset)
+        .toISOString()
+        .slice(0, 16);
+      setFormattedEventEnd(formatted);
+    }
+  }, [editedDate, editedEventEnd]);
+
+  const formatToDate = (fDate) => {
+    if (!fDate) return null;
+    if (fDate.length === 10) {
+      return new Date(fDate + "T00:00:00");
+    }
+    if (fDate.length === 16) {
+      return new Date(fDate + ":00");
+    }
+    return new Date(fDate);
   };
 
   const patchEvent = useMutation(patchEventData, {
@@ -108,6 +127,54 @@ const EventsEditor = () => {
       setShowErrorBanner(true);
     },
   });
+
+  const handleEventPatchSubmit = async (e) => {
+    try {
+      setShowErrorBanner(false);
+      e.preventDefault();
+      if (editedEventEnd) {
+        const startDate = new Date(editedDate);
+        const endDate = new Date(editedEventEnd);
+
+        if (endDate < startDate) {
+          setError("The event's end cannot be earlier than the event's start.");
+          setShowErrorBanner(true);
+          return;
+        }
+
+        if (
+          startDate.getFullYear() !== endDate.getFullYear() ||
+          startDate.getMonth() !== endDate.getMonth() ||
+          startDate.getDate() !== endDate.getDate()
+        ) {
+          setError(
+            "The event's end cannot be in a different day from the event's start.",
+          );
+          setShowErrorBanner(true);
+          return;
+        }
+      }
+
+      patchEvent.mutate({
+        eventID: eventID,
+        userID: currentUser,
+        title: editedTitle,
+        description: editedDescription,
+        date: editedDate,
+        eventEnd: editedEventEnd,
+        location: editedLocation,
+        type: editedType,
+        frequencyType: editedFrequencyType,
+        frequencyWeekDays: editedFrequencyWeekDays,
+        repetition: editedRepetition,
+      });
+
+      navigate("/calendar");
+    } catch (error) {
+      setError(error.message);
+      setShowErrorBanner(true);
+    }
+  };
 
   return (
     <PageTransition>
@@ -145,7 +212,10 @@ const EventsEditor = () => {
                 <AnimatedBackButton to="/calendar" text="Back to Calendar" />
               </div>
 
-              <form>
+              <form
+                onSubmit={handleEventPatchSubmit}
+                style={{ maxWidth: "250px" }}
+              >
                 <FormInput
                   name="title"
                   placeholder="Title"
@@ -162,23 +232,68 @@ const EventsEditor = () => {
                   maxLength="200"
                   style={{ marginTop: "10px" }}
                 />
+                <p
+                  style={{
+                    color:
+                      theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                  }}
+                >
+                  Event Start
+                </p>
                 <FormInput
                   name="date"
-                  type={
-                    Number(editedDuration) === 0 ? "date" : "datetime-local"
-                  }
+                  type={editedEventEnd === null ? "date" : "datetime-local"}
                   value={formattedDate || ""}
-                  onChange={(e) => setEditedDate(e.target.value)}
+                  onChange={(e) => setEditedDate(formatToDate(e.target.value))}
                   required={true}
                   style={{ marginTop: "10px" }}
                 />
+                <p
+                  style={{
+                    color:
+                      theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                  }}
+                >
+                  Event has a Duration
+                </p>
                 <FormInput
-                  name="duration"
-                  type="number"
-                  placeholder="Duration (in minutes)"
-                  value={editedDuration || ""}
-                  onChange={(e) => setEditedDuration(e.target.value)}
+                  type="checkbox"
+                  checked={hasEndDate}
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setHasEndDate(false);
+                      setEditedEventEnd(null);
+                    } else {
+                      setHasEndDate(true);
+                      setEditedEventEnd(editedDate);
+                    }
+                  }}
                 />
+
+                {hasEndDate && (
+                  <div>
+                    <p
+                      style={{
+                        color:
+                          theme === "dark"
+                            ? "rgb(255, 255, 255)"
+                            : "rgb(0, 0, 0)",
+                      }}
+                    >
+                      Event's End
+                    </p>
+                    <FormInput
+                      name="eventEnd"
+                      type="datetime-local"
+                      placeholder="Event End"
+                      value={formattedEventEnd || ""}
+                      onChange={(e) =>
+                        setEditedEventEnd(formatToDate(e.target.value))
+                      }
+                    />
+                  </div>
+                )}
+
                 <FormInput
                   name="location"
                   placeholder="Location"
@@ -186,78 +301,113 @@ const EventsEditor = () => {
                   onChange={(e) => setEditedLocation(e.target.value)}
                   style={{ marginTop: "10px" }}
                 />
-                <FormInput
+                <p
+                  style={{
+                    color:
+                      theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                  }}
+                >
+                  Event Type
+                </p>
+                <FormSelect
                   name="type"
-                  placeholder="Type (basic or recurring)"
                   value={editedType || ""}
                   onChange={(e) => setEditedType(e.target.value)}
                   style={{ marginTop: "10px" }}
-                />
-                <FormInput
-                  name="frequencyType"
-                  placeholder="Frequency Type (daily, weekly, monthly)"
-                  value={editedFrequencyType || ""}
-                  onChange={(e) => setEditedFrequencyType(e.target.value)}
-                  style={{ marginTop: "10px" }}
-                />
-                <FormInput
-                  name="frequencyWeekDays"
-                  placeholder="Frequency Week Days (comma-separated, e.g., Mon,Tue)"
-                  value={editedFrequencyWeekDays.join(", ")}
-                  onChange={(e) =>
-                    setEditedFrequencyWeekDays(
-                      e.target.value.split(",").map((day) => day.trim()),
-                    )
-                  }
-                  style={{ marginTop: "10px" }}
-                />
-                <FormInput
-                  name="repetition"
-                  type="number"
-                  placeholder="Repetition (number of times to repeat)"
-                  value={editedRepetition || ""}
-                  onChange={(e) => setEditedRepetition(e.target.value)}
-                  style={{ marginTop: "10px" }}
-                />
-                <FormButton
-                  type="button"
-                  onClick={() => {
-                    const startDate = new Date(editedDate);
-
-                    const durationMinutes = Number(editedDuration);
-
-                    const endDate = new Date(
-                      startDate.getTime() + durationMinutes * 60000,
-                    );
-
-                    if (
-                      startDate.toISOString().slice(0, 10) !==
-                      endDate.toISOString().slice(0, 10)
-                    ) {
-                      setError(
-                        "The event's duration extends to the next day. Please adjust the duration.",
-                      );
-                      setShowErrorBanner(true);
-                      return;
-                    }
-
-                    patchEvent.mutate({
-                      eventID: eventID,
-                      userID: currentUser,
-                      title: editedTitle,
-                      description: editedDescription,
-                      date: editedDate,
-                      duration: editedDuration,
-                      location: editedLocation,
-                      type: editedType,
-                      frequencyType: editedFrequencyType,
-                      frequencyWeekDays: editedFrequencyWeekDays,
-                      repetition: editedRepetition,
-                    });
-                  }}
                 >
-                  Save
-                </FormButton>
+                  <option value="basic">Basic</option>
+                  <option value="recurring">Recurring</option>
+                </FormSelect>
+                {editedType === "recurring" && (
+                  <div>
+                    <p
+                      style={{
+                        color:
+                          theme === "dark"
+                            ? "rgb(255, 255, 255)"
+                            : "rgb(0, 0, 0)",
+                      }}
+                    >
+                      Frequency of the Event
+                    </p>
+                    <FormSelect
+                      name="frequencyType"
+                      value={editedFrequencyType || ""}
+                      onChange={(e) => setEditedFrequencyType(e.target.value)}
+                      style={{ marginTop: "10px" }}
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </FormSelect>
+                    {editedFrequencyType === "weekly" && (
+                      <div>
+                        <p
+                          style={{
+                            color:
+                              theme === "dark"
+                                ? "rgb(255, 255, 255)"
+                                : "rgb(0, 0, 0)",
+                          }}
+                        >
+                          Frequency in a Week
+                        </p>
+                        <FormSelect
+                          name="frequencyWeekDays"
+                          value={editedFrequencyWeekDays}
+                          multiple={true}
+                          onChange={(e) => {
+                            setEditedFrequencyWeekDays(
+                              Array.from(
+                                e.target.selectedOptions,
+                                (option) => option.value,
+                              ),
+                            );
+                            console.log(editedFrequencyWeekDays);
+                          }}
+                          style={{ marginTop: "10px" }}
+                        >
+                          <option value="0">Monday</option>
+                          <option value="1">Tuesday</option>
+                          <option value="2">Wednesday</option>
+                          <option value="3">Thursday</option>
+                          <option value="4">Friday</option>
+                          <option value="5">Saturday</option>
+                          <option value="6">Sunday</option>
+                        </FormSelect>
+                      </div>
+                    )}
+
+                    <p
+                      style={{
+                        color:
+                          theme === "dark"
+                            ? "rgb(255, 255, 255)"
+                            : "rgb(0, 0, 0)",
+                      }}
+                    >
+                      Repetitions
+                    </p>
+                    <FormInput
+                      name="repetition"
+                      type="text"
+                      placeholder="Infinite"
+                      value={editedRepetition || ""}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (isNaN(value) || value <= 0) {
+                          setEditedRepetition(0);
+                        } else {
+                          setEditedRepetition(value);
+                        }
+                      }}
+                      style={{ marginTop: "10px" }}
+                    />
+                  </div>
+                )}
+
+                <FormButton>Save</FormButton>
               </form>
             </div>
           ) : (

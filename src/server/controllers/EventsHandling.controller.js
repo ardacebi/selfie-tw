@@ -8,7 +8,7 @@ export const createEvent = async (req, res) => {
     title,
     description,
     date,
-    duration,
+    eventEnd,
     location,
     type,
     frequencyType,
@@ -27,7 +27,7 @@ export const createEvent = async (req, res) => {
     title,
     description,
     date,
-    duration: duration || 0,
+    eventEnd: eventEnd || null,
     location,
     type: type || "basic",
     frequencyType: frequencyType || "daily",
@@ -87,7 +87,7 @@ export const getAllUserEvents = async (req, res) => {
       title: event.title,
       description: event.description,
       date: event.date,
-      duration: event.duration,
+      eventEnd: event.eventEnd,
       location: event.location,
       type: event.type,
       frequencyType: event.frequencyType,
@@ -138,7 +138,7 @@ export const getEventById = async (req, res) => {
         title: event.title,
         description: event.description,
         date: event.date,
-        duration: event.duration,
+        eventEnd: event.eventEnd,
         location: event.location,
         type: event.type,
         frequencyType: event.frequencyType,
@@ -158,7 +158,7 @@ export const updateEvent = async (req, res) => {
     title,
     description,
     date,
-    duration,
+    eventEnd,
     location,
     type,
     frequencyType,
@@ -167,7 +167,7 @@ export const updateEvent = async (req, res) => {
     userID,
   } = req.body;
 
-  if (!title || !description || !date || !type) {
+  if (!title || !date || !type) {
     return res.status(400).json({
       success: false,
       message: "you need the essential parameters to update an event",
@@ -199,7 +199,7 @@ export const updateEvent = async (req, res) => {
         title,
         description,
         date,
-        duration,
+        eventEnd,
         location,
         type,
         frequencyType,

@@ -2,7 +2,7 @@ async function patchEventData({
   title,
   description,
   date,
-  duration,
+  eventEnd,
   location,
   type,
   frequencyType,
@@ -15,7 +15,7 @@ async function patchEventData({
     throw new Error("Event ID is required");
   } else if (!userID) {
     throw new Error("User not found");
-  } else if (!title || !description || !date || !type) {
+  } else if (!title || !date || !type) {
     throw new Error("you need the essential parameters to update an event");
   } else {
     const res = await fetch(`/api/events/update_event/${eventID}`, {
@@ -27,7 +27,7 @@ async function patchEventData({
         title,
         description,
         date,
-        duration,
+        eventEnd,
         location,
         type,
         frequencyType,

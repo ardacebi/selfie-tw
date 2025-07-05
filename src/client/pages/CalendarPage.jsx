@@ -70,6 +70,10 @@ const CalendarPage = () => {
   );
 
   useEffect(() => {
+    refetchEvents();
+  }, []);
+
+  useEffect(() => {
     if (eventsData) {
       setAllEvents(eventsData.data);
     }
@@ -414,6 +418,7 @@ const CalendarPage = () => {
             allEvents={allEvents}
             date={date}
             isMobile={isMobile}
+            remapDay={remapDay}
             error={error}
             setError={setError}
           />
