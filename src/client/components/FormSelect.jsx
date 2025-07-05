@@ -2,18 +2,18 @@ import { useState, useContext } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import commonStyles from "../styles/commonStyles";
 
-const FormInput = ({
-  type = "text",
+const FormSelect = ({
   name,
   id,
-  placeholder,
-  required = false,
   style = {},
   marginBottom = "15px",
-  maxLength,
-  value,
   onChange = () => {},
-  checked = false,
+  children,
+  disabled,
+  multiple = false,
+  required = false,
+  size,
+  value = "",
 }) => {
   const { theme } = useContext(ThemeContext);
   const themeStyles = commonStyles.getThemeStyles(theme);
@@ -24,7 +24,7 @@ const FormInput = ({
 
   return (
     <label htmlFor={id || name} style={{ width: "100%" }}>
-      <input
+      <select
         style={{
           ...commonStyles.field,
           backgroundColor: isDark
@@ -59,21 +59,21 @@ const FormInput = ({
         }}
         name={name}
         id={id || name}
-        type={type}
-        placeholder={placeholder}
-        required={required}
-        maxLength={maxLength || Infinity}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onChange={onChange}
-        value={value}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        checked={checked}
-      />
-      <br />
+        disabled={disabled}
+        multiple={multiple}
+        required={required}
+        size={size}
+        value={value}
+      >
+        {children}
+      </select>
     </label>
   );
 };
 
-export default FormInput;
+export default FormSelect;

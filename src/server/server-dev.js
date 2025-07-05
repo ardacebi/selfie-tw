@@ -7,6 +7,7 @@ import { createServer as createViteServer } from "vite";
 import { connectDB } from "./config/db.js";
 import AccountHandling from "./routes/AccountHandling.route.js";
 import NotesHandling from "./routes/NotesHandling.route.js";
+import EventHandling from "./routes/EventsHandling.route.js";
 import { config } from "dotenv";
 
 config();
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/account", AccountHandling);
 app.use("/api/notes", NotesHandling);
+app.use("/api/events", EventHandling);
 
 app.use("*", async (req, res) => {
   try {

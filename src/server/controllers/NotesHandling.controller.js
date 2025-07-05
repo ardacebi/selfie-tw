@@ -86,13 +86,24 @@ export const getAllUserNotes = async (req, res) => {
 };
 
 export const getNoteById = async (req, res) => {
-  const { noteID } = req.body;
+  const { noteID, userID } = req.body;
+
+  if (!Types.ObjectId.isValid(userID)) {
+    return res.status(404).json({ success: false, message: "Invalid User ID" });
+  }
 
   if (!Types.ObjectId.isValid(noteID)) {
     return res.status(404).json({ success: false, message: "Invalid Note ID" });
   }
 
   try {
+    const profile = await ProfileData.findById(userID);
+    if (!profile || !profile.ownedNotes.includes(noteID)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User does not own this note" });
+    }
+
     const note = await NoteData.findById(noteID);
     if (!note) {
       return res

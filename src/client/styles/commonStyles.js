@@ -191,15 +191,18 @@ const commonStyles = {
 
     // Calendar box base styles
     box: {
-      base: {
+      base: (isMobile) => ({
         minHeight: "60px",
         borderRadius: "5px",
+        width: isMobile ? "auto" : "100px",
+        maxWidth: isMobile ? "50px" : "100px",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         cursor: "pointer",
         transition: "background-color 0.3s, transform 0.2s, border-color 0.3s",
-      },
+      }),
       selected: {
         border: "2px solid #003366",
         transform: "scale(1.1)",
@@ -326,6 +329,42 @@ const commonStyles = {
       flexWrap: "wrap",
       width: "100%",
       margin: "10px 0",
+    },
+
+    events: {
+      buttonEventCreate: (isHovered) => ({
+        border: "transparent",
+        backgroundColor: "transparent",
+        transition: "transform 0.2s ease",
+        maxWidth: "30px",
+        cursor: "pointer",
+        margin: "10px",
+        transform: isHovered ? "scale(1.3)" : "scale(1)",
+      }),
+
+      eventsContainer: (theme, isMobile) => ({
+        display: "flex",
+        flexDirection: "column",
+      }),
+
+      eventBox: (type, isHovered) => ({
+        backgroundColor:
+          type === "basic"
+            ? isHovered
+              ? "rgba(255, 122, 122, 0.7)"
+              : "rgba(255, 49, 49, 0.45)"
+            : isHovered
+              ? "rgba(122, 122, 255, 0.7)"
+              : "rgba(49, 49, 255, 0.45)",
+        borderRadius: "10px",
+        border: "2px solid",
+        borderColor: type === "basic" ? "rgb(255, 49, 49)" : "rgb(49, 49, 255)",
+        textAlign: "center",
+        wordBreak: "break-word",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease, background-color 0.2s ease",
+        margin: "5px",
+      }),
     },
   },
 
