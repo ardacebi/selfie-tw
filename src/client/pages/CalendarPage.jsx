@@ -174,18 +174,18 @@ const CalendarPage = () => {
 
   // Format helpers
   const months = [
-    "Gennaio",
-    "Febbraio",
-    "Marzo",
-    "Aprile",
-    "Maggio",
-    "Giugno",
-    "Luglio",
-    "Agosto",
-    "Settembre",
-    "Ottobre",
-    "Novembre",
-    "Dicembre",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // Get abbreviated month names for mobile view
@@ -332,26 +332,26 @@ const CalendarPage = () => {
     let allDays = [];
 
     // Add weekday headers
-    ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach((day) => {
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       // Show abbreviated day names on small screens
       const displayDay =
         windowWidth < 576
           ? day.charAt(0)
           : windowWidth < 768
             ? day
-            : day === "Lun"
-              ? "Lunedì"
-              : day === "Mar"
-                ? "Martedì"
-                : day === "Mer"
-                  ? "Mercoledì"
-                  : day === "Gio"
-                    ? "Giovedì"
-                    : day === "Ven"
-                      ? "Venerdì"
-                      : day === "Sab"
-                        ? "Sabato"
-                        : "Domenica";
+            : day === "Mon"
+              ? "Monday"
+              : day === "Tue"
+                ? "Tuesday"
+                : day === "Wed"
+                  ? "Wednesday"
+                  : day === "Thu"
+                    ? "Thursday"
+                    : day === "Fri"
+                      ? "Friday"
+                      : day === "Sat"
+                        ? "Saturday"
+                        : "Sunday";
 
       allDays.push(
         <div key={day} style={weekDayStyle}>
@@ -439,26 +439,26 @@ const CalendarPage = () => {
     let allDays = [];
 
     // Add weekday headers
-    ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach((day) => {
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       // Show abbreviated day names on small screens
       const displayDay =
         windowWidth < 576
           ? day.charAt(0)
           : windowWidth < 768
             ? day
-            : day === "Lun"
-              ? "Lunedì"
-              : day === "Mar"
-                ? "Martedì"
-                : day === "Mer"
-                  ? "Mercoledì"
-                  : day === "Gio"
-                    ? "Giovedì"
-                    : day === "Ven"
-                      ? "Venerdì"
-                      : day === "Sab"
-                        ? "Sabato"
-                        : "Domenica";
+            : day === "Mon"
+              ? "Monday"
+              : day === "Tue"
+                ? "Tuesday"
+                : day === "Wed"
+                  ? "Wednesday"
+                  : day === "Thu"
+                    ? "Thursday"
+                    : day === "Fri"
+                      ? "Friday"
+                      : day === "Sat"
+                        ? "Saturday"
+                        : "Sunday";
 
       allDays.push(
         <div key={day} style={weekDayStyle}>
