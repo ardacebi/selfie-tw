@@ -9,6 +9,8 @@ import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { FaExclamationCircle } from "react-icons/fa";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { IconContext } from "react-icons";
 import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
 import BlurredWindow from "../components/BlurredWindow";
@@ -24,6 +26,7 @@ const EventsEditor = () => {
   const { currentDate } = useContext(CurrentDateContext);
 
   const [saveButtonHover, setSaveButtonHover] = useState(false);
+  const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
   const [hasEndDate, setHasEndDate] = useState(false);
 
   const [error, setError] = useState("");
@@ -176,6 +179,19 @@ const EventsEditor = () => {
     }
   };
 
+  const patchDeleteEventMutation = useMutation(patchDeleteEvent, {
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => {
+      setError("");
+      setShowErrorBanner(false);
+      navigate("/calendar");
+    },
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
+    },
+  });
+
   return (
     <PageTransition>
       <div>
@@ -210,6 +226,34 @@ const EventsEditor = () => {
                 }}
               >
                 <AnimatedBackButton to="/calendar" text="Back to Calendar" />
+
+                <button
+                  type="button"
+                  onMouseEnter={() => setDeleteButtonHovered(true)}
+                  onMouseLeave={() => setDeleteButtonHovered(false)}
+                  style={{
+                    ...commonStyles.notes.noteDeleteButton,
+                    ...(deleteButtonHovered
+                      ? commonStyles.notes.noteDeleteButtonHover(isMobile)
+                      : {}),
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    patchDeleteEventMutation.mutate({
+                      eventID: eventID,
+                      userID: currentUser,
+                    });
+                  }}
+                >
+                  <IconContext.Provider
+                    value={{
+                      color: theme === "dark" ? "white" : "black",
+                      size: isMobile ? "30px" : "20px",
+                    }}
+                  >
+                    <RiDeleteBin5Fill />
+                  </IconContext.Provider>
+                </button>
               </div>
 
               <form
