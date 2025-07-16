@@ -5,8 +5,6 @@ import fetchEventData from "../data_fetching/fetchEventData";
 import patchEventData from "../data_creation/patchEventData";
 import patchDeleteEvent from "../data_deletion/patchDeleteEvent";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import { CurrentDateContext } from "../contexts/CurrentDateContext";
-import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { FaExclamationCircle } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
@@ -23,9 +21,7 @@ const EventsEditor = () => {
   const { theme } = useContext(ThemeContext);
   const { eventID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
-  const { currentDate } = useContext(CurrentDateContext);
 
-  const [saveButtonHover, setSaveButtonHover] = useState(false);
   const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
   const [hasEndDate, setHasEndDate] = useState(false);
 
@@ -213,7 +209,7 @@ const EventsEditor = () => {
           )}
 
           {eventData ? (
-            <div>
+            <div style={{ position: "relative" }}>
               <div
                 style={{
                   margin: "0 auto",
@@ -225,35 +221,49 @@ const EventsEditor = () => {
                   boxSizing: "border-box",
                 }}
               >
-                <AnimatedBackButton to="/calendar" text="Back to Calendar" />
+                <AnimatedBackButton
+                  to="/calendar"
+                  text="Back to Calendar"
+                  style={{ alignSelf: "flex-start" }}
+                />
 
-                <button
-                  type="button"
-                  onMouseEnter={() => setDeleteButtonHovered(true)}
-                  onMouseLeave={() => setDeleteButtonHovered(false)}
+                <div
                   style={{
-                    ...commonStyles.notes.noteDeleteButton,
-                    ...(deleteButtonHovered
-                      ? commonStyles.notes.noteDeleteButtonHover(isMobile)
-                      : {}),
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    patchDeleteEventMutation.mutate({
-                      eventID: eventID,
-                      userID: currentUser,
-                    });
+                    position: "absolute",
+                    right: 0,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  <IconContext.Provider
-                    value={{
-                      color: theme === "dark" ? "white" : "black",
-                      size: isMobile ? "30px" : "20px",
+                  <button
+                    type="button"
+                    onMouseEnter={() => setDeleteButtonHovered(true)}
+                    onMouseLeave={() => setDeleteButtonHovered(false)}
+                    style={{
+                      ...commonStyles.notes.noteDeleteButton,
+                      ...(deleteButtonHovered
+                        ? commonStyles.notes.noteDeleteButtonHover(isMobile)
+                        : {}),
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      patchDeleteEventMutation.mutate({
+                        eventID: eventID,
+                        userID: currentUser,
+                      });
                     }}
                   >
-                    <RiDeleteBin5Fill />
-                  </IconContext.Provider>
-                </button>
+                    <IconContext.Provider
+                      value={{
+                        color: theme === "dark" ? "white" : "black",
+                        size: isMobile ? "30px" : "20px",
+                      }}
+                    >
+                      <RiDeleteBin5Fill />
+                    </IconContext.Provider>
+                  </button>
+                </div>
               </div>
 
               <form
@@ -292,27 +302,41 @@ const EventsEditor = () => {
                   required={true}
                   style={{ marginTop: "10px" }}
                 />
-                <p
+
+                <div
                   style={{
-                    color:
-                      theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Event has a Duration
-                </p>
-                <FormInput
-                  type="checkbox"
-                  checked={hasEndDate}
-                  onChange={(e) => {
-                    if (!e.target.checked) {
-                      setHasEndDate(false);
-                      setEditedEventEnd(null);
-                    } else {
-                      setHasEndDate(true);
-                      setEditedEventEnd(editedDate);
-                    }
-                  }}
-                />
+                  <p
+                    style={{
+                      color:
+                        theme === "dark"
+                          ? "rgb(255, 255, 255)"
+                          : "rgb(0, 0, 0)",
+                      marginRight: "auto",
+                    }}
+                  >
+                    Event has a Duration
+                  </p>
+                  <FormInput
+                    type="checkbox"
+                    checked={hasEndDate}
+                    onChange={(e) => {
+                      if (!e.target.checked) {
+                        setHasEndDate(false);
+                        setEditedEventEnd(null);
+                      } else {
+                        setHasEndDate(true);
+                        setEditedEventEnd(editedDate);
+                      }
+                    }}
+                    style={{ transform: "scale(1.1)" }}
+                  />
+                </div>
 
                 {hasEndDate && (
                   <div>

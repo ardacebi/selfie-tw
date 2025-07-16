@@ -33,7 +33,7 @@ const NotesPage = () => {
   const [createNoteHover, setCreateNoteHover] = useState(false);
   const [cancelNoteHover, setCancelNoteHover] = useState(false);
   const [dropdownNoteHover, setDropdownNoteHover] = useState(false);
-  const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
+  const [deleteButtonHovered, setDeleteButtonHovered] = useState(null);
   const [copyButtonHovered, setCopyButtonHovered] = useState(false);
   const [hoveredTag, setHoveredTag] = useState(null);
 

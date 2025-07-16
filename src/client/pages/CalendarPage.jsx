@@ -320,6 +320,62 @@ const CalendarPage = () => {
     };
   };
 
+  const RenderCalendarEventsAndActivities = (props) => {
+    const { i, date } = props;
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <button
+          style={commonStyles.calendar.events.buttonEventCreate(
+            eventCreateHovered === i,
+          )}
+          onMouseEnter={() => setEventCreateHovered(i)}
+          onMouseLeave={() => setEventCreateHovered(null)}
+          onClick={() => {
+            if (calendarViewMode === "events") {
+              setShowNewEventForm(true);
+              setNewEventCreateDate(date);
+            } else {
+              setShowNewActivityForm(true);
+              setNewActivityCreateDate(date);
+            }
+          }}
+        >
+          <IconContext.Provider
+            value={{
+              color: theme === "dark" ? "white" : "black",
+              size: isMobile ? "15px" : "20px",
+            }}
+          >
+            <FaCirclePlus />
+          </IconContext.Provider>
+        </button>
+        {calendarViewMode === "events" ? (
+          <DisplayEvents
+            allEvents={allEvents}
+            date={date}
+            isMobile={isMobile}
+            remapDay={remapDay}
+            error={error}
+            setError={setError}
+          />
+        ) : (
+          <DisplayActivities
+            allActivities={allActivities}
+            date={date}
+            isMobile={isMobile}
+            remapDay={remapDay}
+          />
+        )}
+      </div>
+    );
+  };
+
   // Calendar rendering functions
   //This function renders the calendar when zoomLevel is 0. This level shows an entire year in a grid.
   const renderYearCalendar = () => {
@@ -421,50 +477,7 @@ const CalendarPage = () => {
           onMouseLeave={() => setHoveredDay(null)}
         >
           {i}
-          <button
-            style={commonStyles.calendar.events.buttonEventCreate(
-              eventCreateHovered === i,
-            )}
-            onMouseEnter={() => setEventCreateHovered(i)}
-            onMouseLeave={() => setEventCreateHovered(null)}
-            onClick={() => {
-              if (calendarViewMode === "events") {
-                setShowNewEventForm(true);
-                setNewEventCreateDate(date);
-              } else {
-                setShowNewActivityForm(true);
-                setNewActivityCreateDate(date);
-              }
-            }}
-          >
-            <IconContext.Provider
-              value={{
-                color: theme === "dark" ? "white" : "black",
-                size: isMobile ? "15px" : "20px",
-              }}
-            >
-              <FaCirclePlus />
-            </IconContext.Provider>
-          </button>
-          {calendarViewMode === "events" ? (
-            <DisplayEvents
-              allEvents={allEvents}
-              date={date}
-              isMobile={isMobile}
-              remapDay={remapDay}
-              error={error}
-              setError={setError}
-            />
-          ) : (
-            <DisplayActivities
-              allActivities={allActivities}
-              date={date}
-              isMobile={isMobile}
-              remapDay={remapDay}
-              error={error}
-              setError={setError}
-            />
-          )}
+          <RenderCalendarEventsAndActivities i={i} date={date} />
         </div>,
       );
     }
@@ -539,6 +552,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
         daysLeft--;
@@ -562,6 +576,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
       }
@@ -587,6 +602,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
         dayCount++;
@@ -615,6 +631,7 @@ const CalendarPage = () => {
               onMouseLeave={() => setHoveredDay(null)}
             >
               {i}
+              <RenderCalendarEventsAndActivities i={i} date={date} />
             </div>,
           );
         }
@@ -876,11 +893,13 @@ const CalendarPage = () => {
           </ButtonContainer>
 
           {calendarViewMode === "activities" && (
-            <div>
+            <div style={{ width: "100%" }}>
               <ActivitiesSummary
                 activities={allActivities}
                 refetchAllActivitiesData={refetchActivities}
+                isMobile={isMobile}
                 setError={setError}
+                setShowErrorBanner={setShowErrorBanner}
               />
             </div>
           )}

@@ -181,7 +181,7 @@ export const DisplayEvents = ({
   const todayEvents = eventsFilterer(allEvents, date || currentDate, remapDay);
 
   return (
-    <div style={commonStyles.calendar.events.eventsContainer(theme, isMobile)}>
+    <div style={commonStyles.calendar.events.eventsContainer}>
       {todayEvents &&
         todayEvents.map((event) => {
           return (
@@ -195,7 +195,7 @@ export const DisplayEvents = ({
                 hoveredEvent === event._id,
               )}
             >
-              <div style={{ margin: "5px" }}>
+              <div style={{ margin: "5px", fontWeight: "bold" }}>
                 {isMobile && event.title.length > 9
                   ? `${event.title.slice(0, 9)}...`
                   : event.title}

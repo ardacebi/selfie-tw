@@ -15,6 +15,7 @@ import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { ThemeContext } from "./contexts/ThemeContext";
 import commonStyles from "./styles/commonStyles";
 import EventsEditor from "./pages/EventsEditor";
+import ActivitiesEditor from "./pages/ActivitiesEditor";
 
 const savedUser = () => window?.localStorage?.getItem("savedUser") ?? null;
 
@@ -140,6 +141,15 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <EventsEditor />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/calendar/activities_editor/:activityID"
+              element={
+                <ProtectedRoute>
+                  <ActivitiesEditor />
                 </ProtectedRoute>
               }
             />
