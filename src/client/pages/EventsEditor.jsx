@@ -5,10 +5,10 @@ import fetchEventData from "../data_fetching/fetchEventData";
 import patchEventData from "../data_creation/patchEventData";
 import patchDeleteEvent from "../data_deletion/patchDeleteEvent";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import { CurrentDateContext } from "../contexts/CurrentDateContext";
-import { marked } from "marked";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { FaExclamationCircle } from "react-icons/fa";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { IconContext } from "react-icons";
 import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
 import BlurredWindow from "../components/BlurredWindow";
@@ -21,9 +21,8 @@ const EventsEditor = () => {
   const { theme } = useContext(ThemeContext);
   const { eventID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
-  const { currentDate } = useContext(CurrentDateContext);
 
-  const [saveButtonHover, setSaveButtonHover] = useState(false);
+  const [deleteButtonHovered, setDeleteButtonHovered] = useState(false);
   const [hasEndDate, setHasEndDate] = useState(false);
 
   const [error, setError] = useState("");
@@ -176,6 +175,19 @@ const EventsEditor = () => {
     }
   };
 
+  const patchDeleteEventMutation = useMutation(patchDeleteEvent, {
+    onMutate: () => setShowErrorBanner(false),
+    onSuccess: () => {
+      setError("");
+      setShowErrorBanner(false);
+      navigate("/calendar");
+    },
+    onError: (err) => {
+      setError(err.message);
+      setShowErrorBanner(true);
+    },
+  });
+
   return (
     <PageTransition>
       <div>
@@ -197,7 +209,7 @@ const EventsEditor = () => {
           )}
 
           {eventData ? (
-            <div>
+            <div style={{ position: "relative" }}>
               <div
                 style={{
                   margin: "0 auto",
@@ -209,7 +221,49 @@ const EventsEditor = () => {
                   boxSizing: "border-box",
                 }}
               >
-                <AnimatedBackButton to="/calendar" text="Back to Calendar" />
+                <AnimatedBackButton
+                  to="/calendar"
+                  text="Back to Calendar"
+                  style={{ alignSelf: "flex-start" }}
+                />
+
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onMouseEnter={() => setDeleteButtonHovered(true)}
+                    onMouseLeave={() => setDeleteButtonHovered(false)}
+                    style={{
+                      ...commonStyles.notes.noteDeleteButton,
+                      ...(deleteButtonHovered
+                        ? commonStyles.notes.noteDeleteButtonHover(isMobile)
+                        : {}),
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      patchDeleteEventMutation.mutate({
+                        eventID: eventID,
+                        userID: currentUser,
+                      });
+                    }}
+                  >
+                    <IconContext.Provider
+                      value={{
+                        color: theme === "dark" ? "white" : "black",
+                        size: isMobile ? "30px" : "20px",
+                      }}
+                    >
+                      <RiDeleteBin5Fill />
+                    </IconContext.Provider>
+                  </button>
+                </div>
               </div>
 
               <form
@@ -229,7 +283,7 @@ const EventsEditor = () => {
                   placeholder="Description"
                   value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
-                  maxLength="200"
+                  maxLength="150"
                   style={{ marginTop: "10px" }}
                 />
                 <p
@@ -248,27 +302,41 @@ const EventsEditor = () => {
                   required={true}
                   style={{ marginTop: "10px" }}
                 />
-                <p
+
+                <div
                   style={{
-                    color:
-                      theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Event has a Duration
-                </p>
-                <FormInput
-                  type="checkbox"
-                  checked={hasEndDate}
-                  onChange={(e) => {
-                    if (!e.target.checked) {
-                      setHasEndDate(false);
-                      setEditedEventEnd(null);
-                    } else {
-                      setHasEndDate(true);
-                      setEditedEventEnd(editedDate);
-                    }
-                  }}
-                />
+                  <p
+                    style={{
+                      color:
+                        theme === "dark"
+                          ? "rgb(255, 255, 255)"
+                          : "rgb(0, 0, 0)",
+                      marginRight: "auto",
+                    }}
+                  >
+                    Event has a Duration
+                  </p>
+                  <FormInput
+                    type="checkbox"
+                    checked={hasEndDate}
+                    onChange={(e) => {
+                      if (!e.target.checked) {
+                        setHasEndDate(false);
+                        setEditedEventEnd(null);
+                      } else {
+                        setHasEndDate(true);
+                        setEditedEventEnd(editedDate);
+                      }
+                    }}
+                    style={{ transform: "scale(1.1)" }}
+                  />
+                </div>
 
                 {hasEndDate && (
                   <div>

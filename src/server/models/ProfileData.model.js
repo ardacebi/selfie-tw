@@ -13,7 +13,16 @@ const ProfileDataSchema = new Schema(
       ref: "EventData",
       default: [],
     },
-    ownedNotes: { type: [Schema.Types.ObjectId], ref: "NoteData", default: [] },
+    ownedActivities: {
+      type: [Schema.Types.ObjectId],
+      ref: "ActivityData",
+      default: [],
+    },
+    ownedNotes: {
+      type: [Schema.Types.ObjectId],
+      ref: "NoteData",
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -17,15 +18,25 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import BlurredWindow from "../components/BlurredWindow";
 import commonStyles from "../styles/commonStyles";
 import PageTransition from "../components/PageTransition";
-import postNewEvent from "../data_creation/postNewEvent.js";
 import fetchAllEventsData from "../data_fetching/fetchAllEventsData.js";
+import fetchAllActivitiesData from "../data_fetching/fetchAllActivitiesData.js";
+import FormSelect from "../components/FormSelect.jsx";
 import { NewEventForm, DisplayEvents } from "../components/Events.jsx";
+import {
+  NewActivityForm,
+  DisplayActivities,
+  ActivitiesSummary,
+} from "../components/Activities.jsx";
 
 const CalendarPage = () => {
   // These are setup variables for the calendar used through the entire page
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const { calendarViewMode, setCalendarViewMode } = useContext(
+    CalendarViewModeContext,
+  );
+
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [zoomLevel, setZoomLevel] = useState(1); // 0: year, 1: month, 2: week
   const [eventCreateHovered, setEventCreateHovered] = useState(null);
@@ -39,6 +50,9 @@ const CalendarPage = () => {
 
   const [showNewEventForm, setShowNewEventForm] = useState(false);
   const [allEvents, setAllEvents] = useState([]);
+  const [newActivityCreateDate, setNewActivityCreateDate] = useState(null);
+  const [showNewActivityForm, setShowNewActivityForm] = useState(false);
+  const [allActivities, setAllActivities] = useState([]);
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -69,8 +83,15 @@ const CalendarPage = () => {
     { enabled: !!currentUser, refetchOnMount: true, staleTime: 0 },
   );
 
+  const { data: activitiesData, refetch: refetchActivities } = useQuery(
+    ["userActivities", currentUser],
+    () => fetchAllActivitiesData({ userID: currentUser }),
+    { enabled: !!currentUser, refetchOnMount: true, staleTime: 0 },
+  );
+
   useEffect(() => {
     refetchEvents();
+    refetchActivities();
   }, []);
 
   useEffect(() => {
@@ -78,6 +99,12 @@ const CalendarPage = () => {
       setAllEvents(eventsData.data);
     }
   }, [eventsData]);
+
+  useEffect(() => {
+    if (activitiesData) {
+      setAllActivities(activitiesData.data);
+    }
+  }, [activitiesData]);
 
   // Helper functions
   //Takes the year and the month and returns the amount of days of that month in that year
@@ -293,6 +320,62 @@ const CalendarPage = () => {
     };
   };
 
+  const RenderCalendarEventsAndActivities = (props) => {
+    const { i, date } = props;
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <button
+          style={commonStyles.calendar.events.buttonEventCreate(
+            eventCreateHovered === i,
+          )}
+          onMouseEnter={() => setEventCreateHovered(i)}
+          onMouseLeave={() => setEventCreateHovered(null)}
+          onClick={() => {
+            if (calendarViewMode === "events") {
+              setShowNewEventForm(true);
+              setNewEventCreateDate(date);
+            } else {
+              setShowNewActivityForm(true);
+              setNewActivityCreateDate(date);
+            }
+          }}
+        >
+          <IconContext.Provider
+            value={{
+              color: theme === "dark" ? "white" : "black",
+              size: isMobile ? "15px" : "20px",
+            }}
+          >
+            <FaCirclePlus />
+          </IconContext.Provider>
+        </button>
+        {calendarViewMode === "events" ? (
+          <DisplayEvents
+            allEvents={allEvents}
+            date={date}
+            isMobile={isMobile}
+            remapDay={remapDay}
+            error={error}
+            setError={setError}
+          />
+        ) : (
+          <DisplayActivities
+            allActivities={allActivities}
+            date={date}
+            isMobile={isMobile}
+            remapDay={remapDay}
+          />
+        )}
+      </div>
+    );
+  };
+
   // Calendar rendering functions
   //This function renders the calendar when zoomLevel is 0. This level shows an entire year in a grid.
   const renderYearCalendar = () => {
@@ -394,34 +477,7 @@ const CalendarPage = () => {
           onMouseLeave={() => setHoveredDay(null)}
         >
           {i}
-          <button
-            style={commonStyles.calendar.events.buttonEventCreate(
-              eventCreateHovered === i,
-            )}
-            onMouseEnter={() => setEventCreateHovered(i)}
-            onMouseLeave={() => setEventCreateHovered(null)}
-            onClick={() => {
-              setShowNewEventForm(true);
-              setNewEventCreateDate(date);
-            }}
-          >
-            <IconContext.Provider
-              value={{
-                color: theme === "dark" ? "white" : "black",
-                size: isMobile ? "15px" : "20px",
-              }}
-            >
-              <FaCirclePlus />
-            </IconContext.Provider>
-          </button>
-          <DisplayEvents
-            allEvents={allEvents}
-            date={date}
-            isMobile={isMobile}
-            remapDay={remapDay}
-            error={error}
-            setError={setError}
-          />
+          <RenderCalendarEventsAndActivities i={i} date={date} />
         </div>,
       );
     }
@@ -496,6 +552,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
         daysLeft--;
@@ -519,6 +576,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
       }
@@ -544,6 +602,7 @@ const CalendarPage = () => {
             onMouseLeave={() => setHoveredDay(null)}
           >
             {i}
+            <RenderCalendarEventsAndActivities i={i} date={date} />
           </div>,
         );
         dayCount++;
@@ -572,6 +631,7 @@ const CalendarPage = () => {
               onMouseLeave={() => setHoveredDay(null)}
             >
               {i}
+              <RenderCalendarEventsAndActivities i={i} date={date} />
             </div>,
           );
         }
@@ -673,11 +733,21 @@ const CalendarPage = () => {
             </h1>
           </div>
 
+          <div style={{ margin: "10px 0", textAlign: "center" }}>
+            <FormSelect
+              value={calendarViewMode}
+              onChange={(e) => setCalendarViewMode(e.target.value)}
+            >
+              <option value="events">Events</option>
+              <option value="activities">Activities</option>
+            </FormSelect>
+          </div>
+
           <div style={monthNameStyle}>
             {zoomLevel === 0 ? calendarDate.getFullYear() : renderMonth()}
           </div>
 
-          {!showNewEventForm && (
+          {(!showNewEventForm || !showNewActivityForm) && (
             <div
               style={commonStyles.getBannerStyle(
                 "errorBannerStyle",
@@ -690,16 +760,29 @@ const CalendarPage = () => {
             </div>
           )}
 
-          <NewEventForm
-            showForm={showNewEventForm}
-            setShowForm={setShowNewEventForm}
-            refetchAllEventsData={refetchEvents}
-            date={newEventCreateDate}
-            setShowErrorBanner={setShowErrorBanner}
-            showErrorBanner={showErrorBanner}
-            setError={setError}
-            error={error}
-          />
+          {calendarViewMode === "events" ? (
+            <NewEventForm
+              showForm={showNewEventForm}
+              setShowForm={setShowNewEventForm}
+              refetchAllEventsData={refetchEvents}
+              date={newEventCreateDate}
+              setShowErrorBanner={setShowErrorBanner}
+              showErrorBanner={showErrorBanner}
+              setError={setError}
+              error={error}
+            />
+          ) : (
+            <NewActivityForm
+              showForm={showNewActivityForm}
+              setShowForm={setShowNewActivityForm}
+              refetchAllActivitiesData={refetchActivities}
+              endDate={newActivityCreateDate}
+              setShowErrorBanner={setShowErrorBanner}
+              showErrorBanner={showErrorBanner}
+              setError={setError}
+              error={error}
+            />
+          )}
 
           <ButtonContainer>
             {zoomLevel === 0 && (
@@ -808,6 +891,18 @@ const CalendarPage = () => {
               <FaSearchPlus /> {isMobile ? "Zoom +" : "Increase Zoom"}
             </button>
           </ButtonContainer>
+
+          {calendarViewMode === "activities" && (
+            <div style={{ width: "100%" }}>
+              <ActivitiesSummary
+                activities={allActivities}
+                refetchAllActivitiesData={refetchActivities}
+                isMobile={isMobile}
+                setError={setError}
+                setShowErrorBanner={setShowErrorBanner}
+              />
+            </div>
+          )}
         </BlurredWindow>
       </div>
     </PageTransition>
