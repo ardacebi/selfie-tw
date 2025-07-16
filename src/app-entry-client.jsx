@@ -5,6 +5,7 @@ import { CurrentUserProvider } from "./client/contexts/CurrentUserContext";
 import { CurrentDateProvider } from "./client/contexts/CurrentDateContext";
 import { ThemeProvider } from "./client/contexts/ThemeContext";
 import { NoteEditModeProvider } from "./client/contexts/NoteEditModeContext";
+import { CalendarViewModeProvider } from "./client/contexts/CalendarViewModeContext";
 import App from "./client/App";
 
 const queryClient = new QueryClient({
@@ -22,11 +23,13 @@ hydrateRoot(
     <CurrentDateProvider>
       <ThemeProvider>
         <NoteEditModeProvider>
-          <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-              <App />
-            </QueryClientProvider>
-          </BrowserRouter>
+          <CalendarViewModeProvider>
+            <BrowserRouter>
+              <QueryClientProvider client={queryClient}>
+                <App />
+              </QueryClientProvider>
+            </BrowserRouter>
+          </CalendarViewModeProvider>
         </NoteEditModeProvider>
       </ThemeProvider>
     </CurrentDateProvider>

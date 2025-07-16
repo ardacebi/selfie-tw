@@ -273,7 +273,7 @@ const EventsEditor = () => {
                   placeholder="Description"
                   value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
-                  maxLength="200"
+                  maxLength="150"
                   style={{ marginTop: "10px" }}
                 />
                 <p
