@@ -454,7 +454,7 @@ const commonStyles = {
   notes: {
     // NotesPage flex container
     notesPage: (isMobile) => ({
-      width: "90%",
+      width: "95%",
       padding: "20px",
       margin: "0 auto",
       display: "flex",
@@ -476,7 +476,8 @@ const commonStyles = {
 
     // Individual note card
     noteItem: (theme) => ({
-      backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+      backgroundColor:
+        theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
       padding: "15px",
       marginBottom: "10px",
       borderRadius: "10px",
@@ -529,7 +530,8 @@ const commonStyles = {
     },
 
     newNoteFormContainer: (theme) => ({
-      background: theme === "dark" ? "#2e2e2e" : "#ffffff",
+      background:
+        theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
       padding: "15px",
       borderRadius: "8px",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.26)",
@@ -781,7 +783,8 @@ const commonStyles = {
         width: editedTitleWidth ? `${editedTitleWidth}px` : undefined,
         transition: "width 0.2s",
         color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
-        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        backgroundColor:
+          theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
         fontWeight: "bold",
         borderRadius: "10px",
         border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
@@ -793,7 +796,8 @@ const commonStyles = {
       editingTags: (theme, isMobile) => ({
         width: "15vw",
         color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
-        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        backgroundColor:
+          theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
         borderRadius: "10px",
         border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
         textAlign: "left",
