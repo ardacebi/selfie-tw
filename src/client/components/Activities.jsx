@@ -13,6 +13,7 @@ import postNewActivity from "../data_creation/postNewActivity.js";
 import patchActivityData from "../data_creation/patchActivityData.js";
 import patchDeleteActivity from "../data_deletion/patchDeleteActivity.js";
 import { CurrentDateContext } from "../contexts/CurrentDateContext.jsx";
+import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import FormButton from "./FormButton.jsx";
 
 const getDayDiff = (date1, date2) => {
@@ -534,6 +535,126 @@ export const ActivitiesSummary = ({
           </div>
         );
       })}
+    </div>
+  );
+};
+
+export const HomepageDisplayActivity = ({ activityData, isMobile }) => {
+  const navigate = useNavigate();
+  const { setCalendarViewMode } = useContext(CalendarViewModeContext);
+  const { currentDate } = useContext(CurrentDateContext);
+  const [hovered, setHovered] = useState(false);
+
+  const startDate = new Date(activityData.startDate);
+  const deadline = new Date(activityData.endDate);
+  const daysPassed = getDayDiff(startDate, currentDate);
+  const totalTime = getDayDiff(startDate, deadline);
+  const daysRemaining = getDayDiff(currentDate, deadline);
+
+  const isOverdue =
+    !activityData.isCompleted && deadline < new Date(currentDate);
+  const overdueDays = isOverdue
+    ? Math.abs(getDayDiff(activityData.endDate, currentDate))
+    : 0;
+
+  const activityDanger =
+    daysRemaining <= totalTime / 4 && !activityData.isCompleted
+      ? "dangerous"
+      : daysRemaining <= totalTime / 2 && !activityData.isCompleted
+        ? "risky"
+        : !activityData.isCompleted
+          ? "safe"
+          : "completed";
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => {
+        setCalendarViewMode("activities");
+        navigate(`/calendar`);
+      }}
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 5px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: isMobile ? "35px" : "30px",
+          fontWeight: "bold",
+          alignSelf: "center",
+        }}
+      >
+        {activityData.title}
+      </div>
+
+      {/*Warning Icon*/}
+      <div
+        style={{
+          display:
+            activityDanger === "completed" || activityDanger === "safe"
+              ? "none"
+              : "block",
+        }}
+      >
+        <IconContext.Provider
+          value={{
+            color: activityDanger === "dangerous" ? "red" : "yellow",
+            size: isMobile ? "55px" : "40px",
+          }}
+        >
+          <IoWarning />
+        </IconContext.Provider>
+      </div>
+
+      {/*Check Icon*/}
+      <div
+        style={{
+          display: activityDanger === "completed" ? "block" : "none",
+        }}
+      >
+        <IconContext.Provider
+          value={{
+            color: "black",
+            size: isMobile ? "55px" : "40px",
+          }}
+        >
+          <FaCheck />
+        </IconContext.Provider>
+      </div>
+
+      <div
+        style={{
+          display: activityData.description ? "block" : "none",
+          margin: "5px",
+          textDecoration: "underline",
+        }}
+      >
+        {activityData.description}
+      </div>
+
+      <div style={{ margin: "10px", fontWeight: "bold" }}>
+        Days Passed: {daysPassed}
+      </div>
+      {isOverdue ? (
+        <div
+          style={{
+            ...commonStyles.calendar.activities.overdueOutline,
+            color: "red",
+            margin: "10px",
+          }}
+        >
+          Overdue by {overdueDays} day(s)!
+        </div>
+      ) : (
+        <div style={{ margin: "10px", fontWeight: "bold" }}>
+          Days Remaining: {daysRemaining}
+        </div>
+      )}
     </div>
   );
 };

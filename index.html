@@ -2,11 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <link rel="icon" type="image/png" href="/src/client/assets/favicon.png" />
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#000000" />
     <title>Selfie</title>
-    not rendered head
     <style>
       html {
         -webkit-text-size-adjust: 100%;
@@ -30,17 +32,23 @@
       }
     </style>
     <script>
-      (function() {
-        var savedTheme = localStorage.getItem('theme');
-        var isDarkMode = savedTheme 
-          ? savedTheme === 'dark'
-          : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        document.documentElement.classList.add(isDarkMode ? 'dark-theme' : 'light-theme');
-        
+      (function () {
+        var savedTheme = localStorage.getItem("theme");
+        var isDarkMode = savedTheme
+          ? savedTheme === "dark"
+          : window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        document.documentElement.classList.add(
+          isDarkMode ? "dark-theme" : "light-theme",
+        );
+
         var metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
-          metaThemeColor.setAttribute('content', isDarkMode ? '#000000' : '#ffffff');
+          metaThemeColor.setAttribute(
+            "content",
+            isDarkMode ? "#000000" : "#ffffff",
+          );
         }
       })();
     </script>

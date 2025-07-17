@@ -8,6 +8,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import postNewEvent from "../data_creation/postNewEvent.js";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
+import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import FormButton from "./FormButton.jsx";
 
 export const NewEventForm = ({
@@ -175,6 +176,7 @@ export const DisplayEvents = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const { SetCalendarViewMode } = useContext(CalendarViewModeContext);
   const [hoveredEvent, setHoveredEvent] = useState(null);
   const navigate = useNavigate();
 
@@ -208,6 +210,27 @@ export const DisplayEvents = ({
             </div>
           );
         })}
+    </div>
+  );
+};
+
+export const HomepageDisplayEvent = ({ eventData }) => {
+  const navigate = useNavigate();
+  const { setCalendarViewMode } = useContext(CalendarViewModeContext);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => {
+        setCalendarViewMode("events");
+        navigate(`/calendar`);
+      }}
+    >
+      <div>{eventData.title}</div>
+      <div>{eventData.description}</div>
+      <div>{new Date(eventData.date).toLocaleDateString()}</div>
     </div>
   );
 };

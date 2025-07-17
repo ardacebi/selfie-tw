@@ -121,7 +121,7 @@ const App = () => {
         >
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<BaseHomePage />} />
+            <Route path="/" element={<BaseHomePage isMobile={isMobile} />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/sign_up" element={<SignUpForm />} />
             <Route path="/forgot_password" element={<ForgotPasswordForm />} />
