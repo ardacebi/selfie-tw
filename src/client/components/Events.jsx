@@ -214,7 +214,7 @@ export const DisplayEvents = ({
   );
 };
 
-export const HomepageDisplayEvent = ({ eventData }) => {
+export const HomepageDisplayEvent = ({ eventData, isMobile }) => {
   const navigate = useNavigate();
   const { setCalendarViewMode } = useContext(CalendarViewModeContext);
   const [hovered, setHovered] = useState(false);
@@ -227,10 +227,26 @@ export const HomepageDisplayEvent = ({ eventData }) => {
         setCalendarViewMode("events");
         navigate(`/calendar`);
       }}
+      style={commonStyles.calendar.events.homepageEventBox(
+        eventData.type,
+        hovered,
+      )}
     >
-      <div>{eventData.title}</div>
-      <div>{eventData.description}</div>
-      <div>{new Date(eventData.date).toLocaleDateString()}</div>
+      <div style={{ fontSize: isMobile ? "30px" : "20px", fontWeight: "bold" }}>
+        {eventData.title}
+      </div>
+      <div
+        style={{
+          fontSize: isMobile ? "11px" : "13px",
+          color: "gray",
+          margin: "10px",
+          alignSelf: "flex-start",
+          textAlign: "left",
+        }}
+      >
+        Date: {new Date(eventData.date).toLocaleDateString()}
+      </div>
+      <div style={{ padding: "5px" }}>{eventData.description}</div>
     </div>
   );
 };

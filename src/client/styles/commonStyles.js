@@ -368,6 +368,27 @@ const commonStyles = {
         transition: "transform 0.2s ease, background-color 0.2s ease",
         margin: "5px",
       }),
+
+      homepageEventBox: (type, isHovered) => ({
+        backgroundColor:
+          type === "basic"
+            ? isHovered
+              ? "rgba(128, 122, 128, 0.7)"
+              : "rgba(128, 49, 128, 0.45)"
+            : isHovered
+              ? "rgba(122, 122, 255, 0.7)"
+              : "rgba(49, 49, 255, 0.45)",
+        borderRadius: "10px",
+        border: "2px solid",
+        borderColor:
+          type === "basic" ? "rgb(128, 49, 128)" : "rgb(49, 49, 255)",
+        textAlign: "center",
+        wordBreak: "break-word",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease, background-color 0.2s ease",
+        margin: "5px",
+        alignItems: "center",
+      }),
     },
 
     activities: {
@@ -446,6 +467,37 @@ const commonStyles = {
         alignItems: "center",
         justifyContent: "center",
         padding: "10px",
+      }),
+
+      homepageActivityBox: (danger, isHovered) => ({
+        backgroundColor:
+          danger === "safe"
+            ? "rgba(176, 176, 176, 0.45)"
+            : danger === "risky"
+              ? "rgba(255, 255, 49, 0.45)"
+              : danger === "dangerous"
+                ? "rgba(255, 49, 49, 0.45)"
+                : "rgba(49, 255, 49, 0.45)",
+        borderRadius: "10px",
+        border: "2px solid",
+        borderColor:
+          danger === "safe"
+            ? "rgb(176, 176, 176)"
+            : danger === "risky"
+              ? "rgb(255, 255, 49)"
+              : danger === "dangerous"
+                ? "rgb(255, 49, 49)"
+                : "rgb(49, 255, 49)",
+        textAlign: "center",
+        wordBreak: "break-word",
+        margin: "5px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "10px",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease",
       }),
     },
   },
@@ -704,6 +756,7 @@ const commonStyles = {
           theme === "dark"
             ? "0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset"
             : "0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset",
+        color: theme === "dark" ? "white" : "black",
       }),
 
       noteEditButton: (theme, isHovered = false, isDisabled = false) => ({

@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import BlurredWindow from "./BlurredWindow";
-import { FaArrowRight } from "react-icons/fa6";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 import { useContext } from "react";
+import { IconContext } from "react-icons";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { HomepageDisplayEvent } from "./Events";
 import { HomepageDisplayActivity } from "./Activities";
+import { HomepageDisplayNote } from "./HomepageDisplayNote";
 import fetchAllActivitiesData from "../data_fetching/fetchAllActivitiesData";
 import fetchAllEventsData from "../data_fetching/fetchAllEventsData";
 import fetchAllNotesData from "../data_fetching/fetchAllNotesData";
@@ -16,6 +18,8 @@ const RecentStuffCard = ({ isMobile }) => {
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const { theme } = useContext(ThemeContext);
+  const [isLeftArrowHovered, setIsLeftArrowHovered] = useState(false);
+  const [isRightArrowHovered, setIsRightArrowHovered] = useState(false);
 
   const { data: eventsData, refetch: refetchEvents } = useQuery(
     ["userEvents", currentUser],
@@ -69,7 +73,7 @@ const RecentStuffCard = ({ isMobile }) => {
     if (allActivities.length > 0) {
       const pending = allActivities.filter((activity) => !activity.isCompleted);
       if (pending.length > 0) {
-        pending.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        pending.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
         setPendingActivity(pending[0]);
       }
     }
@@ -113,7 +117,7 @@ const RecentStuffCard = ({ isMobile }) => {
   const [userIsControlling, setUserIsControlling] = useState(false);
 
   useEffect(() => {
-    if (items.length > 0 && !userIsControlling) {
+    if (items.length > 1 && !userIsControlling) {
       const timer = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % items.length);
       }, 5000);
@@ -121,22 +125,36 @@ const RecentStuffCard = ({ isMobile }) => {
     }
   }, [items, userIsControlling]);
 
+  useEffect(() => {
+    if (userIsControlling) {
+      const timer = setInterval(() => {
+        setUserIsControlling(false);
+      }, 30000);
+      return () => clearInterval(timer);
+    }
+  }, [userIsControlling]);
+
   // If the items array length changes and the current index is out of bounds, reset it.
   useEffect(() => {
     if (currentIndex >= items.length) setCurrentIndex(0);
   }, [items, currentIndex]);
 
   return (
-    <BlurredWindow>
+    <BlurredWindow width="450px">
       {items[currentIndex] ? (
-        <div>
-          <div>
-            <h3 style={{ marginBottom: "10px" }}>
+        <div
+          style={{ color: theme === "dark" ? "white" : "black", width: "100%" }}
+        >
+          <div style={{ alignSelf: "center", marginBottom: "10px" }}>
+            <h3 style={{ marginBottom: "20px" }}>
               {items[currentIndex].label}
             </h3>
             <div>
               {items[currentIndex].label === "Next Event" && (
-                <HomepageDisplayEvent eventData={items[currentIndex].item} />
+                <HomepageDisplayEvent
+                  eventData={items[currentIndex].item}
+                  isMobile={isMobile}
+                />
               )}
               {items[currentIndex].label === "Pending Activity" && (
                 <HomepageDisplayActivity
@@ -145,34 +163,94 @@ const RecentStuffCard = ({ isMobile }) => {
                 />
               )}
               {items[currentIndex].label === "Last Edited Note" && (
-                <p>
-                  Edited:{" "}
-                  {new Date(
-                    items[currentIndex].item.lastModifiedDate,
-                  ).toLocaleDateString()}
-                </p>
+                <HomepageDisplayNote
+                  noteData={items[currentIndex].item}
+                  isMobile={isMobile}
+                />
               )}
             </div>
           </div>
-          <button
-            onClick={() => {
-              if (!userIsControlling) setUserIsControlling(true);
-              setCurrentIndex((currentIndex + 1) % items.length);
-            }}
-            style={{
-              marginTop: "10px",
-              padding: "5px 10px",
-              cursor: "pointer",
-              borderRadius: "5px",
-              backgroundColor: theme === "dark" ? "#444" : "#ddd",
-              border: "none",
-            }}
-          >
-            <FaArrowRight />
-          </button>
+          {items.length > 1 && (
+            <IconContext.Provider
+              value={{
+                size: isMobile ? "20px" : "15px",
+                color: theme === "dark" ? "white" : "black",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button
+                  onMouseEnter={() => setIsLeftArrowHovered(true)}
+                  onMouseLeave={() => setIsLeftArrowHovered(false)}
+                  onClick={() => {
+                    if (!userIsControlling) setUserIsControlling(true);
+                    if (currentIndex === 0) setCurrentIndex(items.length - 1);
+                    else setCurrentIndex((currentIndex - 1) % items.length);
+                  }}
+                  style={{
+                    marginTop: "10px",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    alignSelf: "flex-start",
+                    boxShadow: "none",
+                    transform: isLeftArrowHovered ? "scale(1.2)" : "scale(1)",
+                    transition: "transform 0.2s ease-in-out",
+                    cursor: "pointer",
+                  }}
+                >
+                  <FaArrowLeft />
+                </button>
+
+                <button
+                  onMouseEnter={() => setIsRightArrowHovered(true)}
+                  onMouseLeave={() => setIsRightArrowHovered(false)}
+                  onClick={() => {
+                    if (!userIsControlling) setUserIsControlling(true);
+                    setCurrentIndex((currentIndex + 1) % items.length);
+                  }}
+                  style={{
+                    marginTop: "10px",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    alignSelf: "flex-end",
+                    boxShadow: "none",
+                    transform: isRightArrowHovered ? "scale(1.2)" : "scale(1)",
+                    transition: "transform 0.2s ease-in-out",
+                    cursor: "pointer",
+                  }}
+                >
+                  <FaArrowRight />
+                </button>
+              </div>
+            </IconContext.Provider>
+          )}
         </div>
       ) : (
-        <div>No data.</div>
+        <div display="flex" flexDirection="column" alignItems="center">
+          <div
+            style={{
+              color: theme === "dark" ? "white" : "black",
+              textAlign: "center",
+              breakWord: "break-word",
+              fontSize: isMobile ? "24px" : "21px",
+              margin: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            Nothing here for now!
+          </div>
+          <div
+            style={{
+              color: theme === "dark" ? "white" : "black",
+              textAlign: "center",
+              breakWord: "break-word",
+              fontSize: isMobile ? "16px" : "14px",
+              margin: "10px",
+              fontStyle: "italic",
+            }}
+          >
+            Come here after you have used Selfie a bit more!
+          </div>
+        </div>
       )}
     </BlurredWindow>
   );

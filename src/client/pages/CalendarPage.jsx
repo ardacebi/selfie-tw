@@ -331,12 +331,22 @@ const CalendarPage = () => {
         }}
       >
         <button
-          style={commonStyles.calendar.events.buttonEventCreate(
-            eventCreateHovered === i,
-          )}
+          style={{
+            ...commonStyles.calendar.events.buttonEventCreate(
+              eventCreateHovered === i,
+            ),
+            pointerEvents: "auto", // ensure button receives pointer events
+            position: "relative", // allow using zIndex
+            zIndex: 10,
+          }}
           onMouseEnter={() => setEventCreateHovered(i)}
           onMouseLeave={() => setEventCreateHovered(null)}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
+            if (e.nativeEvent.stopImmediatePropagation) {
+              e.nativeEvent.stopImmediatePropagation();
+            }
+            console.log("Event create clicked", date);
             if (calendarViewMode === "events") {
               setShowNewEventForm(true);
               setNewEventCreateDate(date);
@@ -472,7 +482,10 @@ const CalendarPage = () => {
         <div
           key={`day-${i}`}
           style={getBoxStyle(date, isToday, false)}
-          onClick={() => handleDateClick(year, month, i)}
+          onClick={(e) => {
+            if (e.target.closest("button")) return;
+            handleDateClick(year, month, i);
+          }}
           onMouseEnter={() => setHoveredDay(date)}
           onMouseLeave={() => setHoveredDay(null)}
         >

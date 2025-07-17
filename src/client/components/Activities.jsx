@@ -554,7 +554,7 @@ export const HomepageDisplayActivity = ({ activityData, isMobile }) => {
   const isOverdue =
     !activityData.isCompleted && deadline < new Date(currentDate);
   const overdueDays = isOverdue
-    ? Math.abs(getDayDiff(activityData.endDate, currentDate))
+    ? Math.abs(getDayDiff(deadline, currentDate))
     : 0;
 
   const activityDanger =
@@ -574,13 +574,10 @@ export const HomepageDisplayActivity = ({ activityData, isMobile }) => {
         setCalendarViewMode("activities");
         navigate(`/calendar`);
       }}
-      style={{
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 5px",
-      }}
+      style={commonStyles.calendar.activities.homepageActivityBox(
+        activityDanger,
+        hovered,
+      )}
     >
       <div
         style={{
