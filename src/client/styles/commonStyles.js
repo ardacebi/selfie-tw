@@ -368,6 +368,27 @@ const commonStyles = {
         transition: "transform 0.2s ease, background-color 0.2s ease",
         margin: "5px",
       }),
+
+      homepageEventBox: (type, isHovered) => ({
+        backgroundColor:
+          type === "basic"
+            ? isHovered
+              ? "rgba(128, 122, 128, 0.7)"
+              : "rgba(128, 49, 128, 0.45)"
+            : isHovered
+              ? "rgba(122, 122, 255, 0.7)"
+              : "rgba(49, 49, 255, 0.45)",
+        borderRadius: "10px",
+        border: "2px solid",
+        borderColor:
+          type === "basic" ? "rgb(128, 49, 128)" : "rgb(49, 49, 255)",
+        textAlign: "center",
+        wordBreak: "break-word",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease, background-color 0.2s ease",
+        margin: "5px",
+        alignItems: "center",
+      }),
     },
 
     activities: {
@@ -447,6 +468,37 @@ const commonStyles = {
         justifyContent: "center",
         padding: "10px",
       }),
+
+      homepageActivityBox: (danger, isHovered) => ({
+        backgroundColor:
+          danger === "safe"
+            ? "rgba(176, 176, 176, 0.45)"
+            : danger === "risky"
+              ? "rgba(255, 255, 49, 0.45)"
+              : danger === "dangerous"
+                ? "rgba(255, 49, 49, 0.45)"
+                : "rgba(49, 255, 49, 0.45)",
+        borderRadius: "10px",
+        border: "2px solid",
+        borderColor:
+          danger === "safe"
+            ? "rgb(176, 176, 176)"
+            : danger === "risky"
+              ? "rgb(255, 255, 49)"
+              : danger === "dangerous"
+                ? "rgb(255, 49, 49)"
+                : "rgb(49, 255, 49)",
+        textAlign: "center",
+        wordBreak: "break-word",
+        margin: "5px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "10px",
+        transform: isHovered ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.2s ease",
+      }),
     },
   },
 
@@ -454,7 +506,7 @@ const commonStyles = {
   notes: {
     // NotesPage flex container
     notesPage: (isMobile) => ({
-      width: "90%",
+      width: "95%",
       padding: "20px",
       margin: "0 auto",
       display: "flex",
@@ -476,7 +528,8 @@ const commonStyles = {
 
     // Individual note card
     noteItem: (theme) => ({
-      backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+      backgroundColor:
+        theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
       padding: "15px",
       marginBottom: "10px",
       borderRadius: "10px",
@@ -528,14 +581,17 @@ const commonStyles = {
       zIndex: 1000,
     },
 
-    newNoteFormContainer: (theme) => ({
-      background: theme === "dark" ? "#2e2e2e" : "#ffffff",
+    newNoteFormContainer: (theme, wHeight) => ({
+      background:
+        theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
       padding: "15px",
       borderRadius: "8px",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.26)",
       minWidth: "200px",
       fontFamily: "sans-serif",
       textAlign: "center",
+      position: "absolute",
+      top: wHeight / 2 - 150 + "px",
     }),
 
     newNoteButton: (theme, isMobile) => ({
@@ -702,6 +758,7 @@ const commonStyles = {
           theme === "dark"
             ? "0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset"
             : "0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset",
+        color: theme === "dark" ? "white" : "black",
       }),
 
       noteEditButton: (theme, isHovered = false, isDisabled = false) => ({
@@ -781,7 +838,8 @@ const commonStyles = {
         width: editedTitleWidth ? `${editedTitleWidth}px` : undefined,
         transition: "width 0.2s",
         color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
-        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        backgroundColor:
+          theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
         fontWeight: "bold",
         borderRadius: "10px",
         border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
@@ -793,7 +851,8 @@ const commonStyles = {
       editingTags: (theme, isMobile) => ({
         width: "15vw",
         color: theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
-        backgroundColor: theme === "dark" ? "#2e2e2e" : "#ffffff",
+        backgroundColor:
+          theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
         borderRadius: "10px",
         border: `2px solid ${theme === "dark" ? "rgb(63, 63, 63)" : "rgb(213, 213, 213)"}`,
         textAlign: "left",

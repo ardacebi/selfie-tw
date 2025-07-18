@@ -331,12 +331,14 @@ const CalendarPage = () => {
         }}
       >
         <button
+          data-stop-calendar-click
           style={commonStyles.calendar.events.buttonEventCreate(
             eventCreateHovered === i,
           )}
           onMouseEnter={() => setEventCreateHovered(i)}
           onMouseLeave={() => setEventCreateHovered(null)}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             if (calendarViewMode === "events") {
               setShowNewEventForm(true);
               setNewEventCreateDate(date);
@@ -357,6 +359,7 @@ const CalendarPage = () => {
         </button>
         {calendarViewMode === "events" ? (
           <DisplayEvents
+            data-stop-calendar-click
             allEvents={allEvents}
             date={date}
             isMobile={isMobile}
@@ -366,6 +369,7 @@ const CalendarPage = () => {
           />
         ) : (
           <DisplayActivities
+            data-stop-calendar-click
             allActivities={allActivities}
             date={date}
             isMobile={isMobile}
@@ -472,7 +476,10 @@ const CalendarPage = () => {
         <div
           key={`day-${i}`}
           style={getBoxStyle(date, isToday, false)}
-          onClick={() => handleDateClick(year, month, i)}
+          onClick={(e) => {
+            if (e.target.closest("[data-stop-calendar-click]")) return;
+            handleDateClick(year, month, i);
+          }}
           onMouseEnter={() => setHoveredDay(date)}
           onMouseLeave={() => setHoveredDay(null)}
         >
@@ -571,7 +578,10 @@ const CalendarPage = () => {
           <div
             key={`day-${i}`}
             style={getBoxStyle(date, isToday, false)}
-            onClick={() => handleDateClick(year, month, i)}
+            onClick={(e) => {
+              if (e.target.closest("[data-stop-calendar-click]")) return;
+              handleDateClick(year, month, i);
+            }}
             onMouseEnter={() => setHoveredDay(date)}
             onMouseLeave={() => setHoveredDay(null)}
           >
@@ -893,7 +903,12 @@ const CalendarPage = () => {
           </ButtonContainer>
 
           {calendarViewMode === "activities" && (
-            <div style={{ width: "100%" }}>
+            <div
+              style={{
+                width: "100%",
+                display: allActivities.length ? "block" : "none",
+              }}
+            >
               <ActivitiesSummary
                 activities={allActivities}
                 refetchAllActivitiesData={refetchActivities}

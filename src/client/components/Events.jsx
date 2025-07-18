@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import commonStyles from "../styles/commonStyles.js";
@@ -8,6 +8,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import postNewEvent from "../data_creation/postNewEvent.js";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
+import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import FormButton from "./FormButton.jsx";
 
 export const NewEventForm = ({
@@ -23,7 +24,21 @@ export const NewEventForm = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 500,
+  );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const postNewEventMutation = useMutation(postNewEvent, {
     onMutate: () => setShowErrorBanner(false),
@@ -68,7 +83,9 @@ export const NewEventForm = ({
     <div>
       {showForm && (
         <div style={commonStyles.notes.newNoteFormOverlay}>
-          <div style={commonStyles.notes.newNoteFormContainer(theme)}>
+          <div
+            style={commonStyles.notes.newNoteFormContainer(theme, windowHeight)}
+          >
             <form onSubmit={handleNewEventSubmit}>
               <FormInput
                 name="title"
@@ -175,6 +192,7 @@ export const DisplayEvents = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const { SetCalendarViewMode } = useContext(CalendarViewModeContext);
   const [hoveredEvent, setHoveredEvent] = useState(null);
   const navigate = useNavigate();
 
@@ -208,6 +226,43 @@ export const DisplayEvents = ({
             </div>
           );
         })}
+    </div>
+  );
+};
+
+export const HomepageDisplayEvent = ({ eventData, isMobile }) => {
+  const navigate = useNavigate();
+  const { setCalendarViewMode } = useContext(CalendarViewModeContext);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => {
+        setCalendarViewMode("events");
+        navigate(`/calendar`);
+      }}
+      style={commonStyles.calendar.events.homepageEventBox(
+        eventData.type,
+        hovered,
+      )}
+    >
+      <div style={{ fontSize: isMobile ? "30px" : "20px", fontWeight: "bold" }}>
+        {eventData.title}
+      </div>
+      <div
+        style={{
+          fontSize: isMobile ? "11px" : "13px",
+          color: "gray",
+          margin: "10px",
+          alignSelf: "flex-start",
+          textAlign: "left",
+        }}
+      >
+        Date: {new Date(eventData.date).toLocaleDateString()}
+      </div>
+      <div style={{ padding: "5px" }}>{eventData.description}</div>
     </div>
   );
 };
