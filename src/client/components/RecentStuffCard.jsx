@@ -61,9 +61,20 @@ const RecentStuffCard = ({ isMobile }) => {
 
   useEffect(() => {
     if (allEvents.length > 0) {
-      const upcoming = allEvents.filter(
-        (event) => new Date(event.date) >= currentDate,
-      );
+      const upcoming = allEvents.filter((event) => {
+        const eventDate = new Date(event.date);
+        const eventDay = new Date(
+          eventDate.getFullYear(),
+          eventDate.getMonth(),
+          eventDate.getDate(),
+        );
+        const currentDay = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate(),
+        );
+        return eventDay >= currentDay;
+      });
       if (upcoming.length > 0) {
         upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
         setNextEvent(upcoming[0]);
@@ -173,7 +184,7 @@ const RecentStuffCard = ({ isMobile }) => {
           {items.length > 1 && (
             <IconContext.Provider
               value={{
-                size: isMobile ? "20px" : "15px",
+                size: isMobile ? "30px" : "18px",
                 color: theme === "dark" ? "white" : "black",
               }}
             >

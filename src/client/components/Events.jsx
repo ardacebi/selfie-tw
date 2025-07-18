@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import commonStyles from "../styles/commonStyles.js";
@@ -24,7 +24,21 @@ export const NewEventForm = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 500,
+  );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const postNewEventMutation = useMutation(postNewEvent, {
     onMutate: () => setShowErrorBanner(false),
@@ -69,7 +83,9 @@ export const NewEventForm = ({
     <div>
       {showForm && (
         <div style={commonStyles.notes.newNoteFormOverlay}>
-          <div style={commonStyles.notes.newNoteFormContainer(theme)}>
+          <div
+            style={commonStyles.notes.newNoteFormContainer(theme, windowHeight)}
+          >
             <form onSubmit={handleNewEventSubmit}>
               <FormInput
                 name="title"

@@ -59,6 +59,21 @@ const NotesPage = () => {
     };
   }, []);
 
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 500,
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const { data: notesData, refetch: refetchNotes } = useQuery(
     ["userNotes", currentUser],
     () => fetchAllNotesData({ userID: currentUser }),
@@ -294,7 +309,12 @@ const NotesPage = () => {
 
             {showNewNoteForm && (
               <div style={commonStyles.notes.newNoteFormOverlay}>
-                <div style={commonStyles.notes.newNoteFormContainer(theme)}>
+                <div
+                  style={commonStyles.notes.newNoteFormContainer(
+                    theme,
+                    windowHeight,
+                  )}
+                >
                   <form onSubmit={handleNewNoteSubmit}>
                     <FormInput
                       name="title"

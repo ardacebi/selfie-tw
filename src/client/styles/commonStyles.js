@@ -581,7 +581,7 @@ const commonStyles = {
       zIndex: 1000,
     },
 
-    newNoteFormContainer: (theme) => ({
+    newNoteFormContainer: (theme, wHeight) => ({
       background:
         theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
       padding: "15px",
@@ -590,6 +590,8 @@ const commonStyles = {
       minWidth: "200px",
       fontFamily: "sans-serif",
       textAlign: "center",
+      position: "absolute",
+      top: wHeight / 2 - 150 + "px",
     }),
 
     newNoteButton: (theme, isMobile) => ({

@@ -345,11 +345,12 @@ const BaseHomePage = ({ isMobile }) => {
                 style={{
                   fontSize: "16px",
                   color: theme === "dark" ? "#d0d0d0" : "#444444",
-                  marginBottom: "32px",
                   fontWeight: "normal",
                   textAlign: "center",
-                  marginLeft: "-8px",
+                  marginLeft: "-5px",
+                  marginTop: "20px",
                   width: "100%",
+                  wordBreak: "break-word",
                 }}
               >
                 You are now logged in.

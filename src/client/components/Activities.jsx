@@ -38,6 +38,21 @@ export const NewActivityForm = ({
   const { currentUser } = useContext(CurrentUserContext);
   const navigate = useNavigate();
 
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 500,
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const [formattedEndDate, setFormattedEndDate] = useState(null);
 
   useEffect(() => {
@@ -100,7 +115,9 @@ export const NewActivityForm = ({
     <div>
       {showForm && (
         <div style={commonStyles.notes.newNoteFormOverlay}>
-          <div style={commonStyles.notes.newNoteFormContainer(theme)}>
+          <div
+            style={commonStyles.notes.newNoteFormContainer(theme, windowHeight)}
+          >
             <form onSubmit={handleNewActivitySubmit}>
               <FormInput
                 name="title"
