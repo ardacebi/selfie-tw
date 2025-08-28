@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
@@ -7,6 +7,7 @@ import BaseHomePage from "./pages/BaseHomePage";
 import CalendarPage from "./pages/CalendarPage";
 import NotesPage from "./pages/NotesPage";
 import NotesEditor from "./pages/NotesEditor";
+import PomodoroPage from "./pages/PomodoroPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
 import SubNavbar from "./components/SubNavbar";
@@ -17,14 +18,15 @@ import commonStyles from "./styles/commonStyles";
 import EventsEditor from "./pages/EventsEditor";
 import ActivitiesEditor from "./pages/ActivitiesEditor";
 
+// keep login btn state between visits
 const savedUser = () => window?.localStorage?.getItem("savedUser") ?? null;
 
 const App = () => {
   const { setCurrentUser } = useContext(CurrentUserContext);
   const { theme, isTransitioning } = useContext(ThemeContext);
-  const animationRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
 
+  // mobile breakpoint
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -38,60 +40,21 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    setCurrentUser(savedUser());
-  }, [setCurrentUser]);
+  // preload saved user (not the real session)
+  useEffect(() => { setCurrentUser(savedUser()); }, [setCurrentUser]);
 
+  // browser address bar color on mobile
   useEffect(() => {
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute(
-        "content",
-        theme === "dark" ? "#000000" : "#ffffff",
-      );
-    }
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
   }, [theme]);
 
-  // global theme transition styles
+  // smooth theme switch css
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = commonStyles.themeTransition.getGlobalStyles(theme);
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
-  }, [theme]);
-
-  // Star animation
-  useEffect(() => {
-    if (theme === "dark") {
-      // clean up
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
-
-      if (window.starAnimationResizeHandler) {
-        window.removeEventListener("resize", window.starAnimationResizeHandler);
-        window.starAnimationResizeHandler = null;
-      }
-
-      setTimeout(() => {
-        const backgroundCanvas = document.getElementById("backgroundCanvas");
-        const starsCanvas = document.getElementById("starsCanvas");
-        const milkyWayCanvas = document.getElementById("milkyWayCanvas");
-      }, 0);
-    }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
-
-      if (window.starAnimationResizeHandler) {
-        window.removeEventListener("resize", window.starAnimationResizeHandler);
-        window.starAnimationResizeHandler = null;
-      }
-    };
   }, [theme]);
 
   const isDark = theme === "dark";
@@ -103,13 +66,14 @@ const App = () => {
 
   return (
     <>
-      {/* Background with transition effects */}
-      <div
+  {/* page bg overlay */}
+  <div
         className={`page-background ${isTransitioning ? "transitioning" : ""}`}
       ></div>
 
       <div style={{ ...commonStyles.appShell.page, color: colors.text }}>
-        <Navbar />
+    {/* top bars */}
+    <Navbar />
         <SubNavbar />
         <main
           style={{
@@ -120,13 +84,13 @@ const App = () => {
           }}
         >
           <Routes>
-            {/* Public routes */}
+      {/* public pages */}
             <Route path="/" element={<BaseHomePage isMobile={isMobile} />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/sign_up" element={<SignUpForm />} />
             <Route path="/forgot_password" element={<ForgotPasswordForm />} />
 
-            {/* Protected routes - require authentication */}
+      {/* logged-in stuff */}
             <Route
               path="/calendar"
               element={
@@ -158,7 +122,7 @@ const App = () => {
               path="/pomodoro"
               element={
                 <ProtectedRoute>
-                  <div>Pomodoro Page</div>
+                  <PomodoroPage />
                 </ProtectedRoute>
               }
             />
@@ -181,7 +145,7 @@ const App = () => {
               }
             />
 
-            {/* 404 route */}
+            {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

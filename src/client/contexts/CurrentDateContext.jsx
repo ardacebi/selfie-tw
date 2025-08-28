@@ -4,15 +4,10 @@ const CurrentDateContext = createContext(null);
 
 const CurrentDateProvider = ({ children }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-
   useEffect(() => {
-    const timerGlobal = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000); // Update every second
-
-    return () => clearInterval(timerGlobal);
+    const t = setInterval(() => setCurrentDate(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
-
   return (
     <CurrentDateContext.Provider value={{ currentDate, setCurrentDate }}>
       {children}

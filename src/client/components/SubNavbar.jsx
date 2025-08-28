@@ -18,33 +18,21 @@ const SubNavbar = () => {
   const [isMobile, setIsMobile] = useState(false);
   
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile(); // Check on initial render
-    window.addEventListener('resize', checkMobile);
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
+    const f = () => setIsMobile(window.innerWidth <= 768);
+    f();
+    window.addEventListener('resize', f);
+    return () => window.removeEventListener('resize', f);
   }, []);
   
   useEffect(() => {
-    const authPages = ['/', '/login', '/sign_up', '/forgot_password'];
-    const validAppPaths = ['/calendar', '/pomodoro', '/notes'];
-    
-    // 1. User is logged in AND
-    // 2. Path is a valid app page
-    const isValidAppPath = validAppPaths.includes(location.pathname);
-    setShowNav(currentUser && isValidAppPath);
+    const valid = ['/calendar', '/pomodoro', '/notes'];
+    setShowNav(!!currentUser && valid.includes(location.pathname));
   }, [location.pathname, currentUser]);
   
   if (!showNav) {
     return null;
   }
 
-  // Navigation items with icons and paths
   const navItems = [
     { path: "/", icon: <FaHome />, text: "Home" },
     { path: "/calendar", icon: <FaCalendarAlt />, text: "Calendar" },
@@ -83,7 +71,6 @@ const SubNavbar = () => {
     fontSize: isMobile ? '12px' : '14px',
   });
 
-  // Vertical separator
   const separatorStyle = {
     width: '1px',
     height: '28px',
@@ -123,7 +110,6 @@ const SubNavbar = () => {
           }}
           className="no-scrollbar"
         >
-          {/* Navigation items */}
           {navItems.map((item, index) => (
             <React.Fragment key={item.path}>
               <NavLink 
