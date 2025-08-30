@@ -10,6 +10,7 @@ import NotesEditor from "./pages/NotesEditor";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navbar from "./components/Navbar";
 import SubNavbar from "./components/SubNavbar";
+import TimeMachine from "./components/TimeMachine";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { CurrentUserContext } from "./contexts/CurrentUserContext";
 import { ThemeContext } from "./contexts/ThemeContext";
@@ -111,6 +112,7 @@ const App = () => {
       <div style={{ ...commonStyles.appShell.page, color: colors.text }}>
         <Navbar />
         <SubNavbar />
+        <TimeMachine />
         <main
           style={{
             ...commonStyles.appShell.mainContent,
