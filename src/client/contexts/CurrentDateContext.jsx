@@ -4,12 +4,33 @@ const CurrentDateContext = createContext(null);
 
 const CurrentDateProvider = ({ children }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  const [manualControl, setManualControl] = useState(false);
+
   useEffect(() => {
-    const t = setInterval(() => setCurrentDate(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
+    if (!manualControl) {
+      const timerGlobal = setInterval(() => {
+        setCurrentDate(new Date());
+      }, 1000); // Update every second
+
+      return () => clearInterval(timerGlobal);
+    }
+  }, [manualControl]);
+
+  useEffect(() => {
+    if (manualControl) {
+      const timerGlobal = setInterval(() => {
+        setCurrentDate((prevDate) => new Date(prevDate.getTime() + 1000));
+      }, 1000); // Update every second
+
+      return () => clearInterval(timerGlobal);
+    }
+  }, [manualControl]);
+  
   return (
-    <CurrentDateContext.Provider value={{ currentDate, setCurrentDate }}>
+    <CurrentDateContext.Provider
+      value={{ currentDate, setCurrentDate, manualControl, setManualControl }}
+    >
       {children}
     </CurrentDateContext.Provider>
   );
