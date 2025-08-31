@@ -872,6 +872,25 @@ const commonStyles = {
     },
   },
 
+  timeMachine: {
+    timeMachineContainer: (isMobile, isVisible) => ({
+      position: "fixed",
+      opacity: isVisible ? 1 : 0,
+      pointerEvents: isVisible ? "auto" : "none",
+      bottom: isMobile ? "90px" : "20px",
+      right: isMobile ? "20px" : "90px",
+      padding: "10px 15px",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
+      zIndex: 1000,
+      transform: isVisible ? "translateX(0)" : "translateX(100px)",
+      transition: "transform 0.8s ease, opacity 0.8s ease",
+    }),
+  },
+
   // Blurred window/backdrop styles
   blurredBackdrop: (theme) => ({
     backgroundColor:

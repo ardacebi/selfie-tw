@@ -242,7 +242,7 @@ const RecentStuffCard = ({ isMobile }) => {
           )}
         </div>
       ) : (
-        <div display="flex" flexDirection="column" alignItems="center">
+        <div display="flex" flexdirection="column" alignitems="center">
           <div
             style={{
               color: theme === "dark" ? "white" : "black",
