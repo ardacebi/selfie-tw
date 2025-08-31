@@ -5,9 +5,7 @@ const CalendarViewModeContext = createContext(null);
 const CalendarViewModeProvider = ({ children }) => {
   const [calendarViewMode, setCalendarViewMode] = useState("events");
   return (
-    <CalendarViewModeContext.Provider
-      value={{ calendarViewMode, setCalendarViewMode }}
-    >
+    <CalendarViewModeContext.Provider value={{ calendarViewMode, setCalendarViewMode }}>
       {children}
     </CalendarViewModeContext.Provider>
   );

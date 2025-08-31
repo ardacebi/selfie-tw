@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { promises as fs } from "fs";
-//import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { connectDB } from "./config/db.js";
 import AccountHandling from "./routes/AccountHandling.route.js";
@@ -50,7 +49,4 @@ app.use("*", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  connectDB();
-  console.log(`Server is running at http://localhost:${port}`);
-});
+app.listen(port, () => { connectDB(); console.log(`http://localhost:${port}`); });

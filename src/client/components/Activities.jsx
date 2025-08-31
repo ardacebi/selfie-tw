@@ -16,12 +16,8 @@ import { CurrentDateContext } from "../contexts/CurrentDateContext.jsx";
 import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import FormButton from "./FormButton.jsx";
 
-const getDayDiff = (date1, date2) => {
-  //one day in milliseconds
-  const oneDay = 1000 * 60 * 60 * 24;
-
-  return Math.floor((date2 - date1) / oneDay);
-};
+// days between two dates
+const getDayDiff = (date1, date2) => Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
 
 export const NewActivityForm = ({
   showForm,
@@ -175,8 +171,7 @@ export const DisplayActivities = ({ allActivities = [], date, isMobile }) => {
   const navigate = useNavigate();
   const [hoveredActivity, setHoveredActivity] = useState(null);
 
-  // Activities are “from now until a certain deadline”
-  // We show an activity on a day if that day is the deadline.
+  // show only deadline day
   const activitiesForDate = allActivities.filter((activity) => {
     const deadline = new Date(activity.endDate);
     return deadline.toDateString() === date.toDateString();
@@ -398,7 +393,6 @@ export const ActivitiesSummary = ({
                   marginBottom: isMobile ? "10px" : "0",
                 }}
               >
-                {/* Delete Button */}
                 <button
                   type="button"
                   onMouseEnter={() => setDeleteButtonHovered(activity._id)}
@@ -427,7 +421,6 @@ export const ActivitiesSummary = ({
                   </IconContext.Provider>
                 </button>
 
-                {/* Edit Button */}
                 <button
                   type="button"
                   onMouseEnter={() => setEditButtonHovered(activity._id)}
@@ -454,7 +447,6 @@ export const ActivitiesSummary = ({
               </div>
             </div>
 
-            {/*Warning Icon*/}
             <div
               style={{
                 display:
@@ -473,7 +465,6 @@ export const ActivitiesSummary = ({
               </IconContext.Provider>
             </div>
 
-            {/*Check Icon*/}
             <div
               style={{
                 display: activityDanger === "completed" ? "block" : "none",
@@ -556,7 +547,7 @@ export const ActivitiesSummary = ({
   );
 };
 
-export const HomepageDisplayActivity = ({ activityData, isMobile }) => {
+export const HomepageDisplayActivity = ({ activityData, isMobile, compact = false }) => {
   const navigate = useNavigate();
   const { setCalendarViewMode } = useContext(CalendarViewModeContext);
   const { currentDate } = useContext(CurrentDateContext);

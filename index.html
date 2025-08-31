@@ -13,11 +13,19 @@
       html {
         -webkit-text-size-adjust: 100%;
         text-size-adjust: 100%;
+        overflow-x: hidden;
+        width: 100%;
       }
       body {
         touch-action: manipulation;
         margin: 0;
         padding: 0;
+        overflow-x: hidden;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
       }
       html.dark-theme {
         background-color: #000000;
@@ -29,6 +37,8 @@
       }
       #root {
         min-height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
       }
     </style>
     <script>

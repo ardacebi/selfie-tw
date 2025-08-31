@@ -4,6 +4,7 @@ const CurrentDateContext = createContext(null);
 
 const CurrentDateProvider = ({ children }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+
   const [manualControl, setManualControl] = useState(false);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const CurrentDateProvider = ({ children }) => {
       return () => clearInterval(timerGlobal);
     }
   }, [manualControl]);
-
+  
   return (
     <CurrentDateContext.Provider
       value={{ currentDate, setCurrentDate, manualControl, setManualControl }}

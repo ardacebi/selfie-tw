@@ -14,7 +14,7 @@ import fetchAllActivitiesData from "../data_fetching/fetchAllActivitiesData";
 import fetchAllEventsData from "../data_fetching/fetchAllEventsData";
 import fetchAllNotesData from "../data_fetching/fetchAllNotesData";
 
-const RecentStuffCard = ({ isMobile }) => {
+const RecentStuffCard = ({ isMobile, compact = false }) => {
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const { theme } = useContext(ThemeContext);
@@ -151,13 +151,30 @@ const RecentStuffCard = ({ isMobile }) => {
   }, [items, currentIndex]);
 
   return (
-    <BlurredWindow width="450px">
+    <BlurredWindow 
+      width="500px" 
+      padding={compact ? (isMobile ? "15px" : "20px") : (isMobile ? "20px" : "30px")}
+      style={{ 
+        marginTop: "20px",
+        ...(compact ? { minHeight: "140px" } : {})
+      }}
+    >
       {items[currentIndex] ? (
         <div
-          style={{ color: theme === "dark" ? "white" : "black", width: "100%" }}
+          style={{ 
+            color: theme === "dark" ? "white" : "black", 
+            width: "100%",
+            ...(compact ? { padding: "0" } : {})
+          }}
         >
-          <div style={{ alignSelf: "center", marginBottom: "10px" }}>
-            <h3 style={{ marginBottom: "20px" }}>
+          <div style={{ 
+            alignSelf: "center", 
+            marginBottom: compact ? "8px" : "10px" 
+          }}>
+            <h3 style={{ 
+              marginBottom: compact ? "12px" : "20px",
+              fontSize: compact ? (isMobile ? "16px" : "18px") : "20px"
+            }}>
               {items[currentIndex].label}
             </h3>
             <div>
@@ -165,18 +182,21 @@ const RecentStuffCard = ({ isMobile }) => {
                 <HomepageDisplayEvent
                   eventData={items[currentIndex].item}
                   isMobile={isMobile}
+                  compact={compact}
                 />
               )}
               {items[currentIndex].label === "Pending Activity" && (
                 <HomepageDisplayActivity
                   activityData={items[currentIndex].item}
                   isMobile={isMobile}
+                  compact={compact}
                 />
               )}
               {items[currentIndex].label === "Last Edited Note" && (
                 <HomepageDisplayNote
                   noteData={items[currentIndex].item}
                   isMobile={isMobile}
+                  compact={compact}
                 />
               )}
             </div>

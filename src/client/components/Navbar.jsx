@@ -19,19 +19,11 @@ const Navbar = () => {
   const tooltipRef = useRef(null);
   const resetButtonRef = useRef(null);
   const navigate = useNavigate();
-  
-  // Detect mobile devices
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
+    const f = () => setIsMobile(window.innerWidth <= 768);
+    f();
+    window.addEventListener('resize', f);
+    return () => window.removeEventListener('resize', f);
   }, []);
   
   const isDark = theme === 'dark';
@@ -40,7 +32,7 @@ const Navbar = () => {
   const colors = {
     moon: "#FFD700",
     sun: "#DAA520",
-    bg: isDark ? 'transparent' : '#ffffff',
+    bg: isDark ? 'rgba(20, 20, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
     border: isDark ? '#444' : '#dcdcdc',
     tooltipBg: isDark ? 'rgba(20, 20, 30, 0.7)' : '#fff',
     tooltipBorder: isDark ? 'rgba(255, 255, 255, 0.1)' : '#ddd',
@@ -51,107 +43,24 @@ const Navbar = () => {
   
   const iconSize = 18;
   
-  const handleLogout = () => {
-    localStorage.removeItem("savedUser");
-    setCurrentUser(null);
-    navigate("/", { replace: true, state: { fromLogout: true } });
-  };
+  const handleLogout = () => { localStorage.removeItem("savedUser"); setCurrentUser(null); navigate("/", { replace: true, state: { fromLogout: true } }); };
   
-  const handleTooltipToggle = (tooltipId, e) => {
-    e.stopPropagation();
-    if (activeTooltip === tooltipId) {
-      setActiveTooltip(null);
-    } else {
-      setActiveTooltip(tooltipId);
-    }
-  };
+  const handleTooltipToggle = (id, e) => { e.stopPropagation(); setActiveTooltip(activeTooltip === id ? null : id); };
 
-  const handleMouseEnter = (tooltipId) => {
-    clearTimeout(buttonLeaveTimeoutRef.current);
-    setActiveTooltip(tooltipId);
-    setHoveredButton(tooltipId);
-  };
+  const handleMouseEnter = (id) => { clearTimeout(buttonLeaveTimeoutRef.current); setActiveTooltip(id); setHoveredButton(id); };
 
-  const handleMouseLeave = () => {
-    buttonLeaveTimeoutRef.current = setTimeout(() => {
-      if (!isTooltipHovered) setActiveTooltip(null);
-    }, 100);
-    setHoveredButton(null);
-  };
+  const handleMouseLeave = () => { buttonLeaveTimeoutRef.current = setTimeout(() => { if (!isTooltipHovered) setActiveTooltip(null); }, 100); setHoveredButton(null); };
 
   const renderTooltip = (id, content) => {
-    // Don't render if no active tooltip
     if (activeTooltip !== id) return null;
-    
-    // Mobile-optimized tooltip
     if (isMobile) {
-      const isInfoTooltip = id === 'info';
-      
+      const isInfo = id === 'info';
       return (
-        <div
-          ref={tooltipRef}
-          data-tooltip={id}
-          style={{
-            position: 'absolute',
-            right: '0',
-            top: '45px',
-            backgroundColor: colors.tooltipBg,
-            color: themeStyles.inputColor,
-            border: `1px solid ${colors.tooltipBorder}`,
-            padding: '16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            whiteSpace: 'normal',
-            width: isInfoTooltip ? '240px' : 'auto',
-            maxWidth: '80vw',
-            zIndex: 9999,
-            boxShadow: '0 3px 15px rgba(0,0,0,0.4)',
-            touchAction: 'manipulation',
-            pointerEvents: 'auto',
-            backdropFilter: isDark ? 'blur(10px)' : 'none',
-            WebkitBackdropFilter: isDark ? 'blur(10px)' : 'none',
-            lineHeight: '1.4',
-            textAlign: 'left'
-          }}
-          onClick={e => e.stopPropagation()}
-        >
-          {content}
-        </div>
+        <div ref={tooltipRef} data-tooltip={id} style={{ position:'absolute', right:0, top:'45px', backgroundColor:colors.tooltipBg, color:themeStyles.inputColor, border:`1px solid ${colors.tooltipBorder}`, padding:'16px', borderRadius:'8px', fontSize:'14px', whiteSpace:'normal', width:isInfo?'240px':'auto', maxWidth:'80vw', zIndex:9999, boxShadow:'0 3px 15px rgba(0,0,0,0.4)', touchAction:'manipulation', pointerEvents:'auto', backdropFilter:isDark?'blur(10px)':'none', WebkitBackdropFilter:isDark?'blur(10px)':'none', lineHeight:'1.4', textAlign:'left' }} onClick={e=>e.stopPropagation()}>{content}</div>
       );
     }
-    
-    // Desktop tooltip
     return (
-      <div
-        ref={tooltipRef}
-        data-tooltip={id}
-        style={{
-          position: 'absolute',
-          right: '0',
-          top: '45px',
-          backgroundColor: colors.tooltipBg,
-          color: themeStyles.inputColor,
-          border: `1px solid ${colors.tooltipBorder}`,
-          padding: '12px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          whiteSpace: 'nowrap', 
-          zIndex: 9999,
-          boxShadow: isDark 
-            ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset' 
-            : '0 3px 8px rgba(0,0,0,0.3)',
-          touchAction: 'manipulation',
-          backdropFilter: isDark ? 'blur(10px)' : 'none',
-          WebkitBackdropFilter: isDark ? 'blur(10px)' : 'none'
-        }}
-        onMouseEnter={() => setIsTooltipHovered(true)}
-        onMouseLeave={() => {
-          setIsTooltipHovered(false);
-          setActiveTooltip(null);
-        }}
-      >
-        {content}
-      </div>
+      <div ref={tooltipRef} data-tooltip={id} style={{ position:'absolute', right:0, top:'45px', backgroundColor:colors.tooltipBg, color:themeStyles.inputColor, border:`1px solid ${colors.tooltipBorder}`, padding:'12px', borderRadius:'4px', fontSize:'12px', whiteSpace:'nowrap', zIndex:9999, boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset' : '0 3px 8px rgba(0,0,0,0.3)', touchAction:'manipulation', backdropFilter:isDark?'blur(10px)':'none', WebkitBackdropFilter:isDark?'blur(10px)':'none' }} onMouseEnter={()=>setIsTooltipHovered(true)} onMouseLeave={()=>{ setIsTooltipHovered(false); setActiveTooltip(null); }}>{content}</div>
     );
   };
 
@@ -171,23 +80,10 @@ const Navbar = () => {
     return (
       <div
         data-tooltip-button={tooltipId}
-        ref={el => {
-          if (el) navButtonsRef.current.set(tooltipId, el);
-          else navButtonsRef.current.delete(tooltipId);
-        }}
+  ref={el => { if (el) navButtonsRef.current.set(tooltipId, el); else navButtonsRef.current.delete(tooltipId); }}
         style={{ position: 'relative', display: 'inline-block', marginRight: tooltipId !== 'logout' ? '10px' : '0' }}
-        onMouseEnter={() => {
-          setHoveredButton(tooltipId);
-          if (window.innerWidth > 768) {
-            setActiveTooltip(tooltipId);
-          }
-        }}
-        onMouseLeave={() => {
-          setHoveredButton(null);
-          if (window.innerWidth > 768 && !isTooltipHovered) {
-            setTimeout(() => setActiveTooltip(null), 100);
-          }
-        }}
+  onMouseEnter={() => { setHoveredButton(tooltipId); if (window.innerWidth > 768) setActiveTooltip(tooltipId); }}
+  onMouseLeave={() => { setHoveredButton(null); if (window.innerWidth > 768 && !isTooltipHovered) setTimeout(() => setActiveTooltip(null), 100); }}
       >
         <button
           onClick={handleButtonClick}
@@ -209,7 +105,7 @@ const Navbar = () => {
         >
           {icon}
         </button>
-        {renderTooltip(tooltipId, tooltipContent)}
+  {renderTooltip(tooltipId, tooltipContent)}
       </div>
     );
   };
@@ -284,38 +180,16 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const h = (e) => {
       if (!activeTooltip) return;
-      
-      if (resetButtonRef.current && resetButtonRef.current.contains(event.target)) {
-        return;
-      }
-    
-      let isTooltipClick = false;
-      
-      if (tooltipRef.current && tooltipRef.current.contains(event.target)) {
-        isTooltipClick = true;
-      }
-      
-      const activeButton = navButtonsRef.current.get(activeTooltip);
-      if (activeButton && activeButton.contains(event.target)) {
-        isTooltipClick = true;
-      }
-      
-      if (!isTooltipClick) {
-        setActiveTooltip(null);
-        setIsTooltipHovered(false);
-        setHoveredButton(null);
-      }
+      if (resetButtonRef.current?.contains(e.target)) return;
+      const insideTooltip = tooltipRef.current?.contains(e.target);
+      const insideBtn = navButtonsRef.current.get(activeTooltip)?.contains(e.target);
+      if (!insideTooltip && !insideBtn) { setActiveTooltip(null); setIsTooltipHovered(false); setHoveredButton(null); }
     };
-
-    document.addEventListener('mousedown', handleClickOutside, true);
-    document.addEventListener('touchstart', handleClickOutside, true);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true);
-      document.removeEventListener('touchstart', handleClickOutside, true);
-    };
+    document.addEventListener('mousedown', h, true);
+    document.addEventListener('touchstart', h, true);
+    return () => { document.removeEventListener('mousedown', h, true); document.removeEventListener('touchstart', h, true); };
   }, [activeTooltip]);
 
   return (
@@ -329,6 +203,8 @@ const Navbar = () => {
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       transition: 'background-color 0.3s, color 0.3s',
       backgroundColor: colors.bg,
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
       borderBottom: `1px solid ${colors.border}`,
     }}>
       <div style={{

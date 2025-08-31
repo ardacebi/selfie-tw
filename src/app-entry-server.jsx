@@ -8,14 +8,7 @@ import { NoteEditModeProvider } from "./client/contexts/NoteEditModeContext";
 import { CalendarViewModeProvider } from "./client/contexts/CalendarViewModeContext";
 import App from "./client/App";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    },
-  },
-});
+const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity, cacheTime: Infinity } } });
 
 export function render(url) {
   return renderToString(

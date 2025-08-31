@@ -3,57 +3,47 @@ import { createContext, useState, useEffect } from "react";
 const ThemeContext = createContext(null);
 
 const ThemeProvider = ({ children }) => {
-  const getSystemTheme = () => window?.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
-  
-  const [theme, setTheme] = useState(() => 
-    typeof window === "undefined" ? "light" : localStorage.getItem("theme") || getSystemTheme()
-  );
-  
-  const [isSystemTheme, setIsSystemTheme] = useState(
-    typeof window !== "undefined" && !localStorage.getItem("theme")
-  );
-  
+  const sys = () => (window?.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light");
+  const [theme, setTheme] = useState(() => (typeof window === "undefined" ? "light" : localStorage.getItem("theme") || sys()));
+  const [isSystemTheme, setIsSystemTheme] = useState(() => (typeof window === "undefined" ? true : !localStorage.getItem("theme")));
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.remove('dark-theme', 'light-theme');
-      document.documentElement.classList.add(theme === 'dark' ? 'dark-theme' : 'light-theme');
-    }
+    const saved = localStorage.getItem("theme");
+    const cur = saved || sys();
+    setTheme((t) => (t === cur ? t : cur));
+    setIsSystemTheme(!saved);
+  }, []);
+
+  useEffect(() => {
+    document?.documentElement?.classList.remove("dark-theme", "light-theme");
+    document?.documentElement?.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
   }, [theme]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => isSystemTheme && setTheme(getSystemTheme());
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const h = () => isSystemTheme && setTheme(sys());
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
   }, [isSystemTheme]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") localStorage.setItem("theme", theme);
-  }, [theme]);
+    isSystemTheme ? localStorage.removeItem("theme") : localStorage.setItem("theme", theme);
+  }, [theme, isSystemTheme]);
 
   const toggleTheme = () => {
     setIsTransitioning(true);
-    
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 600);
-    
+    setTimeout(() => setIsTransitioning(false), 600);
     setIsSystemTheme(false);
-    setTheme(theme === "light" ? "dark" : "light");
+    setTheme((t) => (t === "light" ? "dark" : "light"));
   };
 
   const resetToSystemTheme = () => {
     setIsTransitioning(true);
-    
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 600);
-    
+    setTimeout(() => setIsTransitioning(false), 600);
     setIsSystemTheme(true);
     localStorage.removeItem("theme");
-    setTheme(getSystemTheme());
+    setTheme(sys());
   };
 
   return (

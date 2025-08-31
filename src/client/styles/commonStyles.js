@@ -1,5 +1,3 @@
-import { FaTextHeight } from "react-icons/fa6";
-
 const commonStyles = {
   // Form fields
   field: {
@@ -1254,16 +1252,20 @@ const commonStyles = {
   appShell: {
     page: {
       minHeight: "100vh",
+      width: "100%",
       display: "flex",
       flexDirection: "column",
       fontFamily: "sans-serif",
       transition: "background-color 0.3s, color 0.3s",
       position: "relative",
+      overflowX: "hidden",
     },
     mainContent: {
       display: "flex",
       justifyContent: "center",
       flexGrow: 1,
+      width: "100%",
+      overflowX: "hidden",
     },
   },
 

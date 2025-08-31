@@ -181,7 +181,10 @@ const NotesPage = () => {
   return (
     <PageTransition>
       <div style={{ color: theme === "dark" ? "white" : "black" }}>
-        <BlurredWindow width="95%" padding={isMobile ? "10px" : "20px"}>
+        <BlurredWindow
+          width={isMobile ? "95%" : "850px"}
+          padding={isMobile ? "10px" : "20px"}
+        >
           <div style={commonStyles.notes.notesPage(isMobile)}>
             <div style={commonStyles.calendar.header.title}>
               <h1

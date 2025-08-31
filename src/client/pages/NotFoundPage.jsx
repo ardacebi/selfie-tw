@@ -45,12 +45,7 @@ const NotFoundPage = () => {
               I'm afraid I can't do that.
             </div>
             
-            <NavLink 
-              to="/"
-              style={homeButtonStyle}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
+            <NavLink to="/" style={homeButtonStyle} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)}>
               Return Home
             </NavLink>
           </div>

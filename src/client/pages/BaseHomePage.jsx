@@ -4,6 +4,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { useContext, useEffect, useState, useRef } from "react";
 import RecentStuffCard from "../components/RecentStuffCard";
+import { PomodoroStatusCard } from "../components/PomodoroStatusCard";
 import { FaCalendarAlt, FaClock, FaStickyNote } from "react-icons/fa";
 import commonStyles from "../styles/commonStyles";
 import selfieImg from "../assets/selfie.png";
@@ -18,38 +19,26 @@ const BaseHomePage = ({ isMobile }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const themeStyles = commonStyles.getThemeStyles(theme);
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 992,
-  );
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 992);
   const blurredWindowRef = useRef(null);
-  const [blurredWindowWidth, setBlurredWindowWidth] = useState(450);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [showContent, setShowContent] = useState(false);
   const [pageKey, setPageKey] = useState(Date.now());
+  const [gridW, setGridW] = useState(null); // width of card
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      if (blurredWindowRef.current) {
-        const computedWidth =
-          blurredWindowRef.current.getBoundingClientRect().width;
-        setBlurredWindowWidth(computedWidth);
-      }
+  const onResize = () => setWindowWidth(window.innerWidth);
+  window.addEventListener("resize", onResize);
+  return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const u = () => {
+      if (blurredWindowRef.current) setGridW(blurredWindowRef.current.offsetWidth);
     };
-
-    window.addEventListener("resize", handleResize);
-
-    setTimeout(() => {
-      if (blurredWindowRef.current) {
-        const computedWidth =
-          blurredWindowRef.current.getBoundingClientRect().width;
-        setBlurredWindowWidth(computedWidth);
-      }
-    }, 100);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    u();
+    window.addEventListener('resize', u);
+    return () => window.removeEventListener('resize', u);
   }, []);
 
   useEffect(() => {
@@ -110,18 +99,13 @@ const BaseHomePage = ({ isMobile }) => {
       "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, color 0.3s, border-color 0.3s",
   });
 
-  const formatTime = (time) => {
-    const hours = time.getHours().toString().padStart(2, "0");
-    const minutes = time.getMinutes().toString().padStart(2, "0");
-    const seconds = time.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
+  const formatTime = (d) => `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
 
   if (isLoading) {
     return (
       <div style={styles.container}>
         <BlurredWindow
-          width="450px"
+          width="500px"
           style={{
             minHeight: "200px",
             display: "flex",
@@ -171,7 +155,7 @@ const BaseHomePage = ({ isMobile }) => {
     return (
       <PageTransition>
         <div style={styles.container}>
-          <BlurredWindow width="450px">
+          <BlurredWindow width="500px">
             <div
               style={{
                 ...styles.form,
@@ -230,16 +214,21 @@ const BaseHomePage = ({ isMobile }) => {
     );
   }
 
-  const gapWidth = 20;
-
-  // 3 columns on wider screens, 2 on mobile
-  const columns = windowWidth >= 600 ? 3 : 2;
-
-  const buttonWidth = Math.max(
-    120,
-    (blurredWindowWidth - gapWidth * (columns - 1)) / columns,
-  );
-  const buttonHeight = buttonWidth * 0.6;
+  const gapWidth = isMobile ? 10 : 20;
+  const columns = 3;
+  // match other cards
+  const gridWidth = isMobile ? (gridW ? `${gridW}px` : '95%') : '500px';
+  
+  let calculatedButtonWidth;
+  if (isMobile) {
+    const containerW = gridW || windowWidth * 0.95;
+    calculatedButtonWidth = (containerW - gapWidth * (columns - 1)) / columns;
+  } else {
+    calculatedButtonWidth = (500 - gapWidth * (columns - 1)) / columns; // grid 500px
+  }
+  
+  const buttonWidth = Math.max(80, calculatedButtonWidth);
+  const buttonHeight = buttonWidth * (isMobile ? 0.8 : 0.6);
 
   const getButtonContainerStyle = (buttonId) => {
     const isHovered = hoveredButton === buttonId;
@@ -262,9 +251,11 @@ const BaseHomePage = ({ isMobile }) => {
       border: isDark
         ? "1px solid rgba(255, 255, 255, 0.1)"
         : "1px solid rgba(0, 0, 0, 0.05)",
-      transform: isHovered ? "scale(1.08)" : "scale(1)",
+      transform: isHovered ? (isMobile ? "scale(1.03)" : "scale(1.08)") : "scale(1)",
       transition: "transform 0.2s ease",
       zIndex: isHovered ? 10 : 1,
+      minWidth: isMobile ? "70px" : "120px",
+      minHeight: isMobile ? "56px" : "72px",
     };
   };
 
@@ -282,28 +273,27 @@ const BaseHomePage = ({ isMobile }) => {
             width: "100%",
           }}
         >
-          <BlurredWindow ref={blurredWindowRef} width="450px">
+          <BlurredWindow ref={blurredWindowRef} width="500px" padding={isMobile ? "15px" : "20px"}>
             <div
               style={{
                 backgroundColor: "transparent",
                 display: "flex",
                 flexDirection: "column",
-                padding: "15px",
+                padding: "5px",
               }}
             >
-              {/* Header Row: Logo and Welcome slogan on the same line */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                  marginBottom: "-30px",
+                  marginBottom: "0px",
                 }}
               >
                 <div
                   style={{
-                    width: "80px",
-                    height: "80px",
+                    width: "70px",
+                    height: "70px",
                     borderRadius: "50%",
                     overflow: "hidden",
                     marginRight: "15px",
@@ -317,7 +307,6 @@ const BaseHomePage = ({ isMobile }) => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      // Safari fixes for image rendering issues
                       transform: "translateZ(0)",
                       backfaceVisibility: "hidden",
                       WebkitBackfaceVisibility: "hidden",
@@ -327,39 +316,36 @@ const BaseHomePage = ({ isMobile }) => {
                     }}
                   />
                 </div>
-                <div
-                  style={{
-                    ...commonStyles.welcomeGradient(theme),
-                    textAlign: "left",
-                    fontSize: "28px",
-                    marginTop: "-20px",
-                  }}
-                  key={theme}
-                >
-                  Welcome to Selfie!
+                <div style={{ textAlign: "left", flex: 1 }}>
+                  <div
+                    style={{
+                      ...commonStyles.welcomeGradient(theme),
+                      textAlign: "left",
+                      fontSize: "26px",
+                      marginBottom: "5px",
+                      padding: "0",
+                    }}
+                    key={theme}
+                  >
+                    Welcome to Selfie!
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      color: theme === "dark" ? "#d0d0d0" : "#444444",
+                      fontWeight: "normal",
+                      textAlign: "left",
+                      padding: "0",
+                    }}
+                  >
+                    You are now logged in.
+                  </div>
                 </div>
-              </div>
-
-              {/* "You are now logged in" text */}
-              <div
-                style={{
-                  fontSize: "16px",
-                  color: theme === "dark" ? "#d0d0d0" : "#444444",
-                  fontWeight: "normal",
-                  textAlign: "center",
-                  marginLeft: "-5px",
-                  marginTop: "20px",
-                  width: "100%",
-                  wordBreak: "break-word",
-                }}
-              >
-                You are now logged in.
               </div>
             </div>
           </BlurredWindow>
 
-          {/* New Clock Card */}
-          <BlurredWindow width="450px" style={{ marginTop: "20px" }}>
+          <BlurredWindow width="500px" style={{ marginTop: "20px" }}>
             <div
               style={{
                 backgroundColor: "transparent",
@@ -404,22 +390,18 @@ const BaseHomePage = ({ isMobile }) => {
             </div>
           </BlurredWindow>
 
-          {/* Recent Stuff Card*/}
-          <RecentStuffCard isMobile={isMobile} />
-
-          {/* App Icons Grid outside the BlurredWindow */}
+          {/* three main buttons */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                windowWidth >= 600 ? "repeat(3, 1fr)" : "repeat(2, 1fr)",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: `${gapWidth}px`,
-              width: `${blurredWindowWidth}px`,
+              width: gridWidth,
+              maxWidth: '100%',
               margin: "20px auto",
               padding: "0",
             }}
           >
-            {/* Calendar Button */}
             <div
               style={getButtonContainerStyle("calendar")}
               onMouseEnter={() => setHoveredButton("calendar")}
@@ -428,10 +410,10 @@ const BaseHomePage = ({ isMobile }) => {
               <AnimatedButton
                 icon={
                   <FaCalendarAlt
-                    style={{ fontSize: "28px", marginBottom: "8px" }}
+                    style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }}
                   />
                 }
-                text="Calendar"
+                text={isMobile ? "" : "Calendar"}
                 to="/calendar"
                 backgroundColor="transparent"
                 color={themeStyles.inputColor}
@@ -440,15 +422,15 @@ const BaseHomePage = ({ isMobile }) => {
                   width: "100%",
                   height: "100%",
                   borderRadius: "16px",
-                  padding: "0",
+                  padding: isMobile ? "8px" : "0",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
+                  fontSize: isMobile ? "12px" : "16px",
                 }}
               />
             </div>
 
-            {/* Pomodoro Button */}
             <div
               style={getButtonContainerStyle("pomodoro")}
               onMouseEnter={() => setHoveredButton("pomodoro")}
@@ -456,9 +438,9 @@ const BaseHomePage = ({ isMobile }) => {
             >
               <AnimatedButton
                 icon={
-                  <FaClock style={{ fontSize: "28px", marginBottom: "8px" }} />
+                  <FaClock style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }} />
                 }
-                text="Pomodoro"
+                text={isMobile ? "" : "Pomodoro"}
                 to="/pomodoro"
                 backgroundColor="transparent"
                 color={themeStyles.inputColor}
@@ -467,15 +449,15 @@ const BaseHomePage = ({ isMobile }) => {
                   width: "100%",
                   height: "100%",
                   borderRadius: "16px",
-                  padding: "0",
+                  padding: isMobile ? "8px" : "0",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
+                  fontSize: isMobile ? "12px" : "16px",
                 }}
               />
             </div>
 
-            {/* Notes Button */}
             <div
               style={getButtonContainerStyle("notes")}
               onMouseEnter={() => setHoveredButton("notes")}
@@ -484,10 +466,10 @@ const BaseHomePage = ({ isMobile }) => {
               <AnimatedButton
                 icon={
                   <FaStickyNote
-                    style={{ fontSize: "28px", marginBottom: "8px" }}
+                    style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }}
                   />
                 }
-                text="Notes"
+                text={isMobile ? "" : "Notes"}
                 to="/notes"
                 backgroundColor="transparent"
                 color={themeStyles.inputColor}
@@ -496,17 +478,21 @@ const BaseHomePage = ({ isMobile }) => {
                   width: "100%",
                   height: "100%",
                   borderRadius: "16px",
-                  padding: "0",
+                  padding: isMobile ? "8px" : "0",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
+                  fontSize: isMobile ? "12px" : "16px",
                 }}
               />
             </div>
           </div>
+
+          <PomodoroStatusCard isMobile={isMobile} />
+
+          <RecentStuffCard isMobile={isMobile} compact={true} />
         </div>
 
-        {/* Global transition style */}
         <style>{`
           @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.98); filter: blur(5px); }
@@ -519,7 +505,7 @@ const BaseHomePage = ({ isMobile }) => {
 };
 
 const styles = {
-  container: { padding: "20px", textAlign: "center", width: "100%" },
+  container: { padding: "10px", textAlign: "center", width: "100%" },
   form: {
     padding: "10px",
     display: "inline-block",

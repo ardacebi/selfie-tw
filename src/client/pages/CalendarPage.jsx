@@ -29,7 +29,6 @@ import {
 } from "../components/Activities.jsx";
 
 const CalendarPage = () => {
-  // These are setup variables for the calendar used through the entire page
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
@@ -38,7 +37,7 @@ const CalendarPage = () => {
   );
 
   const [calendarDate, setCalendarDate] = useState(currentDate);
-  const [zoomLevel, setZoomLevel] = useState(1); // 0: year, 1: month, 2: week
+  const [zoomLevel, setZoomLevel] = useState(1); // 0 year, 1 month, 2 week
   const [eventCreateHovered, setEventCreateHovered] = useState(null);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 992,
@@ -106,19 +105,14 @@ const CalendarPage = () => {
     }
   }, [activitiesData]);
 
-  // Helper functions
-  //Takes the year and the month and returns the amount of days of that month in that year
+  // days in month
   const findMonthsDays = (year, month) =>
     new Date(year, month + 1, 0).getDate();
-
-  //Takes the year and the month and returns the day of the week of the first day of the month
+  // first day of month (0-6)
   const findFirstDay = (year, month) => new Date(year, month, 0).getDay();
-
-  //The getDay() function of the Date class sets Sunday as 0, this function remaps it to 6 and Monday to 0
+  // make monday = 0
   const remapDay = (day) => (day === 0 ? 6 : day - 1);
-
-  // Date navigation functions
-  //This function is called when a day is clicked and it sets the calendarDate to the date of the day clicked
+  // pick date
   const handleDateClick = (year, month, day) => {
     const newDate = new Date(year, month, day);
     setCalendarDate(newDate);
@@ -131,11 +125,8 @@ const CalendarPage = () => {
       setSelectedDate(newDate);
     }
   };
-
-  //This function is used to change the calendarDate to the previous month. If it is possible it keeps the same day, if it
-  //is not possible it sets the day to the last day of the month
+  // prev month
   const changeToPrevMonth = () => {
-    // Always select the 1st day of the previous month
     const prevMonth = new Date(
       calendarDate.getFullYear(),
       calendarDate.getMonth() - 1,
@@ -143,11 +134,8 @@ const CalendarPage = () => {
     );
     setCalendarDate(prevMonth);
   };
-
-  //This function is used to change the calendarDate to the next month. If it is possible it keeps the same day, if it
-  //is not possible it sets the day to the last day of the month
+  // next month
   const changeToNextMonth = () => {
-    // Always select the 1st day of the next month
     const nextMonth = new Date(
       calendarDate.getFullYear(),
       calendarDate.getMonth() + 1,
@@ -155,20 +143,17 @@ const CalendarPage = () => {
     );
     setCalendarDate(nextMonth);
   };
-
-  //This function is used to change the calendarDate to the previous year, the day and the month are kept the same
+  // prev year
   const changeToPrevYear = () =>
     setCalendarDate(
       new Date(calendarDate.getFullYear() - 1, calendarDate.getMonth(), 1),
     );
-
-  //This function is used to change the calendarDate to the next year, the day and the month are kept the same
+  // next year
   const changeToNextYear = () =>
     setCalendarDate(
       new Date(calendarDate.getFullYear() + 1, calendarDate.getMonth(), 1),
     );
-
-  //This function is used to change the calendarDate to the previous week
+  // prev week
   const changeToPrevWeek = () =>
     setCalendarDate(
       new Date(
@@ -177,8 +162,7 @@ const CalendarPage = () => {
         calendarDate.getDate() - 7,
       ),
     );
-
-  //This function is used to change the calendarDate to the next week
+  // next week
   const changeToNextWeek = () =>
     setCalendarDate(
       new Date(
@@ -187,14 +171,11 @@ const CalendarPage = () => {
         calendarDate.getDate() + 7,
       ),
     );
-
-  // Zoom control
-  //Decreases the value of the variable zoomLevel by 1, if the value is already 0 it does nothing
+  // zoom -
   const decreaseZoomLevel = () => {
     if (zoomLevel > 0) setZoomLevel(zoomLevel - 1);
   };
-
-  //Increases the value of the variable zoomLevel by 1, if the value is already 2 it does nothing
+  // zoom +
   const increaseZoomLevel = () => {
     if (zoomLevel < 2) setZoomLevel(zoomLevel + 1);
   };
@@ -215,29 +196,24 @@ const CalendarPage = () => {
     "December",
   ];
 
-  // Get abbreviated month names for mobile view
+  // month name
   const getMonthName = (month) => {
     if (isMobile) {
-      // Return abbreviated month names for mobile
       const abbr = months[month].substring(0, 3);
       return abbr;
     }
     return months[month];
   };
-
-  //This function is used to return the month and the year of the calendarDate in italian
+  // month header
   const renderMonth = () =>
     `${getMonthName(calendarDate.getMonth())} ${calendarDate.getFullYear()}`;
-
-  //Similar to renderMonth, but it does not return the year, only the month
   const monthName = (month) => getMonthName(month);
 
-  // Get calendar colors from centralized styles
+  // theme colors
   const calendarColors = commonStyles.calendar.colors;
   const themeColors =
     theme === "dark" ? calendarColors.dark : calendarColors.light;
-
-  // Get responsive styles
+  // responsive tweaks
   const responsiveStyles =
     commonStyles.getResponsiveStyles(windowWidth).calendar || {};
 
@@ -247,14 +223,13 @@ const CalendarPage = () => {
       date &&
       date.toDateString() === selectedDate.toDateString();
 
-    // Base calendar box styles
-    const baseBoxStyle = {
+  // box base
+  const baseBoxStyle = {
       ...commonStyles.calendar.box.base(isMobile),
       ...(zoomLevel === 2 ? { minHeight: isMobile ? "50px" : "80px" } : {}),
     };
-
-    // Add selected/today/other month styling
-    const boxStyle = {
+  // box state styles
+  const boxStyle = {
       ...baseBoxStyle,
       ...(isSelected && {
         ...commonStyles.calendar.box.selected,
@@ -292,9 +267,8 @@ const CalendarPage = () => {
         WebkitBackdropFilter: "blur(10px)",
       }),
     };
-
-    // Check if this day is currently being hovered
-    const isHovered =
+  // hover check
+  const isHovered =
       hoveredDay && date && date.toDateString() === hoveredDay.toDateString();
     const hoverStyles = isHovered
       ? {
@@ -380,8 +354,7 @@ const CalendarPage = () => {
     );
   };
 
-  // Calendar rendering functions
-  //This function renders the calendar when zoomLevel is 0. This level shows an entire year in a grid.
+  // year view
   const renderYearCalendar = () => {
     const year = calendarDate.getFullYear();
     return months.map((month, i) => {
@@ -410,7 +383,7 @@ const CalendarPage = () => {
     });
   };
 
-  //This function renders the calendar when zoomLevel is 1. This level shows an entire month of the year in a grid.
+  // month view
   const renderMonthCalendar = () => {
     const year = calendarDate.getFullYear();
     const month = calendarDate.getMonth();
@@ -418,9 +391,8 @@ const CalendarPage = () => {
     const firstDay = findFirstDay(year, month);
     let allDays = [];
 
-    // Add weekday headers
-    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
-      // Show abbreviated day names on small screens
+  // week days
+  ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       const displayDay =
         windowWidth < 576
           ? day.charAt(0)
@@ -446,9 +418,8 @@ const CalendarPage = () => {
         </div>,
       );
     });
-
-    // Add empty days for start of month
-    for (let i = 0; i < firstDay; i++) {
+  // leading blanks
+  for (let i = 0; i < firstDay; i++) {
       allDays.push(
         <div
           key={`empty-${i}`}
@@ -462,9 +433,8 @@ const CalendarPage = () => {
         ></div>,
       );
     }
-
-    // Add days of month
-    for (let i = 1; i <= totalDays; i++) {
+  // days
+  for (let i = 1; i <= totalDays; i++) {
       const date = new Date(year, month, i);
 
       const isToday =
@@ -491,8 +461,7 @@ const CalendarPage = () => {
 
     return allDays;
   };
-
-  //This function renders the calendar when zoomLevel is 2. This level shows a week of the month in a grid.
+  // week view
   const renderWeekCalendar = () => {
     const year = calendarDate.getFullYear();
     const month = calendarDate.getMonth();
@@ -501,9 +470,8 @@ const CalendarPage = () => {
     const firstDay = findFirstDay(year, month);
     let allDays = [];
 
-    // Add weekday headers
-    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
-      // Show abbreviated day names on small screens
+  // week days
+  ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       const displayDay =
         windowWidth < 576
           ? day.charAt(0)
@@ -529,20 +497,14 @@ const CalendarPage = () => {
         </div>,
       );
     });
-
-    // Calculate first day of the displayed week
-    let firstWeekDay = calendarDate.getDate() - remapDay(calendarDate.getDay());
-
-    //If the first day of the week is in the previous month, you should render the last days of the previous month. When selecting
-    //a day in the previous month, the calendarDate should be set to the day of the month selected
-    if (firstWeekDay < 1) {
-      // Show days from previous month
+  // start of week
+  let firstWeekDay = calendarDate.getDate() - remapDay(calendarDate.getDay());
+  if (firstWeekDay < 1) {
       const prevMonth = month === 0 ? 11 : month - 1;
       const prevYear = month === 0 ? year - 1 : year;
       const prevMonthDays = findMonthsDays(prevYear, prevMonth);
-
-      // Add days from previous month
-      for (let i = prevMonthDays + firstWeekDay; i <= prevMonthDays; i++) {
+  // prev month tail
+  for (let i = prevMonthDays + firstWeekDay; i <= prevMonthDays; i++) {
         const date = new Date(prevYear, prevMonth, i);
 
         const isToday =
@@ -564,9 +526,8 @@ const CalendarPage = () => {
         );
         daysLeft--;
       }
-
-      // Add beginning days of current month
-      for (let i = 1; i <= daysLeft; i++) {
+  // current month head
+  for (let i = 1; i <= daysLeft; i++) {
         const date = new Date(year, month, i);
 
         const isToday =
@@ -591,11 +552,9 @@ const CalendarPage = () => {
         );
       }
     } else {
-      // Show days within the current month or next month
-      let dayCount = 1;
-
-      // Add days from current month
-      for (let i = firstWeekDay; dayCount <= 7 && i <= totalDays; i++) {
+  let dayCount = 1;
+  // fill this week
+  for (let i = firstWeekDay; dayCount <= 7 && i <= totalDays; i++) {
         const date = new Date(year, month, i);
 
         const isToday =
@@ -617,10 +576,8 @@ const CalendarPage = () => {
         );
         dayCount++;
       }
-
-      //If the last day of the week is in the next month, you should render the first days of the next month. When selecting
-      //a day in the next month, the calendarDate should be set to the day of the month selected
-      if (dayCount <= 7) {
+  // spill into next month
+  if (dayCount <= 7) {
         const nextMonth = month === 11 ? 0 : month + 1;
         const nextYear = month === 11 ? year + 1 : year;
 
@@ -650,8 +607,7 @@ const CalendarPage = () => {
 
     return allDays;
   };
-
-  // Calendar button style
+  // nav button style
   const getButtonStyle = (buttonId) => {
     const isHovered = hoveredButton === buttonId;
     const isDisabled =
@@ -663,8 +619,6 @@ const CalendarPage = () => {
       isHovered,
       isDisabled,
     );
-
-    // Make buttons smaller on mobile
     if (isMobile) {
       return {
         ...baseStyle,
@@ -673,11 +627,9 @@ const CalendarPage = () => {
         minWidth: "auto",
       };
     }
-
     return baseStyle;
   };
-
-  // Calendar container styles based on zoom level
+  // grid style
   const calendarContainerStyle = {
     ...(zoomLevel === 0
       ? commonStyles.calendar.container.year
@@ -689,11 +641,9 @@ const CalendarPage = () => {
     ...(zoomLevel === 0 && responsiveStyles.yearGrid
       ? { gridTemplateColumns: responsiveStyles.yearGrid.gridTemplateColumns }
       : {}),
-    // Reduce gap on mobile for tighter layout
     gap: isMobile ? "1px" : "5px",
   };
-
-  // Button container component
+  // button row
   const ButtonContainer = ({ children }) => (
     <div
       style={{
@@ -706,8 +656,7 @@ const CalendarPage = () => {
       {children}
     </div>
   );
-
-  // Week day header style
+  // week day header
   const weekDayStyle = {
     ...commonStyles.calendar.header.weekDay,
     ...(responsiveStyles.weekDay || {}),
@@ -715,8 +664,7 @@ const CalendarPage = () => {
     padding: isMobile ? "2px" : "5px",
     fontSize: isMobile ? "10px" : "14px",
   };
-
-  // Month name style
+  // month label
   const monthNameStyle = {
     ...commonStyles.calendar.header.monthName,
     ...(responsiveStyles.monthName || {}),
@@ -863,22 +811,6 @@ const CalendarPage = () => {
             )}
           </ButtonContainer>
 
-          <div
-            style={{
-              ...commonStyles.calendar.container.outer,
-              padding: isMobile ? "2px" : "10px",
-              maxWidth: "100%",
-              boxSizing: "border-box",
-              overflow: "hidden",
-            }}
-          >
-            <div style={calendarContainerStyle}>
-              {zoomLevel === 0 && renderYearCalendar()}
-              {zoomLevel === 1 && renderMonthCalendar()}
-              {zoomLevel === 2 && renderWeekCalendar()}
-            </div>
-          </div>
-
           <ButtonContainer>
             <button
               className="global-hover"
@@ -901,6 +833,22 @@ const CalendarPage = () => {
               <FaSearchPlus /> {isMobile ? "Zoom +" : "Increase Zoom"}
             </button>
           </ButtonContainer>
+
+          <div
+            style={{
+              ...commonStyles.calendar.container.outer,
+              padding: isMobile ? "2px" : "10px",
+              maxWidth: "100%",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            }}
+          >
+            <div style={calendarContainerStyle}>
+              {zoomLevel === 0 && renderYearCalendar()}
+              {zoomLevel === 1 && renderMonthCalendar()}
+              {zoomLevel === 2 && renderWeekCalendar()}
+            </div>
+          </div>
 
           {calendarViewMode === "activities" && (
             <div

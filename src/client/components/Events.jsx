@@ -131,12 +131,8 @@ const eventsFilterer = (allEvents, date, remapDay) => {
     } else {
       if (date < eventStart) return false;
 
-      const millisecondsInADay = 86400000;
-
-      // Get the difference in days between the event start date and the current date
-      const diffDays = Math.floor((date - eventStart) / millisecondsInADay);
-
-      // Get the difference in years between the event start date and the current date
+  const millisecondsInADay = 86400000; // 1 day
+  const diffDays = Math.floor((date - eventStart) / millisecondsInADay); // days since start
       const yearDiff = date.getFullYear() - eventStart.getFullYear();
 
       switch (e.frequencyType) {
@@ -230,7 +226,7 @@ export const DisplayEvents = ({
   );
 };
 
-export const HomepageDisplayEvent = ({ eventData, isMobile }) => {
+export const HomepageDisplayEvent = ({ eventData, isMobile, compact = false }) => {
   const navigate = useNavigate();
   const { setCalendarViewMode } = useContext(CalendarViewModeContext);
   const [hovered, setHovered] = useState(false);

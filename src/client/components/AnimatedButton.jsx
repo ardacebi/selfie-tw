@@ -98,7 +98,8 @@ const AnimatedButton = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        minWidth: '120px',
+        justifyContent: 'center',
+        minWidth: text ? '120px' : '60px',
         width: 'auto',
         fontSize: '16px',
         overflow: 'hidden',
@@ -126,7 +127,7 @@ const AnimatedButton = ({
         }}
       />
       {icon}
-      {text}
+      {text && <span style={{ marginTop: text ? '4px' : '0' }}>{text}</span>}
     </button>
   );
 };

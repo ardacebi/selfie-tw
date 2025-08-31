@@ -432,7 +432,6 @@ const EventsEditor = () => {
                                 (option) => option.value,
                               ),
                             );
-                            console.log(editedFrequencyWeekDays);
                           }}
                           style={{ marginTop: "10px" }}
                         >
