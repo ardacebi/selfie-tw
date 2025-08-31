@@ -490,7 +490,7 @@ const BaseHomePage = ({ isMobile }) => {
 
           <PomodoroStatusCard isMobile={isMobile} />
 
-          <RecentStuffCard isMobile={isMobile} compact={true} />
+          <RecentStuffCard isMobile={isMobile} />
         </div>
 
         <style>{`
