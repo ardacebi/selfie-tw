@@ -7,29 +7,38 @@ const CurrentDateProvider = ({ children }) => {
 
   const [manualControl, setManualControl] = useState(false);
 
+  const [isTimeStopped, setIsTimeStopped] = useState(false);
+
   useEffect(() => {
-    if (!manualControl) {
+    if (!manualControl && !isTimeStopped) {
       const timerGlobal = setInterval(() => {
         setCurrentDate(new Date());
       }, 1000); // Update every second
 
       return () => clearInterval(timerGlobal);
     }
-  }, [manualControl]);
+  }, [manualControl, isTimeStopped]);
 
   useEffect(() => {
-    if (manualControl) {
+    if (manualControl && !isTimeStopped) {
       const timerGlobal = setInterval(() => {
         setCurrentDate((prevDate) => new Date(prevDate.getTime() + 1000));
       }, 1000); // Update every second
 
       return () => clearInterval(timerGlobal);
     }
-  }, [manualControl]);
-  
+  }, [manualControl, isTimeStopped]);
+
   return (
     <CurrentDateContext.Provider
-      value={{ currentDate, setCurrentDate, manualControl, setManualControl }}
+      value={{
+        currentDate,
+        setCurrentDate,
+        manualControl,
+        setManualControl,
+        isTimeStopped,
+        setIsTimeStopped,
+      }}
     >
       {children}
     </CurrentDateContext.Provider>

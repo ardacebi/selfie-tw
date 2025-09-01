@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import BlurredWindow from "../components/BlurredWindow";
 import PageTransition from "../components/PageTransition";
 import commonStyles from "../styles/commonStyles";
@@ -8,16 +9,17 @@ import { IconContext } from "react-icons";
 
 const PomodoroPage = () => {
   const { theme } = useContext(ThemeContext);
+  const { currentDate } = useContext(CurrentDateContext);
   const [isMobile, setIsMobile] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
-  const [sessionType, setSessionType] = useState('work');
+  const [sessionType, setSessionType] = useState("work");
   const [sessionCount, setSessionCount] = useState(0);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  
+
   const [workDuration, setWorkDuration] = useState(25);
   const [shortBreakDuration, setShortBreakDuration] = useState(5);
   const [longBreakDuration, setLongBreakDuration] = useState(15);
@@ -25,7 +27,7 @@ const PomodoroPage = () => {
 
   const intervalRef = useRef(null);
 
-  const STORAGE_KEY = 'pomodoro_timer_state';
+  const STORAGE_KEY = "pomodoro_timer_state";
 
   useEffect(() => {
     const f = () => setIsMobile(window.innerWidth <= 768);
@@ -39,13 +41,12 @@ const PomodoroPage = () => {
     if (savedState) {
       try {
         const state = JSON.parse(savedState);
-        const now = Date.now();
-        
+
         if (state.isRunning && state.endTime) {
-          const now = Date.now();
+          const now = currentDate.getTime();
           const remainingMs = state.endTime - now;
           const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
-          
+
           if (newTimeLeft > 0) {
             setTimeLeft(newTimeLeft);
             setIsRunning(true);
@@ -56,18 +57,20 @@ const PomodoroPage = () => {
           } else {
             setIsRunning(false);
             setEndTime(null);
-            
-            if (state.sessionType === 'work') {
+
+            if (state.sessionType === "work") {
               const newCount = state.sessionCount + 1;
               setSessionCount(newCount);
-              
+
               const isLongBreak = newCount % longBreakInterval === 0;
-              const breakDuration = isLongBreak ? longBreakDuration : shortBreakDuration;
-              
-              setSessionType('break');
+              const breakDuration = isLongBreak
+                ? longBreakDuration
+                : shortBreakDuration;
+
+              setSessionType("break");
               setTimeLeft(breakDuration * 60);
             } else {
-              setSessionType('work');
+              setSessionType("work");
               setTimeLeft(workDuration * 60);
               setSessionCount(state.sessionCount);
             }
@@ -76,10 +79,10 @@ const PomodoroPage = () => {
         } else {
           setTimeLeft(state.timeLeft || 25 * 60);
           setIsRunning(false);
-          setSessionType(state.sessionType || 'work');
+          setSessionType(state.sessionType || "work");
           setSessionCount(state.sessionCount || 0);
         }
-        
+
         if (state.settings) {
           setWorkDuration(state.settings.workDuration || 25);
           setShortBreakDuration(state.settings.shortBreakDuration || 5);
@@ -87,7 +90,7 @@ const PomodoroPage = () => {
           setLongBreakInterval(state.settings.longBreakInterval || 4);
         }
       } catch (error) {
-        console.error('Error loading pomodoro state:', error);
+        console.error("Error loading pomodoro state:", error);
       }
     }
   }, []);
@@ -104,87 +107,89 @@ const PomodoroPage = () => {
         workDuration,
         shortBreakDuration,
         longBreakDuration,
-        longBreakInterval
-      }
+        longBreakInterval,
+      },
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [timeLeft, isRunning, sessionType, sessionCount, startTime, endTime, workDuration, shortBreakDuration, longBreakDuration, longBreakInterval]);
+  }, [
+    timeLeft,
+    isRunning,
+    sessionType,
+    sessionCount,
+    startTime,
+    endTime,
+    workDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    longBreakInterval,
+  ]);
 
   useEffect(() => {
     if (isRunning && endTime) {
-      const updateTimer = () => {
-        const now = Date.now();
-        const remainingMs = endTime - now;
-        const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
-        
-        setTimeLeft(newTimeLeft);
-        
-        if (newTimeLeft <= 0) {
-          setIsRunning(false);
-          handleSessionComplete();
-        }
-      };
+      const now = currentDate.getTime();
+      const remainingMs = endTime - now;
+      const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
 
-      intervalRef.current = setInterval(updateTimer, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      setTimeLeft(newTimeLeft);
+
+      if (newTimeLeft <= 0) {
+        setIsRunning(false);
+        handleSessionComplete();
       }
     }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isRunning, endTime]);
+  }, [currentDate, isRunning, endTime]);
 
   const handleSessionComplete = () => {
     playNotificationSound();
-    
-    if (sessionType === 'work') {
+
+    if (sessionType === "work") {
       const newCount = sessionCount + 1;
       setSessionCount(newCount);
-      
+
       const isLongBreak = newCount % longBreakInterval === 0;
-      const breakDuration = isLongBreak ? longBreakDuration : shortBreakDuration;
-      
-      setSessionType('break');
+      const breakDuration = isLongBreak
+        ? longBreakDuration
+        : shortBreakDuration;
+
+      setSessionType("break");
       setTimeLeft(breakDuration * 60);
     } else {
-      setSessionType('work');
+      setSessionType("work");
       setTimeLeft(workDuration * 60);
     }
-    
+
     setStartTime(null);
     setEndTime(null);
   };
 
   const playNotificationSound = () => {
-    if (typeof window !== 'undefined' && window.AudioContext) {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (typeof window !== "undefined" && window.AudioContext) {
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = sessionType === 'work' ? 800 : 600;
-      oscillator.type = 'sine';
-      
+
+      oscillator.frequency.value = sessionType === "work" ? 800 : 600;
+      oscillator.type = "sine";
+
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.5,
+      );
+
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
     }
   };
 
   const startTimer = () => {
-    const now = Date.now();
-    const sessionEndTime = now + (timeLeft * 1000);
-    
+    const now = currentDate.getTime();
+    const sessionEndTime = now + timeLeft * 1000;
+
     setIsRunning(true);
     setStartTime(now - (getDurationInSeconds() - timeLeft) * 1000);
     setEndTime(sessionEndTime);
@@ -207,12 +212,12 @@ const PomodoroPage = () => {
     setIsRunning(false);
     setStartTime(null);
     setEndTime(null);
-    
-    setSessionType('work');
+
+    setSessionType("work");
     setTimeLeft(workDuration * 60);
-    
+
     setSessionCount(0);
-    
+
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -223,7 +228,7 @@ const PomodoroPage = () => {
   };
 
   const getDurationInSeconds = () => {
-    if (sessionType === 'work') {
+    if (sessionType === "work") {
       return workDuration * 60;
     } else {
       const isLongBreak = sessionCount % longBreakInterval === 0;
@@ -234,7 +239,7 @@ const PomodoroPage = () => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const getProgress = () => {
@@ -243,18 +248,24 @@ const PomodoroPage = () => {
   };
 
   const getSessionTypeDisplay = () => {
-    if (sessionType === 'work') {
-      return 'Study Session';
+    if (sessionType === "work") {
+      return "Study Session";
     } else {
       const isLongBreak = sessionCount % longBreakInterval === 0;
-      return isLongBreak ? 'Long Break' : 'Short Break';
+      return isLongBreak ? "Long Break" : "Short Break";
     }
   };
 
   const [hoveredBtn, setHoveredBtn] = useState(null);
   const btn = (id, disabled = false) => {
-    const base = commonStyles.calendar.button(theme, hoveredBtn === id, disabled);
-    return isMobile ? { ...base, padding: "6px 10px", fontSize: "12px", minWidth: "auto" } : base;
+    const base = commonStyles.calendar.button(
+      theme,
+      hoveredBtn === id,
+      disabled,
+    );
+    return isMobile
+      ? { ...base, padding: "6px 10px", fontSize: "12px", minWidth: "auto" }
+      : base;
   };
 
   return (
@@ -280,11 +291,13 @@ const PomodoroPage = () => {
           <div style={{ textAlign: "right", marginBottom: "20px" }}>
             <button
               onClick={() => setShowSettings(!showSettings)}
-              style={btn('settings')}
-              onMouseEnter={() => setHoveredBtn('settings')}
+              style={btn("settings")}
+              onMouseEnter={() => setHoveredBtn("settings")}
               onMouseLeave={() => setHoveredBtn(null)}
             >
-              <IconContext.Provider value={{ size: isMobile ? "14px" : "16px" }}>
+              <IconContext.Provider
+                value={{ size: isMobile ? "14px" : "16px" }}
+              >
                 <FaCog />
               </IconContext.Provider>
               {!isMobile && " Settings"}
@@ -292,21 +305,44 @@ const PomodoroPage = () => {
           </div>
           {/* settings panel */}
           {showSettings && (
-            <div style={{
-              backgroundColor: theme === "dark" ? "rgba(45, 55, 72, 0.8)" : "rgba(237, 242, 247, 0.8)",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "30px",
-              border: theme === "dark" ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)"
-            }}>
-              <h3 style={{ marginBottom: "15px", fontSize: isMobile ? "16px" : "18px" }}>Timer Settings</h3>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-                gap: "15px"
-              }}>
+            <div
+              style={{
+                backgroundColor:
+                  theme === "dark"
+                    ? "rgba(45, 55, 72, 0.8)"
+                    : "rgba(237, 242, 247, 0.8)",
+                borderRadius: "12px",
+                padding: "20px",
+                marginBottom: "30px",
+                border:
+                  theme === "dark"
+                    ? "1px solid rgba(255,255,255,0.1)"
+                    : "1px solid rgba(0,0,0,0.1)",
+              }}
+            >
+              <h3
+                style={{
+                  marginBottom: "15px",
+                  fontSize: isMobile ? "16px" : "18px",
+                }}
+              >
+                Timer Settings
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+                  gap: "15px",
+                }}
+              >
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Work Duration (minutes):
                   </label>
                   <input
@@ -314,20 +350,31 @@ const PomodoroPage = () => {
                     min="1"
                     max="60"
                     value={workDuration}
-                    onChange={(e) => setWorkDuration(parseInt(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setWorkDuration(parseInt(e.target.value) || 1)
+                    }
                     disabled={isRunning}
                     style={{
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
-                      color: theme === "dark" ? "white" : "black"
+                      color: theme === "dark" ? "white" : "black",
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Short Break (minutes):
                   </label>
                   <input
@@ -335,20 +382,31 @@ const PomodoroPage = () => {
                     min="1"
                     max="30"
                     value={shortBreakDuration}
-                    onChange={(e) => setShortBreakDuration(parseInt(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setShortBreakDuration(parseInt(e.target.value) || 1)
+                    }
                     disabled={isRunning}
                     style={{
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
-                      color: theme === "dark" ? "white" : "black"
+                      color: theme === "dark" ? "white" : "black",
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Long Break (minutes):
                   </label>
                   <input
@@ -356,20 +414,31 @@ const PomodoroPage = () => {
                     min="1"
                     max="60"
                     value={longBreakDuration}
-                    onChange={(e) => setLongBreakDuration(parseInt(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setLongBreakDuration(parseInt(e.target.value) || 1)
+                    }
                     disabled={isRunning}
                     style={{
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
-                      color: theme === "dark" ? "white" : "black"
+                      color: theme === "dark" ? "white" : "black",
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Long Break Every (sessions):
                   </label>
                   <input
@@ -377,15 +446,20 @@ const PomodoroPage = () => {
                     min="2"
                     max="10"
                     value={longBreakInterval}
-                    onChange={(e) => setLongBreakInterval(parseInt(e.target.value) || 2)}
+                    onChange={(e) =>
+                      setLongBreakInterval(parseInt(e.target.value) || 2)
+                    }
                     disabled={isRunning}
                     style={{
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
-                      color: theme === "dark" ? "white" : "black"
+                      color: theme === "dark" ? "white" : "black",
                     }}
                   />
                 </div>
@@ -394,13 +468,18 @@ const PomodoroPage = () => {
                 <button
                   onClick={() => {
                     if (!isRunning) {
-                      setTimeLeft(sessionType === 'work' ? workDuration * 60 : 
-                        (sessionCount % longBreakInterval === 0 ? longBreakDuration : shortBreakDuration) * 60);
+                      setTimeLeft(
+                        sessionType === "work"
+                          ? workDuration * 60
+                          : (sessionCount % longBreakInterval === 0
+                              ? longBreakDuration
+                              : shortBreakDuration) * 60,
+                      );
                     }
                   }}
                   disabled={isRunning}
-                  style={btn('apply', isRunning)}
-                  onMouseEnter={() => setHoveredBtn('apply')}
+                  style={btn("apply", isRunning)}
+                  onMouseEnter={() => setHoveredBtn("apply")}
                   onMouseLeave={() => setHoveredBtn(null)}
                 >
                   Apply Settings
@@ -409,45 +488,57 @@ const PomodoroPage = () => {
             </div>
           )}
           {/* session info */}
-          <div style={{
-            textAlign: "center",
-            marginBottom: "20px"
-          }}>
-            <h2 style={{
-              fontSize: isMobile ? "18px" : "24px",
-              marginBottom: "10px",
-              color: theme === "dark" ? "#e2e8f0" : "#2d3748"
-            }}>
+          <div
+            style={{
+              textAlign: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: isMobile ? "18px" : "24px",
+                marginBottom: "10px",
+                color: theme === "dark" ? "#e2e8f0" : "#2d3748",
+              }}
+            >
               {getSessionTypeDisplay()}
             </h2>
-            <p style={{
-              fontSize: isMobile ? "14px" : "16px",
-              opacity: 0.8,
-              marginBottom: "5px"
-            }}>
+            <p
+              style={{
+                fontSize: isMobile ? "14px" : "16px",
+                opacity: 0.8,
+                marginBottom: "5px",
+              }}
+            >
               Session {sessionCount + 1} • Completed: {sessionCount}
             </p>
             {startTime && (
-              <p style={{
-                fontSize: isMobile ? "12px" : "14px",
-                opacity: 0.6
-              }}>
+              <p
+                style={{
+                  fontSize: isMobile ? "12px" : "14px",
+                  opacity: 0.6,
+                }}
+              >
                 Started: {new Date(startTime).toLocaleTimeString()}
               </p>
             )}
           </div>
 
           {/* pomodoro timer */}
-          <div style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "30px"
-          }}>
-            <div style={{
-              position: "relative",
-              width: isMobile ? "200px" : "250px",
-              height: isMobile ? "200px" : "250px"
-            }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "30px",
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                width: isMobile ? "200px" : "250px",
+                height: isMobile ? "200px" : "250px",
+              }}
+            >
               <svg
                 width="100%"
                 height="100%"
@@ -472,53 +563,63 @@ const PomodoroPage = () => {
                   strokeDasharray={`${2 * Math.PI * 45}%`}
                   strokeDashoffset={`${2 * Math.PI * 45 * (1 - getProgress() / 100)}%`}
                   style={{
-                    transition: "stroke-dashoffset 1s ease-in-out"
+                    transition: "stroke-dashoffset 1s ease-in-out",
                   }}
                 />
               </svg>
-              
+
               {/* timer display */}
-              <div style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "center"
-              }}>
-                <div style={{
-                  fontSize: isMobile ? "32px" : "48px",
-                  fontWeight: "bold",
-                  marginBottom: "5px",
-                  // use app font
-                }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: isMobile ? "32px" : "48px",
+                    fontWeight: "bold",
+                    marginBottom: "5px",
+                    // use app font
+                  }}
+                >
                   {formatTime(timeLeft)}
                 </div>
-                <div style={{
-                  fontSize: isMobile ? "12px" : "14px",
-                  opacity: 0.7
-                }}>
+                <div
+                  style={{
+                    fontSize: isMobile ? "12px" : "14px",
+                    opacity: 0.7,
+                  }}
+                >
                   {Math.round(getProgress())}% Complete
                 </div>
               </div>
             </div>
           </div>
           {/* controls */}
-          <div style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "10px",
-            marginBottom: "20px"
-          }}>
-            <IconContext.Provider value={{ 
-              size: isMobile ? "16px" : "18px",
-              style: { marginRight: isMobile ? "0px" : "8px" }
-            }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: "10px",
+              marginBottom: "20px",
+            }}
+          >
+            <IconContext.Provider
+              value={{
+                size: isMobile ? "16px" : "18px",
+                style: { marginRight: isMobile ? "0px" : "8px" },
+              }}
+            >
               {!isRunning ? (
                 <button
                   onClick={startTimer}
-                  style={btn('start', timeLeft === 0)}
-                  onMouseEnter={() => setHoveredBtn('start')}
+                  style={btn("start", timeLeft === 0)}
+                  onMouseEnter={() => setHoveredBtn("start")}
                   onMouseLeave={() => setHoveredBtn(null)}
                   disabled={timeLeft === 0}
                 >
@@ -528,29 +629,29 @@ const PomodoroPage = () => {
               ) : (
                 <button
                   onClick={pauseTimer}
-                  style={btn('pause')}
-                  onMouseEnter={() => setHoveredBtn('pause')}
+                  style={btn("pause")}
+                  onMouseEnter={() => setHoveredBtn("pause")}
                   onMouseLeave={() => setHoveredBtn(null)}
                 >
                   <FaPause />
                   {!isMobile && " Pause"}
                 </button>
               )}
-              
+
               <button
                 onClick={resetAllStats}
-                style={btn('reset')}
-                onMouseEnter={() => setHoveredBtn('reset')}
+                style={btn("reset")}
+                onMouseEnter={() => setHoveredBtn("reset")}
                 onMouseLeave={() => setHoveredBtn(null)}
               >
                 <FaRedo />
                 {!isMobile && " Reset"}
               </button>
-              
+
               <button
                 onClick={skipSession}
-                style={btn('skip', timeLeft === 0)}
-                onMouseEnter={() => setHoveredBtn('skip')}
+                style={btn("skip", timeLeft === 0)}
+                onMouseEnter={() => setHoveredBtn("skip")}
                 onMouseLeave={() => setHoveredBtn(null)}
                 disabled={timeLeft === 0}
               >
@@ -560,43 +661,72 @@ const PomodoroPage = () => {
             </IconContext.Provider>
           </div>
           {/* stats */}
-          <div style={{
-            textAlign: "center",
-            padding: "20px",
-            backgroundColor: theme === "dark" ? "rgba(45, 55, 72, 0.3)" : "rgba(237, 242, 247, 0.3)",
-            borderRadius: "12px",
-            fontSize: isMobile ? "14px" : "16px"
-          }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "20px",
+              backgroundColor:
+                theme === "dark"
+                  ? "rgba(45, 55, 72, 0.3)"
+                  : "rgba(237, 242, 247, 0.3)",
+              borderRadius: "12px",
+              fontSize: isMobile ? "14px" : "16px",
+            }}
+          >
             <p style={{ marginBottom: "10px" }}>
               <strong>Today's Progress:</strong>
             </p>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-              gap: "15px",
-              textAlign: "center"
-            }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+                gap: "15px",
+                textAlign: "center",
+              }}
+            >
               <div>
-                <div style={{ fontSize: isMobile ? "20px" : "24px", fontWeight: "bold" }}>
+                <div
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    fontWeight: "bold",
+                  }}
+                >
                   {sessionCount}
                 </div>
-                <div style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}>
+                <div
+                  style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}
+                >
                   Completed Sessions
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: isMobile ? "20px" : "24px", fontWeight: "bold" }}>
-                  {Math.floor(sessionCount * workDuration / 60)}h {(sessionCount * workDuration) % 60}m
+                <div
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {Math.floor((sessionCount * workDuration) / 60)}h{" "}
+                  {(sessionCount * workDuration) % 60}m
                 </div>
-                <div style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}>
+                <div
+                  style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}
+                >
                   Study Time
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: isMobile ? "20px" : "24px", fontWeight: "bold" }}>
-                  {sessionType === 'work' ? 'Working' : 'Break'}
+                <div
+                  style={{
+                    fontSize: isMobile ? "20px" : "24px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {sessionType === "work" ? "Working" : "Break"}
                 </div>
-                <div style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}>
+                <div
+                  style={{ opacity: 0.7, fontSize: isMobile ? "12px" : "14px" }}
+                >
                   Current Status
                 </div>
               </div>

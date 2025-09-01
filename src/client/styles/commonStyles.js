@@ -873,20 +873,42 @@ const commonStyles = {
   },
 
   timeMachine: {
-    timeMachineContainer: (isMobile, isVisible) => ({
+    timeMachineButton: (theme) => ({
+      position: "fixed",
+      bottom: "25px",
+      right: "25px",
+      padding: "10px 12px",
+      backgroundColor:
+        theme === "dark" ? "rgba(20, 20, 30, 0.7)" : "rgb(255, 255, 255)",
+      border: theme === "dark" ? "1px solid #fff" : "1px solid #000",
+      borderRadius: "40px",
+      cursor: "pointer",
+      zIndex: 1000,
+      boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.1)",
+    }),
+
+    timeMachineContainer: (theme, isMobile, isVisible) => ({
       position: "fixed",
       opacity: isVisible ? 1 : 0,
       pointerEvents: isVisible ? "auto" : "none",
+      display: "flex",
+      flexDirection: "column",
       bottom: isMobile ? "90px" : "20px",
       right: isMobile ? "20px" : "90px",
       padding: "10px 15px",
-      backgroundColor: "#007bff",
-      color: "#fff",
+      backgroundColor: "#ddaa33",
+      color: "#000",
       border: "none",
       borderRadius: "5px",
       cursor: "pointer",
       zIndex: 1000,
-      transform: isVisible ? "translateX(0)" : "translateX(100px)",
+      transform: isVisible
+        ? isMobile
+          ? "translateY(0)"
+          : "translateX(0)"
+        : isMobile
+          ? "translateY(100px)"
+          : "translateX(100px)",
       transition: "transform 0.8s ease, opacity 0.8s ease",
     }),
   },
@@ -1373,6 +1395,21 @@ const commonStyles = {
       }),
     },
   },
+
+  shakeAnimation: `
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-10deg); }
+      40% { transform: rotate(10deg); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+  `,
 };
 
 export default commonStyles;
