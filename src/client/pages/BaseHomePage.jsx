@@ -19,7 +19,9 @@ const BaseHomePage = ({ isMobile }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const themeStyles = commonStyles.getThemeStyles(theme);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 992);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 992,
+  );
   const blurredWindowRef = useRef(null);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [showContent, setShowContent] = useState(false);
@@ -27,18 +29,19 @@ const BaseHomePage = ({ isMobile }) => {
   const [gridW, setGridW] = useState(null); // width of card
 
   useEffect(() => {
-  const onResize = () => setWindowWidth(window.innerWidth);
-  window.addEventListener("resize", onResize);
-  return () => window.removeEventListener("resize", onResize);
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
     const u = () => {
-      if (blurredWindowRef.current) setGridW(blurredWindowRef.current.offsetWidth);
+      if (blurredWindowRef.current)
+        setGridW(blurredWindowRef.current.offsetWidth);
     };
     u();
-    window.addEventListener('resize', u);
-    return () => window.removeEventListener('resize', u);
+    window.addEventListener("resize", u);
+    return () => window.removeEventListener("resize", u);
   }, []);
 
   useEffect(() => {
@@ -99,7 +102,8 @@ const BaseHomePage = ({ isMobile }) => {
       "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, color 0.3s, border-color 0.3s",
   });
 
-  const formatTime = (d) => `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+  const formatTime = (d) =>
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
 
   if (isLoading) {
     return (
@@ -217,8 +221,8 @@ const BaseHomePage = ({ isMobile }) => {
   const gapWidth = isMobile ? 10 : 20;
   const columns = 3;
   // match other cards
-  const gridWidth = isMobile ? (gridW ? `${gridW}px` : '95%') : '500px';
-  
+  const gridWidth = isMobile ? (gridW ? `${gridW}px` : "95%") : "500px";
+
   let calculatedButtonWidth;
   if (isMobile) {
     const containerW = gridW || windowWidth * 0.95;
@@ -226,7 +230,7 @@ const BaseHomePage = ({ isMobile }) => {
   } else {
     calculatedButtonWidth = (500 - gapWidth * (columns - 1)) / columns; // grid 500px
   }
-  
+
   const buttonWidth = Math.max(80, calculatedButtonWidth);
   const buttonHeight = buttonWidth * (isMobile ? 0.8 : 0.6);
 
@@ -251,7 +255,11 @@ const BaseHomePage = ({ isMobile }) => {
       border: isDark
         ? "1px solid rgba(255, 255, 255, 0.1)"
         : "1px solid rgba(0, 0, 0, 0.05)",
-      transform: isHovered ? (isMobile ? "scale(1.03)" : "scale(1.08)") : "scale(1)",
+      transform: isHovered
+        ? isMobile
+          ? "scale(1.03)"
+          : "scale(1.08)"
+        : "scale(1)",
       transition: "transform 0.2s ease",
       zIndex: isHovered ? 10 : 1,
       minWidth: isMobile ? "70px" : "120px",
@@ -273,7 +281,11 @@ const BaseHomePage = ({ isMobile }) => {
             width: "100%",
           }}
         >
-          <BlurredWindow ref={blurredWindowRef} width="500px" padding={isMobile ? "15px" : "20px"}>
+          <BlurredWindow
+            ref={blurredWindowRef}
+            width="500px"
+            padding={isMobile ? "15px" : "20px"}
+          >
             <div
               style={{
                 backgroundColor: "transparent",
@@ -365,7 +377,7 @@ const BaseHomePage = ({ isMobile }) => {
                   marginTop: "-10px",
                 }}
               >
-                {new Date().toLocaleDateString("en-US", {
+                {currentDate.toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
@@ -397,7 +409,7 @@ const BaseHomePage = ({ isMobile }) => {
               gridTemplateColumns: "repeat(3, 1fr)",
               gap: `${gapWidth}px`,
               width: gridWidth,
-              maxWidth: '100%',
+              maxWidth: "100%",
               margin: "20px auto",
               padding: "0",
             }}
@@ -410,7 +422,10 @@ const BaseHomePage = ({ isMobile }) => {
               <AnimatedButton
                 icon={
                   <FaCalendarAlt
-                    style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }}
+                    style={{
+                      fontSize: isMobile ? "24px" : "28px",
+                      marginBottom: isMobile ? "4px" : "8px",
+                    }}
                   />
                 }
                 text={isMobile ? "" : "Calendar"}
@@ -438,7 +453,12 @@ const BaseHomePage = ({ isMobile }) => {
             >
               <AnimatedButton
                 icon={
-                  <FaClock style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }} />
+                  <FaClock
+                    style={{
+                      fontSize: isMobile ? "24px" : "28px",
+                      marginBottom: isMobile ? "4px" : "8px",
+                    }}
+                  />
                 }
                 text={isMobile ? "" : "Pomodoro"}
                 to="/pomodoro"
@@ -466,7 +486,10 @@ const BaseHomePage = ({ isMobile }) => {
               <AnimatedButton
                 icon={
                   <FaStickyNote
-                    style={{ fontSize: isMobile ? "24px" : "28px", marginBottom: isMobile ? "4px" : "8px" }}
+                    style={{
+                      fontSize: isMobile ? "24px" : "28px",
+                      marginBottom: isMobile ? "4px" : "8px",
+                    }}
                   />
                 }
                 text={isMobile ? "" : "Notes"}
@@ -490,7 +513,7 @@ const BaseHomePage = ({ isMobile }) => {
 
           <PomodoroStatusCard isMobile={isMobile} />
 
-          <RecentStuffCard isMobile={isMobile} compact={true} />
+          <RecentStuffCard isMobile={isMobile} />
         </div>
 
         <style>{`

@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { useParams, useNavigate, Form } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import fetchEventData from "../data_fetching/fetchEventData";
 import patchEventData from "../data_creation/patchEventData";
