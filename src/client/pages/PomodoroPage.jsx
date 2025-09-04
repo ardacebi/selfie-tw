@@ -49,7 +49,7 @@ const PomodoroPage = () => {
       try {
         const state = JSON.parse(savedState);
 
-  if (state.isRunning && state.endTime) {
+        if (state.isRunning && state.endTime) {
           const now = currentDate.getTime();
           const remainingMs = state.endTime - now;
           const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
@@ -134,7 +134,8 @@ const PomodoroPage = () => {
   useEffect(() => {
     if (!isRunning || !endTime) return;
     const id = setInterval(() => {
-      const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      const now = currentDate.getTime();
+      const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(id);
@@ -144,13 +145,15 @@ const PomodoroPage = () => {
       }
     }, 250);
     return () => clearInterval(id);
-  }, [isRunning, endTime]);
+  }, [isRunning, endTime, currentDate]);
 
   const handleSessionComplete = () => {
     playNotificationSound();
     // browser notification
     const isWorkJustFinished = sessionType === "work";
-    const title = isWorkJustFinished ? "Pomodoro: Study session is done" : "Pomodoro: Break finished";
+    const title = isWorkJustFinished
+      ? "Pomodoro: Study session is done"
+      : "Pomodoro: Break finished";
     const body = isWorkJustFinished
       ? "Nice job. Time for a break."
       : "Break's over. Back to work.";
@@ -166,7 +169,7 @@ const PomodoroPage = () => {
         : shortBreakDuration;
 
       setSessionType("break");
-  setTimeLeft(breakDuration * 60);
+      setTimeLeft(breakDuration * 60);
     } else {
       setSessionType("work");
       setTimeLeft(workDuration * 60);
@@ -219,8 +222,7 @@ const PomodoroPage = () => {
     if (Notification.permission === "granted") {
       try {
         new Notification(title, { body });
-      } catch (_) {
-      }
+      } catch (_) {}
     }
   };
 
@@ -294,11 +296,11 @@ const PomodoroPage = () => {
   const startTimer = () => {
     // ask permission on user click
     requestNotificationPermission();
-  const now = Date.now();
-  const sessionEndTime = now + timeLeft * 1000;
+    const now = currentDate.getTime();
+    const sessionEndTime = now + timeLeft * 1000;
 
     setIsRunning(true);
-  setStartTime(now - (getDurationInSeconds() - timeLeft) * 1000);
+    setStartTime(now - (getDurationInSeconds() - timeLeft) * 1000);
     setEndTime(sessionEndTime);
   };
 
@@ -608,8 +610,8 @@ const PomodoroPage = () => {
                       typeof window === "undefined"
                         ? "unknown"
                         : !("Notification" in window)
-                        ? "unsupported"
-                        : Notification.permission;
+                          ? "unsupported"
+                          : Notification.permission;
                     if (perm === "unsupported") {
                       return (
                         <div style={{ opacity: 0.8, fontSize: "14px" }}>
@@ -626,15 +628,30 @@ const PomodoroPage = () => {
                           onMouseLeave={() => setHoveredBtn(null)}
                           disabled={perm === "granted"}
                         >
-                          {perm === "granted" ? "Notifications Enabled" : "Enable Notifications"}
+                          {perm === "granted"
+                            ? "Notifications Enabled"
+                            : "Enable Notifications"}
                         </button>
-                        {typeof window !== "undefined" && !window.isSecureContext && (
-                          <div style={{ marginTop: "6px", opacity: 0.8, fontSize: "12px" }}>
-                          </div>
-                        )}
+                        {typeof window !== "undefined" &&
+                          !window.isSecureContext && (
+                            <div
+                              style={{
+                                marginTop: "6px",
+                                opacity: 0.8,
+                                fontSize: "12px",
+                              }}
+                            ></div>
+                          )}
                         {perm === "denied" && (
-                          <div style={{ marginTop: "6px", opacity: 0.8, fontSize: "12px" }}>
-                            Notifications are blocked. Use the site settings in your browser to allow them
+                          <div
+                            style={{
+                              marginTop: "6px",
+                              opacity: 0.8,
+                              fontSize: "12px",
+                            }}
+                          >
+                            Notifications are blocked. Use the site settings in
+                            your browser to allow them
                           </div>
                         )}
                       </>
@@ -662,7 +679,13 @@ const PomodoroPage = () => {
                 }}
               >
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Total study minutes:
                   </label>
                   <input
@@ -674,14 +697,23 @@ const PomodoroPage = () => {
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
                       color: theme === "dark" ? "white" : "black",
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontSize: "14px",
+                    }}
+                  >
                     Start date & time:
                   </label>
                   <input
@@ -692,7 +724,10 @@ const PomodoroPage = () => {
                       width: "100%",
                       padding: "8px",
                       borderRadius: "6px",
-                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      border:
+                        theme === "dark"
+                          ? "1px solid #4a5568"
+                          : "1px solid #e2e8f0",
                       backgroundColor: theme === "dark" ? "#2d3748" : "white",
                       color: theme === "dark" ? "white" : "black",
                     }}
@@ -710,7 +745,10 @@ const PomodoroPage = () => {
                 </button>
                 <button
                   onClick={scheduleToCalendar}
-                  style={btn("schedule", isScheduling || !plannedSessions.length)}
+                  style={btn(
+                    "schedule",
+                    isScheduling || !plannedSessions.length,
+                  )}
                   disabled={isScheduling || !plannedSessions.length}
                   onMouseEnter={() => setHoveredBtn("schedule")}
                   onMouseLeave={() => setHoveredBtn(null)}
@@ -719,7 +757,11 @@ const PomodoroPage = () => {
                 </button>
               </div>
               {planInfo && (
-                <div style={{ marginTop: "8px", opacity: 0.8, fontSize: "14px" }}>{planInfo}</div>
+                <div
+                  style={{ marginTop: "8px", opacity: 0.8, fontSize: "14px" }}
+                >
+                  {planInfo}
+                </div>
               )}
             </div>
           )}
