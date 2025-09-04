@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import commonStyles from "../styles/commonStyles.js";
 import FormInput from "./FormInput";
 import { FaExclamationCircle } from "react-icons/fa";
+import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import postNewEvent from "../data_creation/postNewEvent.js";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx";
 import FormButton from "./FormButton.jsx";
+import patchDeleteEvent from "../data_deletion/patchDeleteEvent.js";
 
 export const NewEventForm = ({
   showForm,
@@ -184,6 +186,7 @@ export const DisplayEvents = ({
   remapDay,
   error,
   setError,
+  refetchAll,
 }) => {
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
@@ -193,6 +196,21 @@ export const DisplayEvents = ({
   const navigate = useNavigate();
 
   const todayEvents = eventsFilterer(allEvents, date || currentDate, remapDay);
+
+  const delMutation = useMutation(patchDeleteEvent, {
+    onSuccess: () => {
+      refetchAll && refetchAll();
+    },
+    onError: (err) => {
+      console.error("delete failed", err);
+    },
+  });
+
+  const handleDelete = (e, id) => {
+    e.stopPropagation();
+    if (!currentUser) return;
+    delMutation.mutate({ eventID: id, userID: currentUser });
+  };
 
   return (
     <div style={commonStyles.calendar.events.eventsContainer}>
@@ -209,10 +227,25 @@ export const DisplayEvents = ({
                 hoveredEvent === event._id,
               )}
             >
-              <div style={{ margin: "5px", fontWeight: "bold" }}>
+              <div style={{ margin: "5px", fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
                 {isMobile && event.title.length > 9
                   ? `${event.title.slice(0, 9)}...`
                   : event.title}
+                {/* show delete for simple study sessions */}
+                {event.type === "basic" && (
+                  <button
+                    title="Delete"
+                    onClick={(e) => handleDelete(e, event._id)}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  >
+                    <RiDeleteBin5Fill size={isMobile ? 14 : 16} color={theme === "dark" ? "#e2e8f0" : "#2d3748"} />
+                  </button>
+                )}
               </div>
               <div style={{ fontSize: isMobile ? "9px" : "10px" }}>
                 {event.description && isMobile && event.description?.length > 40

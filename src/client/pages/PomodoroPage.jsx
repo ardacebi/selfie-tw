@@ -1,18 +1,21 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentDateContext } from "../contexts/CurrentDateContext";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import BlurredWindow from "../components/BlurredWindow";
 import PageTransition from "../components/PageTransition";
 import commonStyles from "../styles/commonStyles";
 import { FaPlay, FaPause, FaStop, FaRedo, FaCog } from "react-icons/fa";
 import { IconContext } from "react-icons";
+import postNewEvent from "../data_creation/postNewEvent.js";
 
 const PomodoroPage = () => {
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const [isMobile, setIsMobile] = useState(false);
 
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [sessionType, setSessionType] = useState("work");
   const [sessionCount, setSessionCount] = useState(0);
@@ -20,12 +23,16 @@ const PomodoroPage = () => {
   const [endTime, setEndTime] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
 
-  const [workDuration, setWorkDuration] = useState(25);
+  const [workDuration, setWorkDuration] = useState(30);
   const [shortBreakDuration, setShortBreakDuration] = useState(5);
   const [longBreakDuration, setLongBreakDuration] = useState(15);
   const [longBreakInterval, setLongBreakInterval] = useState(4);
 
   const intervalRef = useRef(null);
+  const [totalStudyMinutes, setTotalStudyMinutes] = useState("");
+  const [scheduleStart, setScheduleStart] = useState("");
+  const [plannedSessions, setPlannedSessions] = useState([]);
+  const [planInfo, setPlanInfo] = useState("");
 
   const STORAGE_KEY = "pomodoro_timer_state";
 
@@ -42,7 +49,7 @@ const PomodoroPage = () => {
       try {
         const state = JSON.parse(savedState);
 
-        if (state.isRunning && state.endTime) {
+  if (state.isRunning && state.endTime) {
           const now = currentDate.getTime();
           const remainingMs = state.endTime - now;
           const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
@@ -77,14 +84,14 @@ const PomodoroPage = () => {
             setStartTime(null);
           }
         } else {
-          setTimeLeft(state.timeLeft || 25 * 60);
+          setTimeLeft(state.timeLeft || 30 * 60);
           setIsRunning(false);
           setSessionType(state.sessionType || "work");
           setSessionCount(state.sessionCount || 0);
         }
 
         if (state.settings) {
-          setWorkDuration(state.settings.workDuration || 25);
+          setWorkDuration(state.settings.workDuration || 30);
           setShortBreakDuration(state.settings.shortBreakDuration || 5);
           setLongBreakDuration(state.settings.longBreakDuration || 15);
           setLongBreakInterval(state.settings.longBreakInterval || 4);
@@ -125,22 +132,29 @@ const PomodoroPage = () => {
   ]);
 
   useEffect(() => {
-    if (isRunning && endTime) {
-      const now = currentDate.getTime();
-      const remainingMs = endTime - now;
-      const newTimeLeft = Math.max(0, Math.ceil(remainingMs / 1000));
-
-      setTimeLeft(newTimeLeft);
-
-      if (newTimeLeft <= 0) {
+    if (!isRunning || !endTime) return;
+    const id = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(id);
         setIsRunning(false);
+        setEndTime(null);
         handleSessionComplete();
       }
-    }
-  }, [currentDate, isRunning, endTime]);
+    }, 250);
+    return () => clearInterval(id);
+  }, [isRunning, endTime]);
 
   const handleSessionComplete = () => {
     playNotificationSound();
+    // browser notification
+    const isWorkJustFinished = sessionType === "work";
+    const title = isWorkJustFinished ? "Pomodoro: Study session is done" : "Pomodoro: Break finished";
+    const body = isWorkJustFinished
+      ? "Nice job. Time for a break."
+      : "Break's over. Back to work.";
+    sendBrowserNotification(title, body);
 
     if (sessionType === "work") {
       const newCount = sessionCount + 1;
@@ -152,7 +166,7 @@ const PomodoroPage = () => {
         : shortBreakDuration;
 
       setSessionType("break");
-      setTimeLeft(breakDuration * 60);
+  setTimeLeft(breakDuration * 60);
     } else {
       setSessionType("work");
       setTimeLeft(workDuration * 60);
@@ -186,12 +200,105 @@ const PomodoroPage = () => {
     }
   };
 
+  const NOTIF_STATUS_KEY = "pomodoro_notif_status";
+  const requestNotificationPermission = async () => {
+    if (typeof window === "undefined") return;
+    if (!("Notification" in window)) return;
+    try {
+      const res = await Notification.requestPermission();
+      if (res) localStorage.setItem(NOTIF_STATUS_KEY, res);
+      return res;
+    } catch (_) {
+      return undefined;
+    }
+  };
+
+  const sendBrowserNotification = (title, body) => {
+    if (typeof window === "undefined") return;
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "granted") {
+      try {
+        new Notification(title, { body });
+      } catch (_) {
+      }
+    }
+  };
+
+  // plan sessions
+  const planSessions = () => {
+    const total = parseInt(totalStudyMinutes);
+    if (!total || total <= 0) {
+      setPlannedSessions([]);
+      setPlanInfo("");
+      return;
+    }
+
+    const start = scheduleStart ? new Date(scheduleStart) : new Date();
+    if (isNaN(start.getTime())) {
+      setPlannedSessions([]);
+      setPlanInfo("");
+      return;
+    }
+
+    let remaining = total;
+    let current = new Date(start);
+    let sessions = [];
+    let count = 0;
+
+    while (remaining >= workDuration) {
+      const s = new Date(current);
+      const e = new Date(current.getTime() + workDuration * 60000);
+      sessions.push({ start: s, end: e });
+      remaining -= workDuration;
+      count++;
+
+      const isLong = count % longBreakInterval === 0;
+      const bd = isLong ? longBreakDuration : shortBreakDuration;
+      current = new Date(e.getTime() + bd * 60000);
+    }
+
+    setPlannedSessions(sessions);
+    setPlanInfo(`${sessions.length} sessions of ${workDuration} min`);
+  };
+
+  const [isScheduling, setIsScheduling] = useState(false);
+  const createEvent = async ({ title, date, eventEnd }) => {
+    return await postNewEvent({
+      title,
+      date,
+      eventEnd,
+      type: "basic",
+      userID: currentUser,
+    });
+  };
+
+  const scheduleToCalendar = async () => {
+    if (!currentUser || !plannedSessions.length) return;
+    setIsScheduling(true);
+    try {
+      for (const [idx, s] of plannedSessions.entries()) {
+        await createEvent({
+          title: `Study Session #${idx + 1}`,
+          date: s.start,
+          eventEnd: s.end,
+        });
+      }
+      setPlanInfo(`Added ${plannedSessions.length} sessions to calendar`);
+    } catch (e) {
+      setPlanInfo("Couldn't add to calendar");
+    } finally {
+      setIsScheduling(false);
+    }
+  };
+
   const startTimer = () => {
-    const now = currentDate.getTime();
-    const sessionEndTime = now + timeLeft * 1000;
+    // ask permission on user click
+    requestNotificationPermission();
+  const now = Date.now();
+  const sessionEndTime = now + timeLeft * 1000;
 
     setIsRunning(true);
-    setStartTime(now - (getDurationInSeconds() - timeLeft) * 1000);
+  setStartTime(now - (getDurationInSeconds() - timeLeft) * 1000);
     setEndTime(sessionEndTime);
   };
 
@@ -485,6 +592,135 @@ const PomodoroPage = () => {
                   Apply Settings
                 </button>
               </div>
+              {/* notifications */}
+              <div style={{ marginTop: "18px" }}>
+                <h3
+                  style={{
+                    marginBottom: "10px",
+                    fontSize: isMobile ? "16px" : "18px",
+                  }}
+                >
+                  Notifications
+                </h3>
+                <div>
+                  {(() => {
+                    const perm =
+                      typeof window === "undefined"
+                        ? "unknown"
+                        : !("Notification" in window)
+                        ? "unsupported"
+                        : Notification.permission;
+                    if (perm === "unsupported") {
+                      return (
+                        <div style={{ opacity: 0.8, fontSize: "14px" }}>
+                          Your browser doesn't support notifications
+                        </div>
+                      );
+                    }
+                    return (
+                      <>
+                        <button
+                          onClick={requestNotificationPermission}
+                          style={btn("enableNotif", perm === "granted")}
+                          onMouseEnter={() => setHoveredBtn("enableNotif")}
+                          onMouseLeave={() => setHoveredBtn(null)}
+                          disabled={perm === "granted"}
+                        >
+                          {perm === "granted" ? "Notifications Enabled" : "Enable Notifications"}
+                        </button>
+                        {typeof window !== "undefined" && !window.isSecureContext && (
+                          <div style={{ marginTop: "6px", opacity: 0.8, fontSize: "12px" }}>
+                          </div>
+                        )}
+                        {perm === "denied" && (
+                          <div style={{ marginTop: "6px", opacity: 0.8, fontSize: "12px" }}>
+                            Notifications are blocked. Use the site settings in your browser to allow them
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* study sessions */}
+              <h3
+                style={{
+                  marginTop: "20px",
+                  marginBottom: "10px",
+                  fontSize: isMobile ? "16px" : "18px",
+                }}
+              >
+                Plan Study Sessions
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                  gap: "10px",
+                  alignItems: "end",
+                }}
+              >
+                <div>
+                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                    Total study minutes:
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={totalStudyMinutes}
+                    onChange={(e) => setTotalStudyMinutes(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      borderRadius: "6px",
+                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      backgroundColor: theme === "dark" ? "#2d3748" : "white",
+                      color: theme === "dark" ? "white" : "black",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>
+                    Start date & time:
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={scheduleStart}
+                    onChange={(e) => setScheduleStart(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      borderRadius: "6px",
+                      border: theme === "dark" ? "1px solid #4a5568" : "1px solid #e2e8f0",
+                      backgroundColor: theme === "dark" ? "#2d3748" : "white",
+                      color: theme === "dark" ? "white" : "black",
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                <button
+                  onClick={planSessions}
+                  style={btn("plan")}
+                  onMouseEnter={() => setHoveredBtn("plan")}
+                  onMouseLeave={() => setHoveredBtn(null)}
+                >
+                  Plan
+                </button>
+                <button
+                  onClick={scheduleToCalendar}
+                  style={btn("schedule", isScheduling || !plannedSessions.length)}
+                  disabled={isScheduling || !plannedSessions.length}
+                  onMouseEnter={() => setHoveredBtn("schedule")}
+                  onMouseLeave={() => setHoveredBtn(null)}
+                >
+                  {isScheduling ? "Adding..." : "Add to Calendar"}
+                </button>
+              </div>
+              {planInfo && (
+                <div style={{ marginTop: "8px", opacity: 0.8, fontSize: "14px" }}>{planInfo}</div>
+              )}
             </div>
           )}
           {/* session info */}
@@ -583,7 +819,6 @@ const PomodoroPage = () => {
                     fontSize: isMobile ? "32px" : "48px",
                     fontWeight: "bold",
                     marginBottom: "5px",
-                    // use app font
                   }}
                 >
                   {formatTime(timeLeft)}

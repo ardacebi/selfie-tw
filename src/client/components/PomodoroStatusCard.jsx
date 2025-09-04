@@ -34,7 +34,7 @@ export const PomodoroStatusCard = ({ isMobile }) => {
           }
         } else {
           setPomodoroState({
-            timeLeft: 25 * 60,
+            timeLeft: 30 * 60,
             isRunning: false,
             sessionType: 'work',
             sessionCount: 0
@@ -43,7 +43,7 @@ export const PomodoroStatusCard = ({ isMobile }) => {
       } catch (error) {
         console.error('Error loading pomodoro state:', error);
         setPomodoroState({
-          timeLeft: 25 * 60,
+          timeLeft: 30 * 60,
           isRunning: false,
           sessionType: 'work',
           sessionCount: 0
