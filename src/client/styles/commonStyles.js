@@ -572,11 +572,11 @@ const commonStyles = {
       left: 0,
       width: "100%",
       height: "100%",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 1000,
+  zIndex: 2000,
     },
 
     newNoteFormContainer: (theme, wHeight) => ({
@@ -590,6 +590,8 @@ const commonStyles = {
       textAlign: "center",
       position: "absolute",
       top: wHeight / 2 - 150 + "px",
+      zIndex: 2100,
+      animation: "fadeInScale 120ms ease",
     }),
 
     newNoteButton: (theme, isMobile) => ({
@@ -1247,6 +1249,11 @@ const commonStyles = {
       /* Prevent mobile zoom on input focus */
       input, select, textarea {
         font-size: 16px !important; /* Prevents iOS zoom */
+      }
+
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
       }
 
       .no-scrollbar::-webkit-scrollbar {

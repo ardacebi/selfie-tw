@@ -31,9 +31,16 @@ app.use("/api/notes", NotesHandling);
 app.use("/api/events", EventHandling);
 app.use("/api/activities", ActivityHandling);
 
-app.use("*", async (req, res) => {
+app.use("*", async (req, res, next) => {
   try {
-    const url = req.originalUrl;
+    const url = req.originalUrl || "/";
+    const accept = req.headers.accept || "";
+    const isApi = url.startsWith("/api/");
+    const hasExt = !!path.extname(url);
+    const isHtmlNav = accept.includes("text/html");
+
+    if (isApi || hasExt || !isHtmlNav) return next();
+
     const template = await vite.transformIndexHtml(
       url,
       await fs.readFile(path.resolve("index.html"), "utf-8"),
