@@ -62,7 +62,9 @@ export const iCalendarGenerator = (eventData, currentDate) => {
     ? formatDateToICalendar(new Date(eventData.eventEnd))
     : dtstart;
 
-  if (!eventData.type === "basic") {
+  console.log("eventData in iCalendarGenerator:", eventData.type);
+
+  if (eventData.type === "basic") {
     const lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -79,39 +81,39 @@ export const iCalendarGenerator = (eventData, currentDate) => {
       "END:VCALENDAR",
     ];
     return lines.join("\r\n");
+  } else {
+    const rrule =
+      `FREQ=${frequencyMap(eventData.frequencyType)};INTERVAL=1;` +
+      (eventData.frequencyType === "yearly"
+        ? `BYMONTH=${fullDate(new Date(eventData.date).getUTCMonth() + 1)};`
+        : "") +
+      (eventData.frequencyType === "monthly" ||
+      eventData.frequencyType === "yearly"
+        ? `BYMONTHDAY=${fullDate(new Date(eventData.date).getUTCDate())};`
+        : "") +
+      (eventData.frequencyType === "weekly"
+        ? `BYDAY=${frequencyWeekDaysMap(eventData.frequencyWeekDays)};`
+        : "") +
+      (eventData.repetition > 1 ? `COUNT=${eventData.repetition};` : "");
+
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Alessandro D'Ambrosio e Arda Cebi//Selfie//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${dtstamp}`,
+      `DTSTART:${dtstart}`,
+      `DTEND:${dtend}`,
+      `RRULE:${rrule}`,
+      `SUMMARY:${eventData.title}`,
+      `DESCRIPTION:${eventData.description || ""}`,
+      `LOCATION:${eventData.location || ""}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ];
+    return lines.join("\r\n");
   }
-
-  const rrule =
-    `FREQ=${frequencyMap(eventData.frequencyType)};INTERVAL=1;` +
-    (eventData.frequencyType === "yearly"
-      ? `BYMONTH=${fullDate(new Date(eventData.date).getUTCMonth() + 1)};`
-      : "") +
-    (eventData.frequencyType === "monthly" ||
-    eventData.frequencyType === "yearly"
-      ? `BYMONTHDAY=${fullDate(new Date(eventData.date).getUTCDate())};`
-      : "") +
-    (eventData.frequencyType === "weekly"
-      ? `BYDAY=${frequencyWeekDaysMap(eventData.frequencyWeekDays)};`
-      : "") +
-    (eventData.repetition > 1 ? `COUNT=${eventData.repetition};` : "");
-
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Alessandro D'Ambrosio e Arda Cebi//Selfie//EN",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${dtstamp}`,
-    `DTSTART:${dtstart}`,
-    `DTEND:${dtend}`,
-    `RRULE:${rrule}`,
-    `SUMMARY:${eventData.title}`,
-    `DESCRIPTION:${eventData.description || ""}`,
-    `LOCATION:${eventData.location || ""}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ];
-  return lines.join("\r\n");
 };
 
 export const downloadICalendarFile = (iCalendarContent, fileName) => {
