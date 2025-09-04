@@ -1,24 +1,31 @@
 import { useContext, useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Form } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import fetchEventData from "../data_fetching/fetchEventData";
 import patchEventData from "../data_creation/patchEventData";
 import patchDeleteEvent from "../data_deletion/patchDeleteEvent";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { CurrentDateContext } from "../contexts/CurrentDateContext";
 import { FaExclamationCircle } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { IconContext } from "react-icons";
+import {
+  iCalendarGenerator,
+  downloadICalendarFile,
+} from "../components/iCalendar";
 import commonStyles from "../styles/commonStyles";
 import AnimatedBackButton from "../components/AnimatedBackButton";
 import BlurredWindow from "../components/BlurredWindow";
 import PageTransition from "../components/PageTransition";
+import Button from "../components/Button";
 import FormInput from "../components/FormInput";
 import FormButton from "../components/FormButton";
 import FormSelect from "../components/FormSelect";
 
 const EventsEditor = () => {
   const { theme } = useContext(ThemeContext);
+  const { currentDate } = useContext(CurrentDateContext);
   const { eventID } = useParams();
   const { currentUser } = useContext(CurrentUserContext);
 
@@ -173,6 +180,11 @@ const EventsEditor = () => {
       setError(error.message);
       setShowErrorBanner(true);
     }
+  };
+
+  const handleDownload = () => {
+    const iCalendarContent = iCalendarGenerator(eventData.data, currentDate);
+    downloadICalendarFile(iCalendarContent, `my_event.ics`);
   };
 
   const patchDeleteEventMutation = useMutation(patchDeleteEvent, {
@@ -476,6 +488,7 @@ const EventsEditor = () => {
 
                 <FormButton>Save</FormButton>
               </form>
+              <Button onClick={handleDownload}>Download</Button>
             </div>
           ) : (
             <p>Loading event...</p>
