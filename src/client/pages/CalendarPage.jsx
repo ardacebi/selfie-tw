@@ -37,7 +37,7 @@ const CalendarPage = () => {
   );
 
   const [calendarDate, setCalendarDate] = useState(currentDate);
-  const [zoomLevel, setZoomLevel] = useState(1); // 0 year, 1 month, 2 week
+  const [zoomLevel, setZoomLevel] = useState(1); // 0 year, 1 month, 2 week, 3 day
   const [eventCreateHovered, setEventCreateHovered] = useState(null);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 992,
@@ -177,8 +177,26 @@ const CalendarPage = () => {
   };
   // zoom +
   const increaseZoomLevel = () => {
-    if (zoomLevel < 2) setZoomLevel(zoomLevel + 1);
+    if (zoomLevel < 3) setZoomLevel(zoomLevel + 1);
   };
+  // prev day
+  const changeToPrevDay = () =>
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth(),
+        calendarDate.getDate() - 1,
+      ),
+    );
+  // next day
+  const changeToNextDay = () =>
+    setCalendarDate(
+      new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth(),
+        calendarDate.getDate() + 1,
+      ),
+    );
 
   // Format helpers
   const months = [
@@ -340,6 +358,7 @@ const CalendarPage = () => {
             remapDay={remapDay}
             error={error}
             setError={setError}
+            refetchAll={refetchEvents}
           />
         ) : (
           <DisplayActivities
@@ -612,7 +631,7 @@ const CalendarPage = () => {
     const isHovered = hoveredButton === buttonId;
     const isDisabled =
       (buttonId === "decreaseZoom" && zoomLevel === 0) ||
-      (buttonId === "increaseZoom" && zoomLevel === 2);
+  (buttonId === "increaseZoom" && zoomLevel === 3);
 
     const baseStyle = commonStyles.calendar.button(
       theme,
@@ -635,7 +654,19 @@ const CalendarPage = () => {
       ? commonStyles.calendar.container.year
       : zoomLevel === 1
         ? commonStyles.calendar.container.month
-        : commonStyles.calendar.container.week),
+        : zoomLevel === 2
+          ? commonStyles.calendar.container.week
+          : {
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gridTemplateRows: "auto",
+              gap: "5px",
+              padding: "10px",
+              borderRadius: "10px",
+              width: "100%",
+              maxWidth: "800px",
+              margin: "0 auto",
+            }),
     ...commonStyles.blurredBackdrop(theme),
     ...(responsiveStyles.container || {}),
     ...(zoomLevel === 0 && responsiveStyles.yearGrid
@@ -670,6 +701,43 @@ const CalendarPage = () => {
     ...(responsiveStyles.monthName || {}),
     color: theme === "dark" ? themeColors.textColor : "inherit",
     fontSize: isMobile ? "16px" : "20px",
+  };
+
+  // day view
+  const renderDayCalendar = () => {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+    const day = calendarDate.getDate();
+    const date = new Date(year, month, day);
+
+    const isToday =
+      currentDate.getDate() === day &&
+      currentDate.getMonth() === month &&
+      currentDate.getFullYear() === year;
+
+    return [
+      <div key={`day-header`} style={weekDayStyle}>
+        {date.toLocaleDateString(undefined, {
+          weekday: isMobile ? "short" : "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </div>,
+      <div
+        key={`day-box`}
+        style={{
+          ...getBoxStyle(date, isToday, false),
+          minHeight: isMobile ? "120px" : "200px",
+        }}
+        onClick={() => handleDateClick(year, month, day)}
+        onMouseEnter={() => setHoveredDay(date)}
+        onMouseLeave={() => setHoveredDay(null)}
+      >
+        {day}
+        <RenderCalendarEventsAndActivities i={day} date={date} />
+      </div>,
+    ];
   };
 
   return (
@@ -809,6 +877,28 @@ const CalendarPage = () => {
                 </button>
               </>
             )}
+            {zoomLevel === 3 && (
+              <>
+                <button
+                  className="global-hover"
+                  style={getButtonStyle("prevDay")}
+                  onClick={changeToPrevDay}
+                  onMouseEnter={() => setHoveredButton("prevDay")}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  <FaArrowLeft /> {isMobile ? "Prev" : "Previous Day"}
+                </button>
+                <button
+                  className="global-hover"
+                  style={getButtonStyle("nextDay")}
+                  onClick={changeToNextDay}
+                  onMouseEnter={() => setHoveredButton("nextDay")}
+                  onMouseLeave={() => setHoveredButton(null)}
+                >
+                  {isMobile ? "Next" : "Next Day"} <FaArrowRight />
+                </button>
+              </>
+            )}
           </ButtonContainer>
 
           <ButtonContainer>
@@ -826,7 +916,7 @@ const CalendarPage = () => {
               className="global-hover"
               style={getButtonStyle("increaseZoom")}
               onClick={increaseZoomLevel}
-              disabled={zoomLevel === 2}
+              disabled={zoomLevel === 3}
               onMouseEnter={() => setHoveredButton("increaseZoom")}
               onMouseLeave={() => setHoveredButton(null)}
             >
@@ -847,6 +937,7 @@ const CalendarPage = () => {
               {zoomLevel === 0 && renderYearCalendar()}
               {zoomLevel === 1 && renderMonthCalendar()}
               {zoomLevel === 2 && renderWeekCalendar()}
+              {zoomLevel === 3 && renderDayCalendar()}
             </div>
           </div>
 
