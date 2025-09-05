@@ -14,6 +14,7 @@ const Navbar = () => {
   const [isTooltipHovered, setIsTooltipHovered] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const buttonLeaveTimeoutRef = useRef(null);
   const navButtonsRef = useRef(new Map());
   const tooltipRef = useRef(null);
@@ -25,8 +26,9 @@ const Navbar = () => {
     window.addEventListener('resize', f);
     return () => window.removeEventListener('resize', f);
   }, []);
+  useEffect(() => { setHydrated(true); }, []);
   
-  const isDark = theme === 'dark';
+  const isDark = hydrated && theme === 'dark';
   const themeStyles = commonStyles.getThemeStyles(theme);
 
   const colors = {

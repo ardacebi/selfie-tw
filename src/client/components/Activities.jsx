@@ -33,6 +33,7 @@ export const NewActivityForm = ({
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const navigate = useNavigate();
+  const [notifyMe, setNotifyMe] = useState(false);
 
   const [windowHeight, setWindowHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight : 500,
@@ -69,11 +70,23 @@ export const NewActivityForm = ({
 
   const postNewActivityMutation = useMutation(postNewActivity, {
     onMutate: () => setShowErrorBanner(false),
-    onSuccess: () => {
+    onSuccess: (res) => {
       setError("");
       setShowErrorBanner(false);
       setShowForm(false);
       refetchAllActivitiesData();
+      try {
+        const key = "notify_activities";
+        const store = JSON.parse(localStorage.getItem(key) || "{}");
+        const id = res?.data?._id;
+        if (id) {
+          store[id] = !!notifyMe;
+          localStorage.setItem(key, JSON.stringify(store));
+        }
+        if (notifyMe && typeof window !== "undefined" && "Notification" in window) {
+          Notification.requestPermission?.();
+        }
+      } catch {}
     },
     onError: (err) => {
       setError(err.message);
@@ -141,6 +154,15 @@ export const NewActivityForm = ({
                 value={formattedEndDate || ""}
                 onChange={(e) => setFormattedEndDate(e.target.value)}
               />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+                <input
+                  id="act-notify"
+                  type="checkbox"
+                  checked={notifyMe}
+                  onChange={(e) => setNotifyMe(e.target.checked)}
+                />
+                <label htmlFor="act-notify" style={{ cursor: "pointer" }}>Notify me</label>
+              </div>
               <div style={{ marginTop: "10px" }}>
                 <FormButton>Create Activity</FormButton>
                 <FormButton onClick={cancelButtonClickHandler} type="button">

@@ -26,6 +26,7 @@ export const NewEventForm = ({
   const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const [notifyMe, setNotifyMe] = useState(false);
   const [windowHeight, setWindowHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight : 500,
   );
@@ -50,6 +51,15 @@ export const NewEventForm = ({
       setShowForm(false);
       refetchAllEventsData();
       const newEventId = res.data._id;
+      try {
+        const key = "notify_events";
+        const store = JSON.parse(localStorage.getItem(key) || "{}");
+        store[newEventId] = !!notifyMe;
+        localStorage.setItem(key, JSON.stringify(store));
+        if (notifyMe && typeof window !== "undefined" && "Notification" in window) {
+          Notification.requestPermission?.();
+        }
+      } catch {}
       navigate(`/calendar/${newEventId}`);
     },
     onError: (err) => {
@@ -95,6 +105,20 @@ export const NewEventForm = ({
                 required={true}
                 maxLength="20"
               />
+              <FormInput
+                name="description"
+                placeholder="Description"
+                maxLength="150"
+              />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+                <input
+                  id="evt-notify"
+                  type="checkbox"
+                  checked={notifyMe}
+                  onChange={(e) => setNotifyMe(e.target.checked)}
+                />
+                <label htmlFor="evt-notify" style={{ cursor: "pointer" }}>Notify me</label>
+              </div>
               <div style={{ marginTop: "10px" }}>
                 <FormButton>Create Event</FormButton>
                 <FormButton onClick={cancelButtonClickHandler} type="button">
