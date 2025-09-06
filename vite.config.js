@@ -7,9 +7,7 @@ export default defineConfig({
   },
   server: {
     hmr: false,
-    watch: {
-      ignored: ["**/node_modules/**"],
-    },
+    watch: null,
   },
   plugins: [react()],
 });
