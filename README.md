@@ -27,7 +27,7 @@ Il sito utilizza ssr rendering, utilizzando javascript solo nel momento in cui v
 La pagina di login e signup non richiede una vera mail (accetta anche email inventate, in modo da non dover creare varie mail usa e getta per la presentazione del progetto) e il nome utente deve essere diverso da tutti gli altri.
 Il calendario ha quattro livelli di zoom: annuale, mensile, settimanale e giornaliero. Ha due visualizzazioni: Eventi e Attività. Gli eventi sono a loro volta divisi in due: basic (in viola) e recurring (in blu). Ogni evento può essere modificato cliccandoci sopra e può anche essere eliminato o scaricato come file .ics seguendo lo standard iCalendar.
 Le Attività, invece, hanno vari colori in base al loro stato: quando sono passati meno della metà dei giorni dalla data di creazione dell'attività alla data di fine dell'attività, il colore è grigio (safe), quando si è oltre la metà il colore è giallo (risky), quando si è oltre i tre quarti o si ha superato la data di fine dell'attività (overdue), allore il colore è rosso (dangerous), infine quando si completa l'attività il colore diventa verde.
-**Arda spiega il Pomodoro**
+Il Pomodoro timer, permette lo studente di dividere il tempo di studio in intervalli con periodi di studio e pause. La durata delle sessioni di focus e delle pause possono essere personalizzata, e il timer supporta le funzioni di avvio, pausa e reset. L'interfaccia mostra lo stato corrente e l'avanzamento, e invia una notifica al cambio di fase.
 Le Note hanno un titolo e possono avere dei tag (che possono essere utili per visualizzare nella pagina di anteprima solo certe note e rendere più veloce la ricerca), il testo è visualizzato utilizzando markdown.
 
 ## Utilizzo dell'IA generativa
