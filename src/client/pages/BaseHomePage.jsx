@@ -14,7 +14,7 @@ import PageTransition from "../components/PageTransition";
 
 const BaseHomePage = ({ isMobile }) => {
   const { currentUser, isLoading } = useContext(CurrentUserContext);
-  const { theme, isTransitioning } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const { currentDate } = useContext(CurrentDateContext);
   const navigate = useNavigate();
   const location = useLocation();

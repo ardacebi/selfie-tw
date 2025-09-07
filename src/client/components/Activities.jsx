@@ -17,7 +17,8 @@ import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx
 import FormButton from "./FormButton.jsx";
 
 // days between two dates
-const getDayDiff = (date1, date2) => Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
+const getDayDiff = (date1, date2) =>
+  Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
 
 export const NewActivityForm = ({
   showForm,
@@ -83,7 +84,11 @@ export const NewActivityForm = ({
           store[id] = !!notifyMe;
           localStorage.setItem(key, JSON.stringify(store));
         }
-        if (notifyMe && typeof window !== "undefined" && "Notification" in window) {
+        if (
+          notifyMe &&
+          typeof window !== "undefined" &&
+          "Notification" in window
+        ) {
           Notification.requestPermission?.();
         }
       } catch {}
@@ -154,14 +159,23 @@ export const NewActivityForm = ({
                 value={formattedEndDate || ""}
                 onChange={(e) => setFormattedEndDate(e.target.value)}
               />
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginTop: "8px",
+                }}
+              >
                 <input
                   id="act-notify"
                   type="checkbox"
                   checked={notifyMe}
                   onChange={(e) => setNotifyMe(e.target.checked)}
                 />
-                <label htmlFor="act-notify" style={{ cursor: "pointer" }}>Notify me</label>
+                <label htmlFor="act-notify" style={{ cursor: "pointer" }}>
+                  Notify me
+                </label>
               </div>
               <div style={{ marginTop: "10px" }}>
                 <FormButton>Create Activity</FormButton>
@@ -509,7 +523,9 @@ export const ActivitiesSummary = ({
                 textDecoration: "underline",
               }}
             >
-              {activity.description}
+              {activity.description.length > 200
+                ? activity.description.substring(0, 200) + "..."
+                : activity.description}
             </div>
 
             <div style={{ margin: "10px", fontWeight: "bold" }}>
@@ -569,7 +585,11 @@ export const ActivitiesSummary = ({
   );
 };
 
-export const HomepageDisplayActivity = ({ activityData, isMobile, compact = false }) => {
+export const HomepageDisplayActivity = ({
+  activityData,
+  isMobile,
+  compact = false,
+}) => {
   const navigate = useNavigate();
   const { setCalendarViewMode } = useContext(CalendarViewModeContext);
   const { currentDate } = useContext(CurrentDateContext);
@@ -661,7 +681,9 @@ export const HomepageDisplayActivity = ({ activityData, isMobile, compact = fals
           textDecoration: "underline",
         }}
       >
-        {activityData.description}
+        {activityData.description.length > 200
+          ? activityData.description.substring(0, 200) + "..."
+          : activityData.description}
       </div>
 
       <div style={{ margin: "10px", fontWeight: "bold" }}>

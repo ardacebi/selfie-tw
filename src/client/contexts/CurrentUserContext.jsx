@@ -8,7 +8,12 @@ const CurrentUserProvider = ({ children }) => {
 
   useEffect(() => {
     const s = localStorage.getItem("currentUser");
-    if (s) try { setCurrentUser(JSON.parse(s)); } catch { localStorage.removeItem("currentUser"); }
+    if (s)
+      try {
+        setCurrentUser(JSON.parse(s));
+      } catch {
+        localStorage.removeItem("currentUser");
+      }
     setIsLoading(false);
   }, []);
 
@@ -19,7 +24,9 @@ const CurrentUserProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser, isLoading }}>
+    <CurrentUserContext.Provider
+      value={{ currentUser, setCurrentUser, isLoading }}
+    >
       {children}
     </CurrentUserContext.Provider>
   );

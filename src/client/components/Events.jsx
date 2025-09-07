@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import commonStyles from "../styles/commonStyles.js";
 import FormInput from "./FormInput";
 import { FaExclamationCircle } from "react-icons/fa";
-import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { CurrentUserContext } from "../contexts/CurrentUserContext.jsx";
 import postNewEvent from "../data_creation/postNewEvent.js";
@@ -24,7 +23,6 @@ export const NewEventForm = ({
   setError,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { currentDate } = useContext(CurrentDateContext);
   const { currentUser } = useContext(CurrentUserContext);
   const [notifyMe, setNotifyMe] = useState(false);
   const [windowHeight, setWindowHeight] = useState(
@@ -56,7 +54,11 @@ export const NewEventForm = ({
         const store = JSON.parse(localStorage.getItem(key) || "{}");
         store[newEventId] = !!notifyMe;
         localStorage.setItem(key, JSON.stringify(store));
-        if (notifyMe && typeof window !== "undefined" && "Notification" in window) {
+        if (
+          notifyMe &&
+          typeof window !== "undefined" &&
+          "Notification" in window
+        ) {
           Notification.requestPermission?.();
         }
       } catch {}
@@ -110,14 +112,23 @@ export const NewEventForm = ({
                 placeholder="Description"
                 maxLength="150"
               />
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginTop: "8px",
+                }}
+              >
                 <input
                   id="evt-notify"
                   type="checkbox"
                   checked={notifyMe}
                   onChange={(e) => setNotifyMe(e.target.checked)}
                 />
-                <label htmlFor="evt-notify" style={{ cursor: "pointer" }}>Notify me</label>
+                <label htmlFor="evt-notify" style={{ cursor: "pointer" }}>
+                  Notify me
+                </label>
               </div>
               <div style={{ marginTop: "10px" }}>
                 <FormButton>Create Event</FormButton>
@@ -157,8 +168,8 @@ const eventsFilterer = (allEvents, date, remapDay) => {
     } else {
       if (date < eventStart) return false;
 
-  const millisecondsInADay = 86400000; // 1 day
-  const diffDays = Math.floor((date - eventStart) / millisecondsInADay); // days since start
+      const millisecondsInADay = 86400000; // 1 day
+      const diffDays = Math.floor((date - eventStart) / millisecondsInADay); // days since start
       const yearDiff = date.getFullYear() - eventStart.getFullYear();
 
       switch (e.frequencyType) {
@@ -251,25 +262,19 @@ export const DisplayEvents = ({
                 hoveredEvent === event._id,
               )}
             >
-              <div style={{ margin: "5px", fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
+              <div
+                style={{
+                  margin: "5px",
+                  fontWeight: "bold",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
                 {isMobile && event.title.length > 9
                   ? `${event.title.slice(0, 9)}...`
                   : event.title}
-                {/* show delete for simple study sessions */}
-                {event.type === "basic" && (
-                  <button
-                    title="Delete"
-                    onClick={(e) => handleDelete(e, event._id)}
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    <RiDeleteBin5Fill size={isMobile ? 14 : 16} color={theme === "dark" ? "#e2e8f0" : "#2d3748"} />
-                  </button>
-                )}
               </div>
               <div style={{ fontSize: isMobile ? "9px" : "10px" }}>
                 {event.description && isMobile && event.description?.length > 40
@@ -283,7 +288,11 @@ export const DisplayEvents = ({
   );
 };
 
-export const HomepageDisplayEvent = ({ eventData, isMobile, compact = false }) => {
+export const HomepageDisplayEvent = ({
+  eventData,
+  isMobile,
+  compact = false,
+}) => {
   const navigate = useNavigate();
   const { setCalendarViewMode } = useContext(CalendarViewModeContext);
   const [hovered, setHovered] = useState(false);

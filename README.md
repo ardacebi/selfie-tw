@@ -22,7 +22,7 @@
 
 ## Scelte Implementative:
 
-Questo progetto utilizza Node.js come backend, MongoDB come database, React come framework e Vite come build tool. L'applicazione è basata su un MERN Stack per gestire frontend, backend e database. La stilizzazione del sito è gestita da un file CSS-in-JS, per cui gli stili vengono definiti come oggetti Javascript, rendendo l'approccio modulare.
+Questo progetto utilizza Node.js come backend, MongoDB come database, React come framework e Vite come build tool. L'applicazione è basata su un MERN Stack per gestire frontend, backend e database. La stilizzazione del sito è gestita da un file CSS-in-JS, per cui gli stili vengono definiti come oggetti Javascript, rendendo l'approccio modulare. Prettier è stato utilizzato per la formattazione del codice.
 Il sito utilizza ssr rendering, utilizzando javascript solo nel momento in cui viene richiesto dall'utente. Una sola porta così gestisce contemporaneamente sia server che client.
 La pagina di login e signup non richiede una vera mail (accetta anche email inventate, in modo da non dover creare varie mail usa e getta per la presentazione del progetto) e il nome utente deve essere diverso da tutti gli altri.
 Il calendario ha quattro livelli di zoom: annuale, mensile, settimanale e giornaliero. Ha due visualizzazioni: Eventi e Attività. Gli eventi sono a loro volta divisi in due: basic (in viola) e recurring (in blu). Ogni evento può essere modificato cliccandoci sopra e può anche essere eliminato o scaricato come file .ics seguendo lo standard iCalendar.

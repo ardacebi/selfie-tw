@@ -1,6 +1,3 @@
-import { useContext } from "react";
-import { CurrentDateContext } from "../contexts/CurrentDateContext";
-
 const fullDate = (n) => (n < 10 ? "0" + n : n);
 
 const frequencyMap = (type) => {

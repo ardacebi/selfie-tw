@@ -405,7 +405,14 @@ const NotesPage = () => {
                   >
                     <div style={commonStyles.notes.noteContent}>
                       <div>
-                        <h2>{note.title}</h2>
+                        <h2
+                          style={{
+                            wordWrap: "break-word",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {note.title}
+                        </h2>
                         <p style={commonStyles.notes.notesDate(theme)}>
                           Created on:{" "}
                           {new Date(note.creationDate).toLocaleDateString()} |

@@ -42,7 +42,9 @@ const App = () => {
   }, []);
 
   // preload saved user (not the real session)
-  useEffect(() => { setCurrentUser(savedUser()); }, [setCurrentUser]);
+  useEffect(() => {
+    setCurrentUser(savedUser());
+  }, [setCurrentUser]);
 
   // browser address bar color on mobile
   useEffect(() => {
@@ -67,14 +69,14 @@ const App = () => {
 
   return (
     <>
-  {/* page bg overlay */}
-  <div
+      {/* page bg overlay */}
+      <div
         className={`page-background ${isTransitioning ? "transitioning" : ""}`}
       ></div>
 
       <div style={{ ...commonStyles.appShell.page, color: colors.text }}>
-    {/* top bars */}
-    <Navbar />
+        {/* top bars */}
+        <Navbar />
         <SubNavbar />
         <TimeMachine />
         <main
@@ -86,13 +88,13 @@ const App = () => {
           }}
         >
           <Routes>
-      {/* public pages */}
+            {/* public pages */}
             <Route path="/" element={<BaseHomePage isMobile={isMobile} />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/sign_up" element={<SignUpForm />} />
             <Route path="/forgot_password" element={<ForgotPasswordForm />} />
 
-      {/* logged-in stuff */}
+            {/* logged-in stuff */}
             <Route
               path="/calendar"
               element={
