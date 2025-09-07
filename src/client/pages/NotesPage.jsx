@@ -181,6 +181,76 @@ const NotesPage = () => {
   return (
     <PageTransition>
       <div style={{ color: theme === "dark" ? "white" : "black" }}>
+        {showNewNoteForm && (
+          <div style={commonStyles.notes.newNoteFormOverlay}>
+            <div
+              style={commonStyles.notes.newNoteFormContainer(
+                theme,
+                windowHeight,
+              )}
+            >
+              <form onSubmit={handleNewNoteSubmit}>
+                <FormInput
+                  name="title"
+                  placeholder="Title"
+                  required={true}
+                  maxLength="50"
+                />
+                <FormInput
+                  name="tags"
+                  placeholder="Tags (comma separated)"
+                  required={false}
+                />
+                <div style={{ marginTop: "10px" }}>
+                  <button
+                    type="submit"
+                    onMouseEnter={() => setCreateNoteHover(true)}
+                    onMouseLeave={() => setCreateNoteHover(false)}
+                    style={{
+                      ...commonStyles.notes.createNoteButton(theme, false),
+                      ...(createNoteHover
+                        ? commonStyles.notes.noteButtonHover(theme)
+                        : {}),
+                    }}
+                  >
+                    Create Note
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewNoteForm(false);
+                      setCancelNoteHover(false);
+                      setCreateNoteHover(false);
+                      setShowErrorBanner(false);
+                      setError("");
+                    }}
+                    onMouseEnter={() => setCancelNoteHover(true)}
+                    onMouseLeave={() => setCancelNoteHover(false)}
+                    style={{
+                      ...commonStyles.notes.cancelNoteButton(theme),
+                      ...(cancelNoteHover
+                        ? commonStyles.notes.noteButtonHover(theme)
+                        : {}),
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+
+              <div
+                style={commonStyles.getBannerStyle(
+                  "errorBannerStyle",
+                  showErrorBanner,
+                  theme,
+                )}
+              >
+                <FaExclamationCircle style={commonStyles.bannerIconStyle} />
+                <span>{error}</span>
+              </div>
+            </div>
+          </div>
+        )}
         <BlurredWindow
           width={isMobile ? "95%" : "850px"}
           padding={isMobile ? "10px" : "20px"}
@@ -309,77 +379,6 @@ const NotesPage = () => {
                 )}
               </div>
             </div>
-
-            {showNewNoteForm && (
-              <div style={commonStyles.notes.newNoteFormOverlay}>
-                <div
-                  style={commonStyles.notes.newNoteFormContainer(
-                    theme,
-                    windowHeight,
-                  )}
-                >
-                  <form onSubmit={handleNewNoteSubmit}>
-                    <FormInput
-                      name="title"
-                      placeholder="Title"
-                      required={true}
-                      maxLength="50"
-                    />
-                    <FormInput
-                      name="tags"
-                      placeholder="Tags (comma separated)"
-                      required={false}
-                    />
-                    <div style={{ marginTop: "10px" }}>
-                      <button
-                        type="submit"
-                        onMouseEnter={() => setCreateNoteHover(true)}
-                        onMouseLeave={() => setCreateNoteHover(false)}
-                        style={{
-                          ...commonStyles.notes.createNoteButton(theme, false),
-                          ...(createNoteHover
-                            ? commonStyles.notes.noteButtonHover(theme)
-                            : {}),
-                        }}
-                      >
-                        Create Note
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowNewNoteForm(false);
-                          setCancelNoteHover(false);
-                          setCreateNoteHover(false);
-                          setShowErrorBanner(false);
-                          setError("");
-                        }}
-                        onMouseEnter={() => setCancelNoteHover(true)}
-                        onMouseLeave={() => setCancelNoteHover(false)}
-                        style={{
-                          ...commonStyles.notes.cancelNoteButton(theme),
-                          ...(cancelNoteHover
-                            ? commonStyles.notes.noteButtonHover(theme)
-                            : {}),
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-
-                  <div
-                    style={commonStyles.getBannerStyle(
-                      "errorBannerStyle",
-                      showErrorBanner,
-                      theme,
-                    )}
-                  >
-                    <FaExclamationCircle style={commonStyles.bannerIconStyle} />
-                    <span>{error}</span>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {sortedNotes.length === 0 && (
               <div>

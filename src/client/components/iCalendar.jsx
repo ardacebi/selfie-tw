@@ -62,8 +62,6 @@ export const iCalendarGenerator = (eventData, currentDate) => {
     ? formatDateToICalendar(new Date(eventData.eventEnd))
     : dtstart;
 
-  console.log("eventData in iCalendarGenerator:", eventData.type);
-
   if (eventData.type === "basic") {
     const lines = [
       "BEGIN:VCALENDAR",
