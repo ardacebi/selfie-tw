@@ -1,6 +1,3 @@
-import { useContext } from "react";
-import { CurrentDateContext } from "../contexts/CurrentDateContext";
-
 const fullDate = (n) => (n < 10 ? "0" + n : n);
 
 const frequencyMap = (type) => {
@@ -61,8 +58,6 @@ export const iCalendarGenerator = (eventData, currentDate) => {
   const dtend = eventData.eventEnd
     ? formatDateToICalendar(new Date(eventData.eventEnd))
     : dtstart;
-
-  console.log("eventData in iCalendarGenerator:", eventData.type);
 
   if (eventData.type === "basic") {
     const lines = [

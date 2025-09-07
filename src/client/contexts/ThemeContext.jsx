@@ -3,9 +3,18 @@ import { createContext, useState, useEffect } from "react";
 const ThemeContext = createContext(null);
 
 const ThemeProvider = ({ children }) => {
-  const sys = () => (window?.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light");
-  const [theme, setTheme] = useState(() => (typeof window === "undefined" ? "light" : localStorage.getItem("theme") || sys()));
-  const [isSystemTheme, setIsSystemTheme] = useState(() => (typeof window === "undefined" ? true : !localStorage.getItem("theme")));
+  const sys = () =>
+    window?.matchMedia?.("(prefers-color-scheme: dark)")?.matches
+      ? "dark"
+      : "light";
+  const [theme, setTheme] = useState(() =>
+    typeof window === "undefined"
+      ? "light"
+      : localStorage.getItem("theme") || sys(),
+  );
+  const [isSystemTheme, setIsSystemTheme] = useState(() =>
+    typeof window === "undefined" ? true : !localStorage.getItem("theme"),
+  );
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
@@ -17,7 +26,9 @@ const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     document?.documentElement?.classList.remove("dark-theme", "light-theme");
-    document?.documentElement?.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
+    document?.documentElement?.classList.add(
+      theme === "dark" ? "dark-theme" : "light-theme",
+    );
   }, [theme]);
 
   useEffect(() => {
@@ -28,7 +39,9 @@ const ThemeProvider = ({ children }) => {
   }, [isSystemTheme]);
 
   useEffect(() => {
-    isSystemTheme ? localStorage.removeItem("theme") : localStorage.setItem("theme", theme);
+    isSystemTheme
+      ? localStorage.removeItem("theme")
+      : localStorage.setItem("theme", theme);
   }, [theme, isSystemTheme]);
 
   const toggleTheme = () => {
@@ -47,7 +60,15 @@ const ThemeProvider = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isSystemTheme, resetToSystemTheme, isTransitioning }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        isSystemTheme,
+        resetToSystemTheme,
+        isTransitioning,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

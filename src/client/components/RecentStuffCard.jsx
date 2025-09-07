@@ -151,11 +151,11 @@ const RecentStuffCard = ({ isMobile }) => {
   }, [items, currentIndex]);
 
   return (
-    <BlurredWindow 
-      width="500px" 
+    <BlurredWindow
+      width="500px"
       padding={isMobile ? "20px" : "30px"}
-      style={{ 
-        marginTop: "20px"
+      style={{
+        marginTop: "20px",
       }}
     >
       {items[currentIndex] ? (

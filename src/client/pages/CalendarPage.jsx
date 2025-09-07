@@ -6,8 +6,6 @@ import { CalendarViewModeContext } from "../contexts/CalendarViewModeContext.jsx
 import {
   FaArrowLeft,
   FaArrowRight,
-  FaHome,
-  FaSearch,
   FaSearchMinus,
   FaSearchPlus,
   FaExclamationCircle,
@@ -139,7 +137,8 @@ const CalendarPage = () => {
     const setStore = (k, v) => localStorage.setItem(k, JSON.stringify(v));
     const playChime = () => {
       if (typeof window === "undefined" || !window.AudioContext) return;
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       oscillator.connect(gainNode);
@@ -147,7 +146,10 @@ const CalendarPage = () => {
       oscillator.frequency.value = 700;
       oscillator.type = "sine";
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.5,
+      );
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
     };
@@ -187,7 +189,7 @@ const CalendarPage = () => {
               break;
             }
           }
-      });
+        });
 
       // activities
       const notifyActs = getStore("notify_activities");
@@ -366,13 +368,13 @@ const CalendarPage = () => {
       date &&
       date.toDateString() === selectedDate.toDateString();
 
-  // box base
-  const baseBoxStyle = {
+    // box base
+    const baseBoxStyle = {
       ...commonStyles.calendar.box.base(isMobile),
       ...(zoomLevel === 2 ? { minHeight: isMobile ? "50px" : "80px" } : {}),
     };
-  // box state styles
-  const boxStyle = {
+    // box state styles
+    const boxStyle = {
       ...baseBoxStyle,
       ...(isSelected && {
         ...commonStyles.calendar.box.selected,
@@ -410,8 +412,8 @@ const CalendarPage = () => {
         WebkitBackdropFilter: "blur(10px)",
       }),
     };
-  // hover check
-  const isHovered =
+    // hover check
+    const isHovered =
       hoveredDay && date && date.toDateString() === hoveredDay.toDateString();
     const hoverStyles = isHovered
       ? {
@@ -464,7 +466,9 @@ const CalendarPage = () => {
             e.stopPropagation();
             try {
               setShowQuickCreate(true);
-              setQuickType(calendarViewMode === "events" ? "event" : "activity");
+              setQuickType(
+                calendarViewMode === "events" ? "event" : "activity",
+              );
               setQuickDate(date);
               setQuickTitle("");
               setQuickDesc("");
@@ -545,8 +549,8 @@ const CalendarPage = () => {
     const firstDay = findFirstDay(year, month);
     let allDays = [];
 
-  // week days
-  ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
+    // week days
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       const displayDay =
         windowWidth < 576
           ? day.charAt(0)
@@ -572,8 +576,8 @@ const CalendarPage = () => {
         </div>,
       );
     });
-  // leading blanks
-  for (let i = 0; i < firstDay; i++) {
+    // leading blanks
+    for (let i = 0; i < firstDay; i++) {
       allDays.push(
         <div
           key={`empty-${i}`}
@@ -587,8 +591,8 @@ const CalendarPage = () => {
         ></div>,
       );
     }
-  // days
-  for (let i = 1; i <= totalDays; i++) {
+    // days
+    for (let i = 1; i <= totalDays; i++) {
       const date = new Date(year, month, i);
 
       const isToday =
@@ -764,7 +768,7 @@ const CalendarPage = () => {
     const isHovered = hoveredButton === buttonId;
     const isDisabled =
       (buttonId === "decreaseZoom" && zoomLevel === 0) ||
-  (buttonId === "increaseZoom" && zoomLevel === 3);
+      (buttonId === "increaseZoom" && zoomLevel === 3);
 
     const baseStyle = commonStyles.calendar.button(
       theme,
@@ -960,9 +964,15 @@ const CalendarPage = () => {
 
           {/* create popup */}
           {showQuickCreate && (
-            <div style={commonStyles.notes.newNoteFormOverlay} onClick={() => setShowQuickCreate(false)}>
+            <div
+              style={commonStyles.notes.newNoteFormOverlay}
+              onClick={() => setShowQuickCreate(false)}
+            >
               <div
-                style={commonStyles.notes.newNoteFormContainer(theme, typeof window !== "undefined" ? window.innerHeight : 600)}
+                style={commonStyles.notes.newNoteFormContainer(
+                  theme,
+                  typeof window !== "undefined" ? window.innerHeight : 600,
+                )}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
@@ -973,23 +983,49 @@ const CalendarPage = () => {
                   placeholder="Title"
                   value={quickTitle}
                   onChange={(e) => setQuickTitle(e.target.value)}
-                  style={{ width: "100%", padding: "8px", borderRadius: "6px", marginBottom: "6px" }}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    marginBottom: "6px",
+                  }}
                 />
                 <input
                   type="text"
                   placeholder="Description"
                   value={quickDesc}
                   onChange={(e) => setQuickDesc(e.target.value)}
-                  style={{ width: "100%", padding: "8px", borderRadius: "6px", marginBottom: "6px" }}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    marginBottom: "6px",
+                  }}
                 />
-                <div style={{ fontSize: "12px", opacity: 0.8, marginBottom: "8px" }}>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.8,
+                    marginBottom: "8px",
+                  }}
+                >
                   {quickType === "event"
                     ? `Date: ${new Date(quickDate).toLocaleDateString()} at ${quickTime}`
                     : `Ends: ${new Date(quickDate).toLocaleDateString()}`}
                 </div>
                 {quickType === "event" && (
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", margin: "6px 0", justifyContent: "center" }}>
-                    <span style={{ minWidth: 40, textAlign: "right" }}>Time</span>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      margin: "6px 0",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <span style={{ minWidth: 40, textAlign: "right" }}>
+                      Time
+                    </span>
                     <input
                       type="time"
                       value={quickTime}
@@ -998,18 +1034,38 @@ const CalendarPage = () => {
                     />
                   </label>
                 )}
-                <label style={{ display: "flex", alignItems: "center", gap: "8px", margin: "6px 0" }}>
-                  <input type="checkbox" checked={quickNotify} onChange={(e) => setQuickNotify(e.target.checked)} />
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    margin: "6px 0",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={quickNotify}
+                    onChange={(e) => setQuickNotify(e.target.checked)}
+                  />
                   Notify me (browser notification)
                 </label>
-                <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "8px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    justifyContent: "center",
+                    marginTop: "8px",
+                  }}
+                >
                   <button
                     style={commonStyles.calendar.button(theme)}
                     onClick={async () => {
                       if (!quickTitle || !quickDate || !currentUser) return;
                       try {
                         if (quickType === "event") {
-                          const [hh, mm] = (quickTime || "09:00").split(":").map((n) => parseInt(n, 10));
+                          const [hh, mm] = (quickTime || "09:00")
+                            .split(":")
+                            .map((n) => parseInt(n, 10));
                           const eventDate = new Date(quickDate);
                           if (!Number.isNaN(hh) && !Number.isNaN(mm)) {
                             eventDate.setHours(hh, mm, 0, 0);
@@ -1024,11 +1080,17 @@ const CalendarPage = () => {
                           const id = res?.data?._id;
                           if (id) {
                             const key = "notify_events";
-                            const store = JSON.parse(localStorage.getItem(key) || "{}");
+                            const store = JSON.parse(
+                              localStorage.getItem(key) || "{}",
+                            );
                             store[id] = !!quickNotify;
                             localStorage.setItem(key, JSON.stringify(store));
                           }
-                          if (quickNotify && typeof window !== "undefined" && "Notification" in window) {
+                          if (
+                            quickNotify &&
+                            typeof window !== "undefined" &&
+                            "Notification" in window
+                          ) {
                             Notification.requestPermission?.();
                           }
                           refetchEvents();
@@ -1037,17 +1099,25 @@ const CalendarPage = () => {
                             title: quickTitle,
                             description: quickDesc || undefined,
                             startDate: currentDate,
-                            endDate: new Date(new Date(quickDate).toDateString()),
+                            endDate: new Date(
+                              new Date(quickDate).toDateString(),
+                            ),
                             userID: currentUser,
                           });
                           const id = res?.data?._id;
                           if (id) {
                             const key = "notify_activities";
-                            const store = JSON.parse(localStorage.getItem(key) || "{}");
+                            const store = JSON.parse(
+                              localStorage.getItem(key) || "{}",
+                            );
                             store[id] = !!quickNotify;
                             localStorage.setItem(key, JSON.stringify(store));
                           }
-                          if (quickNotify && typeof window !== "undefined" && "Notification" in window) {
+                          if (
+                            quickNotify &&
+                            typeof window !== "undefined" &&
+                            "Notification" in window
+                          ) {
                             Notification.requestPermission?.();
                           }
                           refetchActivities();

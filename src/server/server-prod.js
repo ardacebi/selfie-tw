@@ -47,7 +47,8 @@ app.use("*", async (req, res) => {
   }
 });
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
+
   connectDB();
   console.log(`http://localhost:${port}`);
 });

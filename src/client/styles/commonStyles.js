@@ -572,11 +572,11 @@ const commonStyles = {
       left: 0,
       width: "100%",
       height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-  zIndex: 2000,
+      zIndex: 2000,
     },
 
     newNoteFormContainer: (theme, wHeight) => ({
@@ -902,7 +902,6 @@ const commonStyles = {
       color: "#000",
       border: "none",
       borderRadius: "5px",
-      cursor: "pointer",
       zIndex: 1000,
       transform: isVisible
         ? isMobile
